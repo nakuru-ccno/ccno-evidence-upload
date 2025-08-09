@@ -42,11 +42,24 @@
     .btn-custom:hover {
       background-color: #7f0000;
     }
+    #uploadArea {
+      margin-top: 12px;
+      display: none;
+    }
+    .progress {
+      height: 18px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
+  <p style="text-align:center; margin-bottom:20px;">
+    <a href="https://sites.google.com/view/ccnoevidences/home" target="_blank" style="color:#006400; font-weight:700; text-decoration:underline;">
+      Go to CCNO Evidence Home
+    </a>
+  </p>
+
   <h2>Nakuru County CCNO Evidence Upload</h2>
   <form id="uploadForm" novalidate>
     <div class="mb-3">
@@ -71,15 +84,38 @@
       <div class="invalid-feedback">Please select a sub county.</div>
     </div>
 
-    <!-- You can add your file upload input here -->
+    <div class="mb-3">
+      <label for="file" class="form-label">Choose PDF file(s) (max 3MB each, up to 10 files):</label>
+      <input type="file" class="form-control" id="file" accept="application/pdf" multiple required />
+      <div class="form-text">You can select multiple PDF files (maximum 10). Files larger than 3MB will be rejected.</div>
+      <div class="invalid-feedback">Please select at least one PDF file (max 3MB each).</div>
+    </div>
 
-    <button type="submit" class="btn btn-custom">Submit</button>
+    <button type="submit" id="uploadBtn" class="btn btn-custom">Upload PDF Evidence</button>
+
+    <div id="uploadArea">
+      <div class="d-flex justify-content-center mb-2">
+        <div class="spinner-border text-success" role="status" id="spinner" aria-hidden="true"></div>
+      </div>
+      <div class="progress">
+        <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%;">0%</div>
+      </div>
+    </div>
   </form>
+
+  <div id="result" class="mt-3" style="text-align:center; font-weight:600;"></div>
 </div>
 
 <script>
   const categorySelect = document.getElementById('category');
   const subCountySelect = document.getElementById('subCounty');
+  const uploadForm = document.getElementById('uploadForm');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const resultDiv = document.getElementById('result');
+  const uploadArea = document.getElementById('uploadArea');
+  const progressBar = document.getElementById('progressBar');
+  const spinner = document.getElementById('spinner');
+  const fileInput = document.getElementById('file');
 
   async function loadData() {
     try {
@@ -111,17 +147,92 @@
 
   loadData();
 
-  // Optional: form validation on submit
-  const form = document.getElementById('uploadForm');
-  form.addEventListener('submit', (e) => {
-    if (!form.checkValidity()) {
-      e.preventDefault();
-      e.stopPropagation();
-      form.classList.add('was-validated');
-    } else {
-      e.preventDefault();
-      alert('Form ready to submit. (Add your submission logic)');
-      // Here you can add your form submission code (e.g., POST to your Apps Script)
+  function readFileAsArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (e) => reject(e);
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function uploadSingleFile(base64Data, evidenceName, folderId, subCounty, fileName) {
+    // Adjust if your backend supports fetch or google.script.run
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(err => reject(new Error(err?.message || err)))
+        .uploadEvidence(base64Data, evidenceName, folderId, subCounty, fileName);
+    });
+  }
+
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resultDiv.textContent = '';
+    if (!uploadForm.checkValidity()) {
+      uploadForm.classList.add('was-validated');
+      return;
+    }
+
+    const evidenceName = document.getElementById('evidenceName').value.trim();
+    const folderId = categorySelect.value;
+    const subCounty = subCountySelect.value;
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+      fileInput.classList.add('is-invalid');
+      return;
+    }
+
+    // Limit files to 10 max
+    const files = Array.from(fileInput.files).slice(0, 10);
+    if (files.length > 10) {
+      resultDiv.innerHTML = '<div class="text-danger">You selected more than 10 files — only the first 10 will be uploaded.</div>';
+    }
+
+    // Validate each file
+    for (const file of files) {
+      if (file.type !== 'application/pdf') {
+        resultDiv.innerHTML = `<div class="text-danger">Only PDF files allowed. "${file.name}" is not a PDF.</div>`;
+        return;
+      }
+      if (file.size > 3 * 1024 * 1024) {
+        resultDiv.innerHTML = `<div class="text-danger">Each file must be ≤3MB. "${file.name}" is too large.</div>`;
+        return;
+      }
+    }
+
+    uploadBtn.disabled = true;
+    uploadArea.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    spinner.style.display = 'inline-block';
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const arrayBuffer = await readFileAsArrayBuffer(file);
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let b = 0; b < bytes.byteLength; b++) {
+          binary += String.fromCharCode(bytes[b]);
+        }
+        const base64Data = btoa(binary);
+
+        await uploadSingleFile(base64Data, evidenceName, folderId, subCounty, file.name);
+
+        // Update progress
+        const percent = Math.round(((i + 1) / files.length) * 100);
+        progressBar.style.width = `${percent}%`;
+        progressBar.textContent = `${percent}%`;
+      }
+      resultDiv.innerHTML = '<p class="text-success fw-bold">✅ All file(s) uploaded successfully!</p>';
+      uploadForm.reset();
+      uploadForm.classList.remove('was-validated');
+    } catch (err) {
+      resultDiv.innerHTML = `<p class="text-danger fw-bold">❌ Upload failed: ${err.message || err}</p>`;
+    } finally {
+      uploadBtn.disabled = false;
+      spinner.style.display = 'none';
     }
   });
 </script>
