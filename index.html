@@ -42,26 +42,19 @@
     .btn-custom:hover {
       background-color: #7f0000;
     }
-    #uploadArea {
-      margin-top: 12px;
-      display: none;
-    }
-    .progress {
-      height: 18px;
-    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <p style="text-align:center; margin-bottom:20px;">
-    <a href="https://sites.google.com/view/ccnoevidences/home" target="_blank" style="color:#006400; font-weight:700; text-decoration:underline;">
-      Go to CCNO Evidence Home
-    </a>
-  </p>
-
   <h2>Nakuru County CCNO Evidence Upload</h2>
-  <form id="uploadForm" novalidate>
+  
+  <!-- Link to the external site -->
+  <div class="mb-4">
+    <a href="https://sites.google.com/view/ccnoevidences/home" target="_blank" class="btn btn-link">Visit CCNO Evidence Portal</a>
+  </div>
+
+  <form id="uploadForm" novalidate enctype="multipart/form-data">
     <div class="mb-3">
       <label for="evidenceName" class="form-label">Evidence Name:</label>
       <input type="text" class="form-control" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
@@ -85,46 +78,30 @@
     </div>
 
     <div class="mb-3">
-      <label for="file" class="form-label">Choose PDF file(s) (max 3MB each, up to 10 files):</label>
-      <input type="file" class="form-control" id="file" accept="application/pdf" multiple required />
-      <div class="form-text">You can select multiple PDF files (maximum 10). Files larger than 3MB will be rejected.</div>
-      <div class="invalid-feedback">Please select at least one PDF file (max 3MB each).</div>
+      <label for="fileUpload" class="form-label">Choose PDF file(s) (max 3MB each, up to 10 files):</label>
+      <input type="file" class="form-control" id="fileUpload" accept=".pdf" multiple required />
+      <div class="invalid-feedback">Please select PDF files (max 3MB each, up to 10 files).</div>
     </div>
 
-    <button type="submit" id="uploadBtn" class="btn btn-custom">Upload PDF Evidence</button>
-
-    <div id="uploadArea">
-      <div class="d-flex justify-content-center mb-2">
-        <div class="spinner-border text-success" role="status" id="spinner" aria-hidden="true"></div>
-      </div>
-      <div class="progress">
-        <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%;">0%</div>
-      </div>
-    </div>
+    <button type="submit" class="btn btn-custom">Submit</button>
   </form>
 
-  <div id="result" class="mt-3" style="text-align:center; font-weight:600;"></div>
+  <div id="message" class="mt-3"></div>
 </div>
 
 <script>
   const categorySelect = document.getElementById('category');
   const subCountySelect = document.getElementById('subCounty');
-  const uploadForm = document.getElementById('uploadForm');
-  const uploadBtn = document.getElementById('uploadBtn');
-  const resultDiv = document.getElementById('result');
-  const uploadArea = document.getElementById('uploadArea');
-  const progressBar = document.getElementById('progressBar');
-  const spinner = document.getElementById('spinner');
-  const fileInput = document.getElementById('file');
+  const fileInput = document.getElementById('fileUpload');
+  const messageDiv = document.getElementById('message');
 
+  // Load categories and subCounties from your Apps Script endpoint
   async function loadData() {
     try {
-      const res = await fetch('https://script.google.com/macros/s/AKfycbx9cCpgIgJtb39Sxl7qy4lc944wCZjlKwadYn76MObKJl0XQMxYkQ7uu4eJ2B5StFn7/exec?action=getData');
+      const res = await fetch('https://script.google.com/macros/s/AKfycbzM_iwYO_L7apCHMc_we9brMUJ-Jhv1NUcmAGzWrFvOP7Y-OomesAvUCWcv38VELwmR/exec?action=getData');
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
       const data = await res.json();
 
-      // Populate categories
       data.categories.forEach(cat => {
         const option = document.createElement('option');
         option.value = cat.id;
@@ -132,7 +109,6 @@
         categorySelect.appendChild(option);
       });
 
-      // Populate subCounties
       data.subCounties.forEach(sub => {
         const option = document.createElement('option');
         option.value = sub;
@@ -144,95 +120,69 @@
       alert('Failed to load categories and sub counties. Please try again later.');
     }
   }
-
   loadData();
 
-  function readFileAsArrayBuffer(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = (e) => reject(e);
-      reader.readAsArrayBuffer(file);
-    });
-  }
-
-  async function uploadSingleFile(base64Data, evidenceName, folderId, subCounty, fileName) {
-    // Adjust if your backend supports fetch or google.script.run
-    return new Promise((resolve, reject) => {
-      google.script.run
-        .withSuccessHandler(resolve)
-        .withFailureHandler(err => reject(new Error(err?.message || err)))
-        .uploadEvidence(base64Data, evidenceName, folderId, subCounty, fileName);
-    });
-  }
-
-  uploadForm.addEventListener('submit', async (e) => {
+  document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    resultDiv.textContent = '';
-    if (!uploadForm.checkValidity()) {
-      uploadForm.classList.add('was-validated');
+    messageDiv.textContent = '';
+    const form = e.target;
+    form.classList.remove('was-validated');
+
+    // Basic validation
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
       return;
     }
 
-    const evidenceName = document.getElementById('evidenceName').value.trim();
-    const folderId = categorySelect.value;
-    const subCounty = subCountySelect.value;
-
-    if (!fileInput.files || fileInput.files.length === 0) {
-      fileInput.classList.add('is-invalid');
+    // Validate files
+    const files = fileInput.files;
+    if (files.length === 0) {
+      alert('Please select at least one PDF file.');
       return;
     }
-
-    // Limit files to 10 max
-    const files = Array.from(fileInput.files).slice(0, 10);
     if (files.length > 10) {
-      resultDiv.innerHTML = '<div class="text-danger">You selected more than 10 files — only the first 10 will be uploaded.</div>';
+      alert('You can upload up to 10 files only.');
+      return;
     }
-
-    // Validate each file
-    for (const file of files) {
+    for (let file of files) {
       if (file.type !== 'application/pdf') {
-        resultDiv.innerHTML = `<div class="text-danger">Only PDF files allowed. "${file.name}" is not a PDF.</div>`;
+        alert(`File "${file.name}" is not a PDF.`);
         return;
       }
       if (file.size > 3 * 1024 * 1024) {
-        resultDiv.innerHTML = `<div class="text-danger">Each file must be ≤3MB. "${file.name}" is too large.</div>`;
+        alert(`File "${file.name}" exceeds 3MB size limit.`);
         return;
       }
     }
 
-    uploadBtn.disabled = true;
-    uploadArea.style.display = 'block';
-    progressBar.style.width = '0%';
-    progressBar.textContent = '0%';
-    spinner.style.display = 'inline-block';
+    // Build FormData to send
+    const formData = new FormData();
+    formData.append('evidenceName', document.getElementById('evidenceName').value.trim());
+    formData.append('category', categorySelect.value);
+    formData.append('subCounty', subCountySelect.value);
+
+    // Append files with keys 'file0', 'file1', etc.
+    for (let i = 0; i < files.length; i++) {
+      formData.append('file' + i, files[i]);
+    }
 
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const arrayBuffer = await readFileAsArrayBuffer(file);
-        const bytes = new Uint8Array(arrayBuffer);
-        let binary = '';
-        for (let b = 0; b < bytes.byteLength; b++) {
-          binary += String.fromCharCode(bytes[b]);
-        }
-        const base64Data = btoa(binary);
+      const response = await fetch('https://script.google.com/macros/s/AKfycbzM_iwYO_L7apCHMc_we9brMUJ-Jhv1NUcmAGzWrFvOP7Y-OomesAvUCWcv38VELwmR/exec', {
+        method: 'POST',
+        body: formData
+      });
 
-        await uploadSingleFile(base64Data, evidenceName, folderId, subCounty, file.name);
-
-        // Update progress
-        const percent = Math.round(((i + 1) / files.length) * 100);
-        progressBar.style.width = `${percent}%`;
-        progressBar.textContent = `${percent}%`;
+      const result = await response.json();
+      if (result.result === 'success') {
+        messageDiv.textContent = '✅ Evidence uploaded successfully!';
+        messageDiv.style.color = 'green';
+        form.reset();
+      } else {
+        throw new Error(result.message || 'Unknown error');
       }
-      resultDiv.innerHTML = '<p class="text-success fw-bold">✅ All file(s) uploaded successfully!</p>';
-      uploadForm.reset();
-      uploadForm.classList.remove('was-validated');
     } catch (err) {
-      resultDiv.innerHTML = `<p class="text-danger fw-bold">❌ Upload failed: ${err.message || err}</p>`;
-    } finally {
-      uploadBtn.disabled = false;
-      spinner.style.display = 'none';
+      messageDiv.textContent = '❌ Upload failed: ' + err.message;
+      messageDiv.style.color = 'red';
     }
   });
 </script>
