@@ -5,206 +5,109 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nakuru County CCNO Evidence Upload</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <style>
-    body { background-color: #f9f9f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 8px; }
-    .container { width: 95%; max-width: 520px; margin: 18px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); border: 2px solid #008000; box-sizing: border-box; }
-    h2 { color: #b22222; font-weight: 700; text-align: center; margin-bottom: 20px; font-size: 1.4rem; }
-    label { font-weight: 600; color: #006400; }
-    .btn-custom { background-color: #b22222; border: none; font-weight: 700; font-size: 1rem; padding: 10px; }
-    .btn-custom:hover:not(:disabled) { background-color: #7f0000; }
-    #result { margin-top: 12px; font-weight: 600; text-align: center; }
-    .progress { height: 18px; }
-    @media (max-width: 480px) {
-      .container { padding: 12px; }
-      h2 { font-size: 1.2rem; }
-      label { font-size: 0.95rem; }
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container mt-4">
     <h2>Nakuru County CCNO PC Evidence Upload</h2>
+
     <form id="uploadForm" novalidate>
+      <!-- Evidence Name -->
       <div class="mb-3">
         <label for="evidenceName" class="form-label">Evidence Name:</label>
         <input type="text" class="form-control" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
-        <div class="form-text">Give a short descriptive name for this evidence.</div>
         <div class="invalid-feedback">Please enter an evidence name.</div>
       </div>
 
+      <!-- Category -->
       <div class="mb-3">
         <label for="category" class="form-label">Evidence Category:</label>
         <select class="form-select" id="category" required>
-          <option value="" disabled selected>Loading categories...</option>
+          <option value="" disabled selected>Select Evidence Category</option>
         </select>
         <div class="invalid-feedback">Please select a category.</div>
       </div>
 
+      <!-- Sub County -->
       <div class="mb-3">
         <label for="subCounty" class="form-label">Sub County:</label>
         <select class="form-select" id="subCounty" required>
-          <option value="" disabled selected>Loading sub-counties...</option>
+          <option value="" disabled selected>Select Sub County</option>
         </select>
         <div class="invalid-feedback">Please select a sub county.</div>
       </div>
 
+      <!-- File Upload -->
       <div class="mb-3">
         <label for="file" class="form-label">Choose PDF file(s) (max 3MB each, up to 10 files):</label>
         <input type="file" class="form-control" id="file" accept="application/pdf" multiple required />
-        <div class="form-text">You can select multiple PDF files (maximum 10). Files larger than 3MB will be rejected.</div>
         <div class="invalid-feedback">Please select at least one PDF file (max 3MB each).</div>
       </div>
 
-      <button type="submit" id="uploadBtn" class="btn btn-custom w-100">Upload PDF Evidence</button>
+      <button type="submit" id="uploadBtn" class="btn btn-primary w-100">Upload PDF Evidence</button>
 
-      <div id="uploadArea" style="display:none; margin-top:12px;">
-        <div class="d-flex justify-content-center mb-2">
-          <div class="spinner-border text-success" role="status" id="spinner" aria-hidden="true"></div>
-        </div>
-        <div class="progress">
-          <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%;">0%</div>
-        </div>
-      </div>
+      <div id="result" class="mt-3 text-center"></div>
     </form>
-    <div id="result" class="mt-3"></div>
   </div>
 
   <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxXSO636h6oRNR6iNmwSVV4Sedsm4teEAmihVcNUQqh2QiRUm_4S7kQRGt53A1ulHLA/exec';
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXSO636h6oRNR6iNmwSVV4Sedsm4teEAmihVcNUQqh2QiRUm_4S7kQRGt53A1ulHLA/exec";
+    const CORS_PROXY = "https://corsproxy.io/?"; // or use "https://api.allorigins.win/raw?url="
 
-    const categorySelect = document.getElementById('category');
-    const subCountySelect = document.getElementById('subCounty');
-    const uploadForm = document.getElementById('uploadForm');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const resultDiv = document.getElementById('result');
-    const uploadArea = document.getElementById('uploadArea');
-    const progressBar = document.getElementById('progressBar');
-    const spinner = document.getElementById('spinner');
+    // Elements
+    const categorySelect = document.getElementById("category");
+    const subCountySelect = document.getElementById("subCounty");
+    const uploadForm = document.getElementById("uploadForm");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const resultDiv = document.getElementById("result");
 
+    // Fetch categories and subCounties from Apps Script using CORS proxy
     async function fetchData() {
       try {
-        const res = await fetch(GAS_URL + '?action=getData');
-        if (!res.ok) throw new Error('Failed to fetch data');
+        const res = await fetch(`${CORS_PROXY}${encodeURIComponent(SCRIPT_URL + "?action=getData")}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
 
-        // Populate categories
-        categorySelect.innerHTML = '<option value="" disabled selected>Select Evidence Category</option>';
+        // Populate categories dropdown
         data.categories.forEach(cat => {
-          const option = document.createElement('option');
+          const option = document.createElement("option");
           option.value = cat.id;
           option.textContent = cat.name;
           categorySelect.appendChild(option);
         });
 
-        // Populate subCounties
-        subCountySelect.innerHTML = '<option value="" disabled selected>Select Sub County</option>';
-        data.subCounties.forEach(sc => {
-          const option = document.createElement('option');
-          option.value = sc;
-          option.textContent = sc;
+        // Populate subCounties dropdown
+        data.subCounties.forEach(sub => {
+          const option = document.createElement("option");
+          option.value = sub;
+          option.textContent = sub;
           subCountySelect.appendChild(option);
         });
+
       } catch (err) {
-        categorySelect.innerHTML = '<option value="" disabled>Error loading categories</option>';
-        subCountySelect.innerHTML = '<option value="" disabled>Error loading sub counties</option>';
-        resultDiv.innerHTML = `<p class="text-danger">Error loading data: ${err.message}</p>`;
+        resultDiv.textContent = "Failed to load categories or sub counties: " + err.message;
+        resultDiv.className = "text-danger mt-3";
       }
     }
 
-    uploadForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      resultDiv.innerHTML = '';
-
-      if (!uploadForm.checkValidity()) {
-        uploadForm.classList.add('was-validated');
-        return;
-      }
-
-      const evidenceName = document.getElementById('evidenceName').value.trim();
-      const folderId = categorySelect.value;
-      const subCounty = subCountySelect.value;
-      const fileInput = document.getElementById('file');
-
-      if (!fileInput.files || fileInput.files.length === 0) {
-        fileInput.classList.add('is-invalid');
-        return;
-      }
-
-      const files = Array.from(fileInput.files).slice(0, 10);
-      if (files.length > 10) {
-        resultDiv.innerHTML = '<div class="text-danger">You selected more than 10 files — only the first 10 will be uploaded.</div>';
-      }
-
-      for (let f of files) {
-        if (f.type !== 'application/pdf') {
-          resultDiv.innerHTML = '<div class="text-danger">Only PDF files are allowed. "' + f.name + '" is not a PDF.</div>';
-          return;
-        }
-        if (f.size > 3 * 1024 * 1024) {
-          resultDiv.innerHTML = '<div class="text-danger">Each file must be 3MB or less. "' + f.name + '" is too large.</div>';
-          return;
-        }
-      }
-
-      uploadBtn.disabled = true;
-      uploadArea.style.display = 'block';
-      progressBar.style.width = '0%';
-      progressBar.textContent = '0%';
-      spinner.style.display = 'inline-block';
-
-      try {
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const base64Data = await fileToBase64(file);
-
-          const payload = {
-            base64Data: base64Data.split(',')[1],
-            evidenceName,
-            folderId,
-            subCounty,
-            fileName: file.name,
-          };
-
-          const response = await fetch(GAS_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-
-          if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error || `Upload failed with status ${response.status}`);
-          }
-
-          await response.json();
-
-          const percent = Math.round(((i + 1) / files.length) * 100);
-          progressBar.style.width = percent + '%';
-          progressBar.textContent = percent + '%';
-        }
-
-        resultDiv.innerHTML = '<p class="text-success fw-bold">✅ All file(s) uploaded successfully!</p>';
-        uploadForm.reset();
-        uploadForm.classList.remove('was-validated');
-      } catch (err) {
-        resultDiv.innerHTML = `<p class="text-danger fw-bold">❌ Upload failed: ${err.message}</p>`;
-      } finally {
-        uploadBtn.disabled = false;
-        spinner.style.display = 'none';
-      }
-    });
-
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
-    }
-
-    // Initial fetch of categories and subCounties
+    // Call on page load
     fetchData();
+
+    // Form submission (basic validation, actual upload function to implement)
+    uploadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      resultDiv.textContent = "";
+
+      // Validate
+      if (!uploadForm.checkValidity()) {
+        uploadForm.classList.add("was-validated");
+        return;
+      }
+
+      // You can add the file upload logic here with fetch and Google Apps Script upload endpoint
+
+      resultDiv.textContent = "Upload feature coming soon.";
+      resultDiv.className = "text-success mt-3";
+    });
   </script>
 </body>
 </html>
