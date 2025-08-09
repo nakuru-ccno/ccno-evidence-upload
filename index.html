@@ -1,241 +1,184 @@
-function doGet() {
-  const ss = SpreadsheetApp.openById("1Swfu4LlYjxFBJmGjDh4MwOr1VKhgIYgBM6Y0GVTwUZw");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nakuru County CCNO Evidence Upload</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body { background-color: #f9f9f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 8px; }
+    .container { width: 95%; max-width: 520px; margin: 18px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); border: 2px solid #008000; box-sizing: border-box; }
+    h2 { color: #b22222; font-weight: 700; text-align: center; margin-bottom: 20px; font-size: 1.4rem; }
+    label { font-weight: 600; color: #006400; }
+    .btn-custom { background-color: #b22222; border: none; font-weight: 700; font-size: 1rem; padding: 10px; }
+    .btn-custom:hover:not(:disabled) { background-color: #7f0000; }
+    #result { margin-top: 12px; font-weight: 600; text-align: center; }
+    .progress { height: 18px; }
+    @media (max-width: 480px) {
+      .container { padding: 12px; }
+      h2 { font-size: 1.2rem; }
+      label { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Nakuru County CCNO PC Evidence Upload</h2>
+    <form id="uploadForm" novalidate>
+      <div class="mb-3">
+        <label for="evidenceName" class="form-label">Evidence Name:</label>
+        <input type="text" class="form-control" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
+        <div class="form-text">Give a short descriptive name for this evidence.</div>
+        <div class="invalid-feedback">Please enter an evidence name.</div>
+      </div>
 
-  // Fetch folder categories and IDs from the "FolderIDs" sheet (columns: name, folderId, ...)
-  const folderSheet = ss.getSheetByName("FolderIDs");
-  const folderData = folderSheet.getRange(2, 1, folderSheet.getLastRow() - 1, 3).getValues();
-  let categoryOptions = folderData.map(row => `<option value="${row[1]}">${row[0]}</option>`).join('\n');
+      <div class="mb-3">
+        <label for="category" class="form-label">Evidence Category:</label>
+        <select class="form-select" id="category" required>
+          <option value="" disabled selected>Select Evidence Category</option>
+          <!-- Replace these with your actual folder IDs and names -->
+          <option value="folderId1">Category A</option>
+          <option value="folderId2">Category B</option>
+          <option value="folderId3">Category C</option>
+        </select>
+        <div class="invalid-feedback">Please select a category.</div>
+      </div>
 
-  // Fetch subCounties from "Data" sheet (assuming subCounties are in column A)
-  const dataSheet = ss.getSheetByName("Data");
-  const data = dataSheet.getRange(2, 1, dataSheet.getLastRow() - 1, 2).getValues();
-  const subCounties = [...new Set(data.map(row => row[0]))];
-  const subCountiesJson = JSON.stringify(subCounties);
+      <div class="mb-3">
+        <label for="subCounty" class="form-label">Sub County:</label>
+        <select class="form-select" id="subCounty" required>
+          <option value="" disabled selected>Select Sub County</option>
+          <!-- Replace these with your actual sub counties -->
+          <option value="SubCounty 1">SubCounty 1</option>
+          <option value="SubCounty 2">SubCounty 2</option>
+          <option value="SubCounty 3">SubCounty 3</option>
+        </select>
+        <div class="invalid-feedback">Please select a sub county.</div>
+      </div>
 
-  // Build HTML page
-  const html = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nakuru County CCNO Evidence Upload</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-      body { background-color: #f9f9f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 8px; }
-      .container { width: 95%; max-width: 520px; margin: 18px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); border: 2px solid #008000; box-sizing: border-box; }
-      h2 { color: #b22222; font-weight: 700; text-align: center; margin-bottom: 20px; font-size: 1.4rem; }
-      label { font-weight: 600; color: #006400; }
-      .btn-custom { background-color: #b22222; border: none; font-weight: 700; font-size: 1rem; padding: 10px; }
-      .btn-custom:hover:not(:disabled) { background-color: #7f0000; }
-      #result { margin-top: 12px; font-weight: 600; text-align: center; }
-      .progress { height: 18px; }
-      @media (max-width: 480px) {
-        .container { padding: 12px; }
-        h2 { font-size: 1.2rem; }
-        label { font-size: 0.95rem; }
+      <div class="mb-3">
+        <label for="file" class="form-label">Choose PDF file(s) (max 3MB each, up to 10 files):</label>
+        <input type="file" class="form-control" id="file" accept="application/pdf" multiple required />
+        <div class="form-text">You can select multiple PDF files (maximum 10). Files larger than 3MB will be rejected.</div>
+        <div class="invalid-feedback">Please select at least one PDF file (max 3MB each).</div>
+      </div>
+
+      <button type="submit" id="uploadBtn" class="btn btn-custom w-100">Upload PDF Evidence</button>
+
+      <div id="uploadArea" style="display:none; margin-top:12px;">
+        <div class="d-flex justify-content-center mb-2">
+          <div class="spinner-border text-success" role="status" id="spinner" aria-hidden="true"></div>
+        </div>
+        <div class="progress">
+          <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%;">0%</div>
+        </div>
+      </div>
+    </form>
+    <div id="result" class="mt-3"></div>
+  </div>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxXSO636h6oRNR6iNmwSVV4Sedsm4teEAmihVcNUQqh2QiRUm_4S7kQRGt53A1ulHLA/exec';
+
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const resultDiv = document.getElementById('result');
+    const uploadArea = document.getElementById('uploadArea');
+    const progressBar = document.getElementById('progressBar');
+    const spinner = document.getElementById('spinner');
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultDiv.innerHTML = '';
+
+      if (!uploadForm.checkValidity()) {
+        uploadForm.classList.add('was-validated');
+        return;
       }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h2>Nakuru County CCNO PC Evidence Upload</h2>
-      <form id="uploadForm" novalidate>
-        <div class="mb-3">
-          <label for="evidenceName" class="form-label">Evidence Name:</label>
-          <input type="text" class="form-control" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
-          <div class="form-text">Give a short descriptive name for this evidence.</div>
-          <div class="invalid-feedback">Please enter an evidence name.</div>
-        </div>
 
-        <div class="mb-3">
-          <label for="category" class="form-label">Evidence Category:</label>
-          <select class="form-select" id="category" required>
-            <option value="" disabled selected>Select Evidence Category</option>
-            ${categoryOptions}
-          </select>
-          <div class="invalid-feedback">Please select a category.</div>
-        </div>
+      const evidenceName = document.getElementById('evidenceName').value.trim();
+      const folderId = document.getElementById('category').value;
+      const subCounty = document.getElementById('subCounty').value;
+      const fileInput = document.getElementById('file');
 
-        <div class="mb-3">
-          <label for="subCounty" class="form-label">Sub County:</label>
-          <select class="form-select" id="subCounty" required>
-            <option value="" disabled selected>Select Sub County</option>
-          </select>
-          <div class="invalid-feedback">Please select a sub county.</div>
-        </div>
+      if (!fileInput.files || fileInput.files.length === 0) {
+        fileInput.classList.add('is-invalid');
+        return;
+      }
 
-        <div class="mb-3">
-          <label for="file" class="form-label">Choose PDF file(s) (max 3MB each, up to 10 files):</label>
-          <input type="file" class="form-control" id="file" accept="application/pdf" multiple required />
-          <div class="form-text">You can select multiple PDF files (maximum 10). Files larger than 3MB will be rejected.</div>
-          <div class="invalid-feedback">Please select at least one PDF file (max 3MB each).</div>
-        </div>
+      const files = Array.from(fileInput.files).slice(0, 10);
+      if (files.length > 10) {
+        resultDiv.innerHTML = '<div class="text-danger">You selected more than 10 files — only the first 10 will be uploaded.</div>';
+      }
 
-        <button type="submit" id="uploadBtn" class="btn btn-custom w-100">Upload PDF Evidence</button>
+      for (let f of files) {
+        if (f.type !== 'application/pdf') {
+          resultDiv.innerHTML = '<div class="text-danger">Only PDF files are allowed. "' + f.name + '" is not a PDF.</div>';
+          return;
+        }
+        if (f.size > 3 * 1024 * 1024) {
+          resultDiv.innerHTML = '<div class="text-danger">Each file must be 3MB or less. "' + f.name + '" is too large.</div>';
+          return;
+        }
+      }
 
-        <div id="uploadArea" style="display:none; margin-top:12px;">
-          <div class="d-flex justify-content-center mb-2">
-            <div class="spinner-border text-success" role="status" id="spinner" aria-hidden="true"></div>
-          </div>
-          <div class="progress">
-            <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%;">0%</div>
-          </div>
-        </div>
-      </form>
-      <div id="result" class="mt-3"></div>
-    </div>
+      uploadBtn.disabled = true;
+      uploadArea.style.display = 'block';
+      progressBar.style.width = '0%';
+      progressBar.textContent = '0%';
+      spinner.style.display = 'inline-block';
 
-    <script>
-      (function(){
-        const subCounties = ${subCountiesJson};
-        const subCountySelect = document.getElementById('subCounty');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const resultDiv = document.getElementById('result');
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadArea = document.getElementById('uploadArea');
-        const progressBar = document.getElementById('progressBar');
-        const spinner = document.getElementById('spinner');
+      try {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const base64Data = await fileToBase64(file);
 
-        // Populate subCounties dropdown
-        subCounties.forEach(sub => {
-          const opt = document.createElement('option');
-          opt.value = sub;
-          opt.textContent = sub;
-          subCountySelect.appendChild(opt);
-        });
+          const payload = {
+            base64Data: base64Data.split(',')[1],
+            evidenceName,
+            folderId,
+            subCounty,
+            fileName: file.name,
+          };
 
-        function readFileArrayBuffer(file) {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = (e) => reject(e);
-            reader.readAsArrayBuffer(file);
+          // Send to your Apps Script Web App
+          const response = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
           });
+
+          if (!response.ok) {
+            throw new Error(`Upload failed with status ${response.status}`);
+          }
+
+          // You can parse response if needed
+          await response.json();
+
+          const percent = Math.round(((i + 1) / files.length) * 100);
+          progressBar.style.width = percent + '%';
+          progressBar.textContent = percent + '%';
         }
 
-        function gsUpload(base64Data, evidenceName, folderId, subCounty, fileName) {
-          return new Promise((resolve, reject) => {
-            google.script.run
-              .withSuccessHandler(resolve)
-              .withFailureHandler(err => reject(new Error(err && err.message ? err.message : err)))
-              .uploadEvidence(base64Data, evidenceName, folderId, subCounty, fileName);
-          });
-        }
+        resultDiv.innerHTML = '<p class="text-success fw-bold">✅ All file(s) uploaded successfully!</p>';
+        uploadForm.reset();
+        uploadForm.classList.remove('was-validated');
+      } catch (err) {
+        resultDiv.innerHTML = `<p class="text-danger fw-bold">❌ Upload failed: ${err.message}</p>`;
+      } finally {
+        uploadBtn.disabled = false;
+        spinner.style.display = 'none';
+      }
+    });
 
-        uploadForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          resultDiv.innerHTML = '';
-          if (!uploadForm.checkValidity()) {
-            uploadForm.classList.add('was-validated');
-            return;
-          }
-
-          const evidenceName = document.getElementById('evidenceName').value.trim();
-          const folderId = document.getElementById('category').value;
-          const subCounty = subCountySelect.value;
-          const fileInput = document.getElementById('file');
-
-          if (!fileInput.files || fileInput.files.length === 0) {
-            fileInput.classList.add('is-invalid');
-            return;
-          }
-
-          const files = Array.from(fileInput.files).slice(0, 10);
-          if (files.length > 10) {
-            resultDiv.innerHTML = '<div class="text-danger">You selected more than 10 files — only the first 10 will be uploaded.</div>';
-          }
-
-          for (let f of files) {
-            if (f.type !== 'application/pdf') {
-              resultDiv.innerHTML = '<div class="text-danger">Only PDF files are allowed. "' + f.name + '" is not a PDF.</div>';
-              return;
-            }
-            if (f.size > 3 * 1024 * 1024) {
-              resultDiv.innerHTML = '<div class="text-danger">Each file must be 3MB or less. "' + f.name + '" is too large.</div>';
-              return;
-            }
-          }
-
-          uploadBtn.disabled = true;
-          uploadArea.style.display = 'block';
-          progressBar.style.width = '0%';
-          progressBar.textContent = '0%';
-          spinner.style.display = 'inline-block';
-
-          try {
-            for (let i = 0; i < files.length; i++) {
-              const file = files[i];
-              const arrayBuffer = await readFileArrayBuffer(file);
-              const bytes = new Uint8Array(arrayBuffer);
-              let binary = '';
-              for (let j = 0; j < bytes.byteLength; j++) {
-                binary += String.fromCharCode(bytes[j]);
-              }
-              const base64Data = btoa(binary);
-
-              await gsUpload(base64Data, evidenceName, folderId, subCounty, file.name);
-
-              const percent = Math.round(((i + 1) / files.length) * 100);
-              progressBar.style.width = percent + '%';
-              progressBar.textContent = percent + '%';
-            }
-
-            resultDiv.innerHTML = '<p class="text-success fw-bold">✅ All file(s) uploaded successfully!</p>';
-            uploadForm.reset();
-            uploadForm.classList.remove('was-validated');
-          } catch (err) {
-            resultDiv.innerHTML = '<p class="text-danger fw-bold">❌ Upload failed: ' + (err.message || err) + '</p>';
-          } finally {
-            uploadBtn.disabled = false;
-            spinner.style.display = 'none';
-          }
-        });
-
-      })();
-    </script>
-  </body>
-  </html>
-  `;
-
-  return HtmlService.createHtmlOutput(html).setTitle("Evidence Upload");
-}
-
-function uploadEvidence(base64Data, evidenceName, folderId, subCounty, fileName) {
-  try {
-    const contentType = "application/pdf";
-    const bytes = Utilities.base64Decode(base64Data);
-
-    const safeEvidence = (evidenceName || 'evidence').toString().replace(/[\\/:*?"<>|]+/g, '').trim().substring(0, 100);
-    const baseName = (fileName || 'file.pdf').toString().replace(/[\\/:*?"<>|]+/g, '_');
-    const timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMdd-HHmmss");
-    const finalName = safeEvidence
-      ? `${safeEvidence}_${timestamp}.pdf`
-      : `${baseName.replace(/\.pdf$/i, '')}_${timestamp}.pdf`;
-
-    const blob = Utilities.newBlob(bytes, contentType, finalName);
-
-    const folder = DriveApp.getFolderById(folderId);
-    const file = folder.createFile(blob);
-
-    const ss = SpreadsheetApp.openById("1Swfu4LlYjxFBJmGjDh4MwOr1VKhgIYgBM6Y0GVTwUZw");
-    const sheet = ss.getSheetByName("Data");
-    sheet.appendRow([subCounty, evidenceName, file.getUrl(), new Date()]);
-
-    const recipientEmail = "tiongikevin99@gmail.com";
-    const subject = `New Evidence Uploaded: ${safeEvidence}`;
-    const body = `A new evidence file has been uploaded.\n\n` +
-                 `Evidence Name: ${safeEvidence}\n` +
-                 `Sub County: ${subCounty}\n` +
-                 `File Name: ${finalName}\n` +
-                 `File URL: ${file.getUrl()}\n` +
-                 `Upload Date: ${new Date().toLocaleString()}\n\n` +
-                 `-- Nakuru County CCNO`;
-
-    MailApp.sendEmail(recipientEmail, subject, body);
-
-    return file.getUrl();
-  } catch (err) {
-    throw new Error((err && err.message) ? err.message : err);
-  }
-}
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+  </script>
+</body>
+</html>
