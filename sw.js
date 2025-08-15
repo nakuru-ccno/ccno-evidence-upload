@@ -1,51 +1,56 @@
-const CACHE_NAME = 'evidence-upload-v1';
+// Bump this when you deploy changes to force-update caches
+const CACHE_NAME = 'evidence-upload-v4';
+
+// Add any other site assets you want guaranteed offline here
 const OFFLINE_URLS = [
-  './', // root
+  './',
   './index.html',
-  './style.css', // if you have a CSS file
-  './script.js', // if you have a separate JS file
   './favicon.ico'
 ];
 
-// Install event: cache all static files
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(OFFLINE_URLS);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_URLS))
   );
   self.skipWaiting();
 });
 
-// Activate event: remove old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => {
-        if (key !== CACHE_NAME) {
-          return caches.delete(key);
-        }
-      }))
+      Promise.all(keys.map((key) => (key !== CACHE_NAME ? caches.delete(key) : undefined)))
     )
   );
   self.clients.claim();
 });
 
-// Fetch event: serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  // Don't try to cache Google Apps Script uploads or Tawk.to
-  if (event.request.url.includes('script.google.com') || event.request.url.includes('tawk.to')) {
-    return fetch(event.request);
+  const url = event.request.url;
+
+  // Never cache Tawk.to or Google Apps Script requests
+  if (url.includes('tawk.to') || url.includes('script.google.com')) {
+    event.respondWith(fetch(event.request));
+    return;
   }
 
+  // Navigation requests: network first, fallback to cached index
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // For other requests: cache-first, network fallback
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).catch(() => {
-        // If offline and not found in cache, serve index.html
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
+    caches.match(event.request).then((cached) =>
+      cached ||
+      fetch(event.request).then((resp) => {
+        const respClone = resp.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, respClone));
+        return resp;
+      }).catch(() => caches.match('./index.html'))
+    )
   );
 });
+
