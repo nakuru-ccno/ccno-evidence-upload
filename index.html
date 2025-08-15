@@ -15,15 +15,16 @@
 </head>
 <body>
   <h2>Evidence Upload Form</h2>
+
   <form id="uploadForm">
     <label for="evidenceName">Evidence Name</label>
-    <input type="text" id="evidenceName" name="evidenceName" required />
+    <input type="text" id="evidenceName" name="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
 
     <label for="category">Evidence Category (Folder ID)</label>
-    <input type="text" id="category" name="category" required />
+    <input type="text" id="category" name="category" placeholder="Paste folder ID here" required />
 
     <label for="subCounty">Sub County</label>
-    <input type="text" id="subCounty" name="subCounty" required />
+    <input type="text" id="subCounty" name="subCounty" placeholder="e.g., Nakuru East" required />
 
     <label for="files">Choose PDF files (max 3MB each, up to 10 files)</label>
     <input type="file" id="files" name="files" accept="application/pdf" multiple required />
@@ -34,151 +35,188 @@
   <div id="result"></div>
 
 <script>
-  const form = document.getElementById('uploadForm');
-  const resultDiv = document.getElementById('result');
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbycb6MkCa9f8MNPTZyidHvZjeqP49Q48zm2q3AM8TNgd0CEdYwdc1IoMuWBigGjHoLh/exec';
+  // ---------- CONFIG ----------
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxMex9rlVYM9AHiQotfCbpwY7VZcWlCnt3E6_NhXmj__npzRJHUsbNaaudGyzS9Fn2-GA/exec';
 
-  function saveToIndexedDB(data) {
+  // ---------- IndexedDB HELPERS ----------
+  function openDB() {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('EvidenceDB', 1);
-      request.onupgradeneeded = e => {
+      const req = indexedDB.open('EvidenceDB', 1);
+      req.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains('submissions')) {
-          db.createObjectStore('submissions', { autoIncrement: true });
+          db.createObjectStore('submissions', { keyPath: 'id', autoIncrement: true });
         }
       };
-      request.onsuccess = e => {
-        const db = e.target.result;
-        const tx = db.transaction('submissions', 'readwrite');
-        tx.objectStore('submissions').add(data);
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-      };
-      request.onerror = () => reject(request.error);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
     });
   }
 
-  function getAllSubmissions() {
+  async function saveSubmission(submission) {
+    const db = await openDB();
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('EvidenceDB', 1);
-      request.onsuccess = e => {
-        const db = e.target.result;
-        const tx = db.transaction('submissions', 'readonly');
-        const store = tx.objectStore('submissions');
-        const all = store.getAll();
-        all.onsuccess = () => resolve(all.result);
-        all.onerror = () => reject(all.error);
-      };
+      const tx = db.transaction('submissions', 'readwrite');
+      tx.objectStore('submissions').add(submission);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
     });
   }
 
-  function clearSubmissions() {
+  async function getAllSubmissions() {
+    const db = await openDB();
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('EvidenceDB', 1);
-      request.onsuccess = e => {
-        const db = e.target.result;
-        const tx = db.transaction('submissions', 'readwrite');
-        tx.objectStore('submissions').clear();
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-      };
+      const tx = db.transaction('submissions', 'readonly');
+      const req = tx.objectStore('submissions').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
     });
   }
 
+  async function deleteSubmission(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('submissions', 'readwrite');
+      tx.objectStore('submissions').delete(id);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // ---------- NETWORK ----------
   async function sendSubmission(data) {
     const formData = new FormData();
     formData.append('evidenceName', data.evidenceName);
     formData.append('category', data.category);
     formData.append('subCounty', data.subCounty);
-    data.files.forEach(file => formData.append('files', file));
+    // Rebuild File objects from blobs if needed
+    (data.files || []).forEach((f, i) => {
+      // If coming from IndexedDB, f may be a plain object with name & type & blob
+      if (f instanceof File) {
+        formData.append('files', f);
+      } else {
+        const blob = new Blob([new Uint8Array(f.buffer)], { type: f.type || 'application/pdf' });
+        const file = new File([blob], f.name || `file-${i+1}.pdf`, { type: blob.type });
+        formData.append('files', file);
+      }
+    });
 
-    const response = await fetch(ENDPOINT, { method: 'POST', body: formData });
-    return await response.json();
+    const res = await fetch(ENDPOINT, { method: 'POST', body: formData });
+    // Expect JSON back
+    const json = await res.json().catch(() => ({ status: 'error', message: 'Invalid JSON response' }));
+    if (!res.ok || json.status !== 'success') {
+      throw new Error(json.message || `HTTP ${res.status}`);
+    }
+    return json;
   }
+
+  // Serialize Files for IndexedDB (since Files aren’t structured-clone friendly everywhere)
+  async function filesToStorable(files) {
+    const out = [];
+    for (const f of files) {
+      const arrayBuf = await f.arrayBuffer();
+      out.push({
+        name: f.name,
+        type: f.type,
+        size: f.size,
+        buffer: Array.from(new Uint8Array(arrayBuf)) // store as array of numbers
+      });
+    }
+    return out;
+  }
+
+  // ---------- UI / FORM ----------
+  const form = document.getElementById('uploadForm');
+  const resultDiv = document.getElementById('result');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     resultDiv.textContent = '';
 
-    const files = Array.from(form.elements['files'].files);
-    if (files.length === 0 || files.length > 10) {
-      alert("Select 1–10 PDF files only.");
-      return;
-    }
+    const files = Array.from(form.files.files);
+    if (files.length === 0) return alert('Please select at least one PDF file.');
+    if (files.length > 10) return alert('You can upload up to 10 files only.');
     for (const f of files) {
-      if (f.type !== 'application/pdf' || f.size > 3 * 1024 * 1024) {
-        alert(`Invalid file: ${f.name}`);
-        return;
-      }
+      if (f.type !== 'application/pdf') return alert(`File ${f.name} is not a PDF.`);
+      if (f.size > 3 * 1024 * 1024) return alert(`File ${f.name} exceeds 3MB size limit.`);
     }
 
     const submission = {
-      evidenceName: form.evidenceName.value,
-      category: form.category.value,
-      subCounty: form.subCounty.value,
-      files: files
+      evidenceName: form.evidenceName.value.trim(),
+      category: form.category.value.trim(),
+      subCounty: form.subCounty.value.trim(),
+      files
     };
 
     if (!navigator.onLine) {
-      await saveToIndexedDB(submission);
+      // Save a storable copy
+      const storable = {
+        evidenceName: submission.evidenceName,
+        category: submission.category,
+        subCounty: submission.subCounty,
+        files: await filesToStorable(submission.files),
+        createdAt: Date.now()
+      };
+      await saveSubmission(storable);
       resultDiv.style.color = 'orange';
       resultDiv.textContent = '📦 Saved offline. Will upload when you’re online.';
       form.reset();
-    } else {
-      try {
-        const res = await sendSubmission(submission);
-        if (res.status === "success") {
-          resultDiv.style.color = 'green';
-          resultDiv.textContent = `✅ Uploaded ${res.files.length} file(s) successfully!`;
-          form.reset();
-        } else {
-          throw new Error(res.message);
-        }
-      } catch (err) {
-        resultDiv.style.color = 'red';
-        resultDiv.textContent = `❌ Upload failed: ${err.message}`;
-      }
+      return;
+    }
+
+    try {
+      const res = await sendSubmission(submission);
+      resultDiv.style.color = 'green';
+      resultDiv.textContent = `✅ Uploaded ${res.files?.length ?? submission.files.length} file(s) successfully!`;
+      form.reset();
+    } catch (err) {
+      resultDiv.style.color = 'red';
+      resultDiv.textContent = `❌ Upload failed: ${err.message}`;
     }
   });
 
+  // Auto-sync when back online
   window.addEventListener('online', async () => {
-    const submissions = await getAllSubmissions();
-    if (submissions.length > 0) {
-      resultDiv.style.color = 'blue';
-      resultDiv.textContent = `📤 Uploading ${submissions.length} saved submission(s)...`;
-      for (const sub of submissions) {
-        try {
-          await sendSubmission(sub);
-        } catch (err) {
-          console.error("Retry failed", err);
-        }
-      }
-      await clearSubmissions();
-      resultDiv.textContent = '✅ All saved submissions uploaded!';
-    }
-  });
-</script>
+    const queue = await getAllSubmissions();
+    if (!queue.length) return;
 
-<script>
-  // Register Service Worker for PWA support
+    resultDiv.style.color = 'blue';
+    resultDiv.textContent = `📤 Uploading ${queue.length} saved submission(s)...`;
+
+    for (const item of queue) {
+      try {
+        await sendSubmission(item); // sendSubmission handles storable files too
+        await deleteSubmission(item.id);
+      } catch (err) {
+        console.error('Retry failed', err);
+      }
+    }
+    resultDiv.style.color = 'green';
+    resultDiv.textContent = '✅ All saved submissions uploaded!';
+  });
+
+  // ---------- Service Worker ----------
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(console.error);
+    // If sw.js is in repo root, this is correct:
+    navigator.serviceWorker.register('./sw.js').catch(console.error);
   }
 </script>
 
+<!-- Tawk.to: ensure your domain is allowed in Tawk dashboard -->
 <!-- Start of Tawk.to Script -->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
+  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+  s1.async=true;
+  s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
+  s1.charset='UTF-8';
+  s1.setAttribute('crossorigin','*');
+  s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 <!-- End of Tawk.to Script -->
 
 </body>
 </html>
+
