@@ -1,95 +1,290 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Evidence Upload</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select { width: 100%; padding: 8px; margin-top: 4px; }
-    button { margin-top: 15px; padding: 10px 15px; background-color: #b22222; color: white; border: none; cursor: pointer; }
-    button:hover { background-color: #7f0000; }
-    #result { margin-top: 15px; font-weight: bold; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CCNO Evidence Upload</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9f9f9;
+    margin: 0; padding: 0;
+    color: #000;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    background: #0277bd;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2em;
+  }
+  header img {
+    height: 50px;
+    margin-right: 15px;
+  }
+  .container {
+    max-width: 650px;
+    background: white;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 8px;
+    border: 2px solid #2e7d32;
+  }
+  h2 {
+    text-align: center;
+    font-weight: bold;
+    color: #b71c1c;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+    color: #2e7d32;
+  }
+  input[type="text"], select, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+  }
+  input[type="file"] {
+    padding: 5px;
+  }
+  small {
+    display: block;
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 4px;
+  }
+  button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1em;
+    background-color: #b71c1c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.25s ease;
+  }
+  button:hover {
+    background-color: #d32f2f;
+  }
+  .spinner {
+    display: none;
+    margin: 20px 0;
+    text-align: center;
+    color: #b71c1c;
+    font-weight: 600;
+  }
+  .success {
+    display: none;
+    margin: 20px 0;
+    padding: 15px;
+    background: #bbdefb;
+    color: #0d47a1;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .error {
+    display: none;
+    margin: 20px 0;
+    padding: 15px;
+    background: #ffcdd2;
+    color: #b71c1c;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+</style>
 </head>
 <body>
-  <h2>Evidence Upload Form</h2>
-  <form id="uploadForm">
-    <label for="evidenceName">Evidence Name</label>
-    <input type="text" id="evidenceName" name="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
+<header>
+  <img src="https://www.nakurucountychiefnursingofficer.site/lovable-uploads/00cc8120-039e-4419-8b2b-e07e69d6fdd8.png" alt="Nakuru County Logo" />
+  Q1 FY 25/26 Performance Contract
+</header>
+<div class="container">
+  <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
-    <label for="category">Evidence Category (Folder ID)</label>
-    <input type="text" id="category" name="category" placeholder="Paste folder ID here" required />
+  <label for="evidenceName">Evidence Name:</label>
+  <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
 
-    <label for="subCounty">Sub County</label>
-    <input type="text" id="subCounty" name="subCounty" placeholder="e.g., Nakuru East" required />
+  <small>Give a short descriptive name for this evidence.</small>
 
-    <label for="files">Choose PDF files (max 3MB each, up to 10 files)</label>
-    <input type="file" id="files" name="files" accept="application/pdf" multiple required />
+  <label for="category">Evidence Category:</label>
+  <select id="category" required>
+    <option value="">Select Evidence Category</option>
+    <option value="C02 Referral System Improved">C02 Referral System Improved</option>
+    <option value="C04 Operationalization of Health Facilities to Better Services">C04 Operationalization of Health Facilities to Better Services</option>
+    <option value="C10 Theater Services Improved">C10 Theater Services Improved</option>
+    <option value="C11 In-Patient Services Improved">C11 In-Patient Services Improved</option>
+    <option value="C14 ANC (Antenatal Care)">C14 ANC (Antenatal Care)</option>
+    <option value="C15 POSTNATAL CARE">C15 POSTNATAL CARE</option>
+    <option value="C16 MPDSR (Maternal and Perinatal Death Surveillance and Response)">C16 MPDSR</option>
+    <option value="C17 FAMILY PLANNING">C17 FAMILY PLANNING</option>
+    <option value="C18 IMMUNIZATION">C18 IMMUNIZATION</option>
+    <option value="C21 HIV SERVICES">C21 HIV SERVICES</option>
+    <option value="C23 BURDEN OF CANCER REDUCED">C23 BURDEN OF CANCER REDUCED</option>
+    <option value="C27 SUPPORT SUPERVISION">C27 SUPPORT SUPERVISION</option>
+  </select>
 
-    <button type="submit">Upload</button>
-  </form>
+  <label for="subCounty">Sub County:</label>
+  <select id="subCounty" required>
+    <option value="">Select Sub County</option>
+    <option value="Nakuru West Sub County">Nakuru West Sub County</option>
+    <option value="Nakuru East Sub County">Nakuru East Sub County</option>
+    <option value="Nakuru North Sub County">Nakuru North Sub County</option>
+    <option value="Naivasha Sub County">Naivasha Sub County</option>
+    <option value="Rongai Sub County">Rongai Sub County</option>
+    <option value="Kuresoi South Sub County">Kuresoi South Sub County</option>
+    <option value="Kuresoi North Sub County">Kuresoi North Sub County</option>
+    <option value="Subukia Sub County">Subukia Sub County</option>
+    <option value="Molo Sub County">Molo Sub County</option>
+    <option value="Njoro Sub County">Njoro Sub County</option>
+    <option value="Gilgil Sub County">Gilgil Sub County</option>
+  </select>
 
-  <div id="result"></div>
+  <label for="files">Choose PDF file(s) (max 20MB each, up to 5 files):</label>
+  <input type="file" id="files" accept="application/pdf" multiple />
+  <small>You can select multiple PDF files (maximum 5). Files larger than 20MB will be rejected.</small>
+
+  <div class="spinner" id="spinner">⏳ Uploading...</div>
+  <div class="success" id="success">✅ Upload successful!</div>
+  <div class="error" id="error"></div>
+
+  <button id="uploadBtn">Upload PDF Evidence</button>
+</div>
 
 <script>
-  const form = document.getElementById('uploadForm');
-  const resultDiv = document.getElementById('result');
+  const PROXY_URL = 'https://ccno-proxy-production.up.railway.app/upload-evidence';
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    resultDiv.textContent = '';
+  const evidenceNameInput = document.getElementById('evidenceName');
+  const categorySelect = document.getElementById('category');
+  const subCountySelect = document.getElementById('subCounty');
+  const filesInput = document.getElementById('files');
+  const spinner = document.getElementById('spinner');
+  const successMsg = document.getElementById('success');
+  const errorMsg = document.getElementById('error');
+  const uploadBtn = document.getElementById('uploadBtn');
 
-    const filesInput = form.elements['files'];
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+    successMsg.style.display = 'none';
+    spinner.style.display = 'none';
+    uploadBtn.disabled = false;
+  }
+
+  function showSuccess() {
+    successMsg.style.display = 'block';
+    errorMsg.style.display = 'none';
+    spinner.style.display = 'none';
+    uploadBtn.disabled = false;
+  }
+
+  async function upload() {
+    const evidenceName = evidenceNameInput.value.trim();
+    const category = categorySelect.value;
+    const subCounty = subCountySelect.value;
     const files = filesInput.files;
 
+    if (!evidenceName || !category || !subCounty) {
+      showError('Please fill in all required fields.');
+      return;
+    }
     if (files.length === 0) {
-      alert("Please select at least one PDF file.");
+      showError('Please select at least one PDF file.');
       return;
     }
-    if (files.length > 10) {
-      alert("You can upload up to 10 files only.");
+    if (files.length > 5) {
+      showError('You can upload a maximum of 5 files.');
       return;
     }
-    for (const f of files) {
-      if (f.type !== 'application/pdf') {
-        alert(`File ${f.name} is not a PDF.`);
+
+    for (let f of files) {
+      if (f.size > 20 * 1024 * 1024) {
+        showError(`File ${f.name} exceeds the 20MB size limit.`);
         return;
       }
-      if (f.size > 3 * 1024 * 1024) {
-        alert(`File ${f.name} exceeds 3MB size limit.`);
+      if (f.type !== 'application/pdf') {
+        showError(`File ${f.name} is not a PDF.`);
         return;
       }
     }
 
-    // Prepare form data
-    const formData = new FormData(form);
+    spinner.style.display = 'block';
+    uploadBtn.disabled = true;
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
 
     try {
-      const response = await fetch('https://script.google.com/macros/s/AKfycbycb6MkCa9f8MNPTZyidHvZjeqP49Q48zm2q3AM8TNgd0CEdYwdc1IoMuWBigGjHoLh/exec', {
+      const fileData = await Promise.all(
+        Array.from(files).map(
+          (file) =>
+            new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const base64 = e.target.result.split(',')[1];
+                resolve({ name: file.name, type: file.type, data: base64 });
+              };
+              reader.onerror = (e) => reject(e);
+              reader.readAsDataURL(file);
+            })
+        )
+      );
+
+      const payload = { evidenceName, category, subCounty, files: fileData };
+
+      const response = await fetch(PROXY_URL, {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
-      const json = await response.json();
-
-      if (json.status === "success") {
-        resultDiv.style.color = 'green';
-        resultDiv.textContent = `✅ Uploaded ${json.files.length} file(s) successfully!`;
-        form.reset();
-      } else {
-        resultDiv.style.color = 'red';
-        resultDiv.textContent = `❌ Upload failed: ${json.message}`;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
       }
 
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccess();
+        evidenceNameInput.value = '';
+        categorySelect.value = '';
+        subCountySelect.value = '';
+        filesInput.value = '';
+      } else {
+        showError(data.message || 'Upload failed');
+      }
     } catch (error) {
-      resultDiv.style.color = 'red';
-      resultDiv.textContent = `❌ Error: ${error.message}`;
+      showError('Upload failed: ' + error.message);
     }
-  });
+  }
+
+  uploadBtn.addEventListener('click', upload);
 </script>
+
+<!-- Tawk.to Widget -->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/YOUR_WIDGET_ID/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!-- End of Tawk.to Widget -->
+
 </body>
 </html>
-
