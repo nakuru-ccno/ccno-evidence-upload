@@ -2,104 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Evidence Upload</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nakuru County CCNO PC Evidence Upload</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select { width: 100%; padding: 8px; margin-top: 4px; }
-    button { margin-top: 15px; padding: 10px 15px; background-color: #b22222; color: white; border: none; cursor: pointer; }
-    button:hover { background-color: #7f0000; }
-    #result { margin-top: 15px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f7f9fc;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #219150;
+    }
+    .message {
+      text-align: center;
+      padding: 10px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <h2>Evidence Upload Form</h2>
+
+  <h2>Nakuru County CCNO PC Evidence Upload</h2>
+  
   <form id="uploadForm">
-    <label for="evidenceName">Evidence Name</label>
-    <input type="text" id="evidenceName" name="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
+    <label for="name">Full Name</label>
+    <input type="text" id="name" name="name" required>
 
-    <label for="category">Evidence Category (Folder ID)</label>
-    <input type="text" id="category" name="category" placeholder="Paste folder ID here" required />
+    <label for="facility">Facility</label>
+    <input type="text" id="facility" name="facility" required>
 
-    <label for="subCounty">Sub County</label>
-    <input type="text" id="subCounty" name="subCounty" placeholder="e.g., Nakuru East" required />
+    <label for="file">Upload PDF (Max 20MB)</label>
+    <input type="file" id="file" name="file" accept="application/pdf" required>
 
-    <label for="files">Choose PDF files (max 20MB each, up to 10 files)</label>
-    <input type="file" id="files" name="files" accept="application/pdf" multiple required />
-
-    <button type="submit">Upload</button>
+    <button type="submit">Submit Evidence</button>
   </form>
 
-  <div id="result"></div>
+  <div id="status" class="message"></div>
 
-  <!-- Tawk.to Live Chat Script -->
+  <script>
+    const form = document.getElementById('uploadForm');
+    const statusDiv = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const fileInput = document.getElementById('file');
+      const file = fileInput.files[0];
+
+      // Validate file
+      if (!file) {
+        statusDiv.textContent = "Please select a file.";
+        statusDiv.style.color = "red";
+        return;
+      }
+      if (file.type !== "application/pdf") {
+        statusDiv.textContent = "Only PDF files are allowed.";
+        statusDiv.style.color = "red";
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) { // 20MB
+        statusDiv.textContent = "File size exceeds 20MB.";
+        statusDiv.style.color = "red";
+        return;
+      }
+
+      statusDiv.textContent = "Uploading...";
+      statusDiv.style.color = "blue";
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbxMex9rlVYM9AHiQotfCbpwY7VZcWlCnt3E6_NhXmj__npzRJHUsbNaaudGyzS9Fn2-GA/exec",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+        if (response.ok) {
+          statusDiv.textContent = "File uploaded successfully!";
+          statusDiv.style.color = "green";
+          form.reset();
+        } else {
+          statusDiv.textContent = "Upload failed. Please try again.";
+          statusDiv.style.color = "red";
+        }
+      } catch (error) {
+        statusDiv.textContent = "Error: " + error.message;
+        statusDiv.style.color = "red";
+      }
+    });
+  </script>
+
+  <!-- Tawk.to Script -->
   <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
       var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
       s1.async=true;
-      s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
+      s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1i6p28c34';
       s1.charset='UTF-8';
       s1.setAttribute('crossorigin','*');
       s0.parentNode.insertBefore(s1,s0);
     })();
   </script>
-  <!-- End of Tawk.to Script -->
 
-  <script>
-    const form = document.getElementById('uploadForm');
-    const resultDiv = document.getElementById('result');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      resultDiv.textContent = '';
-
-      const files = form.elements['files'].files;
-
-      if (files.length === 0) {
-        alert("Please select at least one file.");
-        return;
-      }
-      if (files.length > 10) {
-        alert("You can upload up to 10 files only.");
-        return;
-      }
-      for (const f of files) {
-        if (f.type !== "application/pdf") {
-          alert(`File ${f.name} is not a PDF.`);
-          return;
-        }
-        if (f.size > 20 * 1024 * 1024) {
-          alert(`File ${f.name} exceeds 20MB size limit.`);
-          return;
-        }
-      }
-
-      const formData = new FormData(form);
-
-      try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbycb6MkCa9f8MNPTZyidHvZjeqP49Q48zm2q3AM8TNgd0CEdYwdc1IoMuWBigGjHoLh/exec', {
-          method: 'POST',
-          body: formData
-        });
-
-        const json = await response.json();
-
-        if (json.status === "success") {
-          resultDiv.style.color = 'green';
-          resultDiv.textContent = `✅ Uploaded ${json.files.length} PDF(s) successfully!`;
-          form.reset();
-        } else {
-          resultDiv.style.color = 'red';
-          resultDiv.textContent = `❌ Upload failed: ${json.message}`;
-        }
-
-      } catch (error) {
-        resultDiv.style.color = 'red';
-        resultDiv.textContent = `❌ Error: ${error.message}`;
-      }
-    });
-  </script>
 </body>
 </html>
