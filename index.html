@@ -2,85 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nakuru County CCNO PC Evidence Upload</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        header {
-            background: #006699;
-            color: white;
-            padding: 15px;
-        }
-        main {
-            margin: 30px auto;
-            max-width: 500px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        input[type="file"] {
-            margin-top: 15px;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #006699;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #004d4d;
-        }
-    </style>
+    <title>Tawk.to Test</title>
 </head>
 <body>
-
-    <header>
-        <h1>Nakuru County CCNO PC Evidence Upload</h1>
-        <p>Please upload only PDF files (Max size: 20MB per file).</p>
-    </header>
-
-    <main>
-        <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
-            <label for="file">Select PDF file(s):</label><br>
-            <input type="file" id="file" name="files[]" accept="application/pdf" multiple required>
-            <br>
-            <button type="submit">Upload</button>
-        </form>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Nakuru County Chief Nursing Officer</p>
-    </footer>
-
-    <script>
-        // Client-side file validation
-        document.getElementById('uploadForm').addEventListener('submit', function(event) {
-            const files = document.getElementById('file').files;
-            for (let i = 0; i < files.length; i++) {
-                if (files[i].type !== "application/pdf") {
-                    alert("Only PDF files are allowed!");
-                    event.preventDefault();
-                    return;
-                }
-                if (files[i].size > 20 * 1024 * 1024) { // 20MB
-                    alert("File size must not exceed 20 MB!");
-                    event.preventDefault();
-                    return;
-                }
-            }
-        });
-    </script>
+    <h1>Testing Tawk.to Widget</h1>
 
     <!--Start of Tawk.to Script-->
     <script type="text/javascript">
@@ -98,3 +23,4 @@
 
 </body>
 </html>
+
