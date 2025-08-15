@@ -15,7 +15,6 @@
 </head>
 <body>
   <h2>Evidence Upload Form</h2>
-
   <form id="uploadForm">
     <label for="evidenceName">Evidence Name</label>
     <input type="text" id="evidenceName" name="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
@@ -35,188 +34,120 @@
   <div id="result"></div>
 
 <script>
-  // ---------- CONFIG ----------
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxMex9rlVYM9AHiQotfCbpwY7VZcWlCnt3E6_NhXmj__npzRJHUsbNaaudGyzS9Fn2-GA/exec';
-
-  // ---------- IndexedDB HELPERS ----------
-  function openDB() {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open('EvidenceDB', 1);
-      req.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('submissions')) {
-          db.createObjectStore('submissions', { keyPath: 'id', autoIncrement: true });
-        }
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
-
-  async function saveSubmission(submission) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('submissions', 'readwrite');
-      tx.objectStore('submissions').add(submission);
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
-  async function getAllSubmissions() {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('submissions', 'readonly');
-      const req = tx.objectStore('submissions').getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error);
-    });
-  }
-
-  async function deleteSubmission(id) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('submissions', 'readwrite');
-      tx.objectStore('submissions').delete(id);
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
-  // ---------- NETWORK ----------
-  async function sendSubmission(data) {
-    const formData = new FormData();
-    formData.append('evidenceName', data.evidenceName);
-    formData.append('category', data.category);
-    formData.append('subCounty', data.subCounty);
-    // Rebuild File objects from blobs if needed
-    (data.files || []).forEach((f, i) => {
-      // If coming from IndexedDB, f may be a plain object with name & type & blob
-      if (f instanceof File) {
-        formData.append('files', f);
-      } else {
-        const blob = new Blob([new Uint8Array(f.buffer)], { type: f.type || 'application/pdf' });
-        const file = new File([blob], f.name || `file-${i+1}.pdf`, { type: blob.type });
-        formData.append('files', file);
-      }
-    });
-
-    const res = await fetch(ENDPOINT, { method: 'POST', body: formData });
-    // Expect JSON back
-    const json = await res.json().catch(() => ({ status: 'error', message: 'Invalid JSON response' }));
-    if (!res.ok || json.status !== 'success') {
-      throw new Error(json.message || `HTTP ${res.status}`);
-    }
-    return json;
-  }
-
-  // Serialize Files for IndexedDB (since Files aren’t structured-clone friendly everywhere)
-  async function filesToStorable(files) {
-    const out = [];
-    for (const f of files) {
-      const arrayBuf = await f.arrayBuffer();
-      out.push({
-        name: f.name,
-        type: f.type,
-        size: f.size,
-        buffer: Array.from(new Uint8Array(arrayBuf)) // store as array of numbers
-      });
-    }
-    return out;
-  }
-
-  // ---------- UI / FORM ----------
   const form = document.getElementById('uploadForm');
   const resultDiv = document.getElementById('result');
+  const endpoint = 'https://script.google.com/macros/s/AKfycbycb6MkCa9f8MNPTZyidHvZjeqP49Q48zm2q3AM8TNgd0CEdYwdc1IoMuWBigGjHoLh/exec';
 
+  // IndexedDB setup
+  let db;
+  const request = indexedDB.open('EvidenceDB', 1);
+  request.onupgradeneeded = e => {
+    db = e.target.result;
+    db.createObjectStore('submissions', { keyPath: 'id', autoIncrement: true });
+  };
+  request.onsuccess = e => { db = e.target.result; };
+
+  function saveOffline(data) {
+    const tx = db.transaction('submissions', 'readwrite');
+    tx.objectStore('submissions').add(data);
+  }
+
+  async function uploadOnline(data) {
+    const fd = new FormData();
+    fd.append('evidenceName', data.evidenceName);
+    fd.append('category', data.category);
+    fd.append('subCounty', data.subCounty);
+    data.files.forEach(f => fd.append('files', new File([f.blob], f.name, { type: 'application/pdf' })));
+
+    const res = await fetch(endpoint, { method: 'POST', body: fd });
+    return res.json();
+  }
+
+  async function syncOfflineData() {
+    const tx = db.transaction('submissions', 'readonly');
+    const store = tx.objectStore('submissions');
+    const all = await store.getAll();
+    for (const entry of all) {
+      try {
+        const result = await uploadOnline(entry);
+        if (result.status === "success") {
+          const dtx = db.transaction('submissions', 'readwrite');
+          dtx.objectStore('submissions').delete(entry.id);
+        }
+      } catch (err) {
+        console.warn("Sync failed, will retry later", err);
+      }
+    }
+  }
+
+  // Handle form submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     resultDiv.textContent = '';
 
-    const files = Array.from(form.files.files);
-    if (files.length === 0) return alert('Please select at least one PDF file.');
-    if (files.length > 10) return alert('You can upload up to 10 files only.');
+    const files = [...form.elements['files'].files];
+    if (files.length === 0) return alert("Select a PDF.");
+    if (files.length > 10) return alert("Max 10 files.");
     for (const f of files) {
-      if (f.type !== 'application/pdf') return alert(`File ${f.name} is not a PDF.`);
-      if (f.size > 3 * 1024 * 1024) return alert(`File ${f.name} exceeds 3MB size limit.`);
+      if (f.type !== 'application/pdf') return alert(`Not a PDF: ${f.name}`);
+      if (f.size > 3 * 1024 * 1024) return alert(`Too large: ${f.name}`);
     }
 
-    const submission = {
-      evidenceName: form.evidenceName.value.trim(),
-      category: form.category.value.trim(),
-      subCounty: form.subCounty.value.trim(),
-      files
+    const data = {
+      evidenceName: form.evidenceName.value,
+      category: form.category.value,
+      subCounty: form.subCounty.value,
+      files: await Promise.all(files.map(async f => ({
+        name: f.name,
+        blob: await f.arrayBuffer()
+      })))
     };
 
-    if (!navigator.onLine) {
-      // Save a storable copy
-      const storable = {
-        evidenceName: submission.evidenceName,
-        category: submission.category,
-        subCounty: submission.subCounty,
-        files: await filesToStorable(submission.files),
-        createdAt: Date.now()
-      };
-      await saveSubmission(storable);
-      resultDiv.style.color = 'orange';
-      resultDiv.textContent = '📦 Saved offline. Will upload when you’re online.';
-      form.reset();
-      return;
-    }
-
-    try {
-      const res = await sendSubmission(submission);
-      resultDiv.style.color = 'green';
-      resultDiv.textContent = `✅ Uploaded ${res.files?.length ?? submission.files.length} file(s) successfully!`;
-      form.reset();
-    } catch (err) {
-      resultDiv.style.color = 'red';
-      resultDiv.textContent = `❌ Upload failed: ${err.message}`;
-    }
-  });
-
-  // Auto-sync when back online
-  window.addEventListener('online', async () => {
-    const queue = await getAllSubmissions();
-    if (!queue.length) return;
-
-    resultDiv.style.color = 'blue';
-    resultDiv.textContent = `📤 Uploading ${queue.length} saved submission(s)...`;
-
-    for (const item of queue) {
+    if (navigator.onLine) {
       try {
-        await sendSubmission(item); // sendSubmission handles storable files too
-        await deleteSubmission(item.id);
+        const res = await uploadOnline(data);
+        if (res.status === "success") {
+          resultDiv.style.color = 'green';
+          resultDiv.textContent = `✅ Uploaded ${res.files.length} file(s)`;
+          form.reset();
+        } else {
+          resultDiv.style.color = 'red';
+          resultDiv.textContent = `❌ Failed: ${res.message}`;
+        }
       } catch (err) {
-        console.error('Retry failed', err);
+        saveOffline(data);
+        resultDiv.style.color = 'orange';
+        resultDiv.textContent = "📦 Saved offline, will upload later.";
       }
+    } else {
+      saveOffline(data);
+      resultDiv.style.color = 'orange';
+      resultDiv.textContent = "📦 Saved offline, will upload later.";
     }
-    resultDiv.style.color = 'green';
-    resultDiv.textContent = '✅ All saved submissions uploaded!';
   });
 
-  // ---------- Service Worker ----------
+  // Sync when back online
+  window.addEventListener('online', syncOfflineData);
+
+  // Register service worker
   if ('serviceWorker' in navigator) {
-    // If sw.js is in repo root, this is correct:
-    navigator.serviceWorker.register('./sw.js').catch(console.error);
+    navigator.serviceWorker.register('./sw.js');
   }
 </script>
 
-<!-- Tawk.to: ensure your domain is allowed in Tawk dashboard -->
-<!-- Start of Tawk.to Script -->
+<!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-<!-- End of Tawk.to Script -->
+<!--End of Tawk.to Script-->
 
 </body>
 </html>
-
