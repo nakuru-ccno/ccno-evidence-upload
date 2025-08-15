@@ -53,15 +53,8 @@
     border-radius: 4px;
     font-size: 1em;
   }
-  input[type="file"] {
-    padding: 5px;
-  }
-  small {
-    display: block;
-    font-size: 0.85em;
-    color: #666;
-    margin-top: 4px;
-  }
+  input[type="file"] { padding: 5px; }
+  small { display: block; font-size: 0.85em; color: #666; margin-top: 4px; }
   button {
     margin-top: 25px;
     width: 100%;
@@ -75,34 +68,12 @@
     font-weight: 700;
     transition: background-color 0.25s ease;
   }
-  button:hover {
-    background-color: #d32f2f;
-  }
-  .spinner {
-    display: none;
-    margin: 20px 0;
-    text-align: center;
-    color: #b71c1c;
-    font-weight: 600;
-  }
-  .success {
-    display: none;
-    margin: 20px 0;
-    padding: 15px;
-    background: #bbdefb;
-    color: #0d47a1;
-    border-radius: 4px;
-    font-weight: 600;
-  }
-  .error {
-    display: none;
-    margin: 20px 0;
-    padding: 15px;
-    background: #ffcdd2;
-    color: #b71c1c;
-    border-radius: 4px;
-    font-weight: 600;
-  }
+  button:hover { background-color: #d32f2f; }
+  .spinner { display: none; margin: 20px 0; text-align: center; color: #b71c1c; font-weight: 600; }
+  .progress-bar-container { display: none; width: 100%; background: #eee; border-radius: 4px; margin-top: 15px; }
+  .progress-bar { width: 0%; height: 20px; background: #2e7d32; border-radius: 4px; transition: width 0.3s ease; }
+  .success { display: none; margin: 20px 0; padding: 15px; background: #bbdefb; color: #0d47a1; border-radius: 4px; font-weight: 600; }
+  .error { display: none; margin: 20px 0; padding: 15px; background: #ffcdd2; color: #b71c1c; border-radius: 4px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -115,7 +86,6 @@
 
   <label for="evidenceName">Evidence Name:</label>
   <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
-
   <small>Give a short descriptive name for this evidence.</small>
 
   <label for="category">Evidence Category:</label>
@@ -127,7 +97,7 @@
     <option value="C11 In-Patient Services Improved">C11 In-Patient Services Improved</option>
     <option value="C14 ANC (Antenatal Care)">C14 ANC (Antenatal Care)</option>
     <option value="C15 POSTNATAL CARE">C15 POSTNATAL CARE</option>
-    <option value="C16 MPDSR (Maternal and Perinatal Death Surveillance and Response)">C16 MPDSR</option>
+    <option value="C16 MPDSR">C16 MPDSR</option>
     <option value="C17 FAMILY PLANNING">C17 FAMILY PLANNING</option>
     <option value="C18 IMMUNIZATION">C18 IMMUNIZATION</option>
     <option value="C21 HIV SERVICES">C21 HIV SERVICES</option>
@@ -156,6 +126,9 @@
   <small>You can select multiple PDF files (maximum 5). Files larger than 20MB will be rejected.</small>
 
   <div class="spinner" id="spinner">⏳ Uploading...</div>
+  <div class="progress-bar-container" id="progressContainer">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
   <div class="success" id="success">✅ Upload successful!</div>
   <div class="error" id="error"></div>
 
@@ -170,6 +143,8 @@
   const subCountySelect = document.getElementById('subCounty');
   const filesInput = document.getElementById('files');
   const spinner = document.getElementById('spinner');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
   const successMsg = document.getElementById('success');
   const errorMsg = document.getElementById('error');
   const uploadBtn = document.getElementById('uploadBtn');
@@ -179,6 +154,7 @@
     errorMsg.style.display = 'block';
     successMsg.style.display = 'none';
     spinner.style.display = 'none';
+    progressContainer.style.display = 'none';
     uploadBtn.disabled = false;
   }
 
@@ -186,7 +162,13 @@
     successMsg.style.display = 'block';
     errorMsg.style.display = 'none';
     spinner.style.display = 'none';
+    progressContainer.style.display = 'none';
     uploadBtn.disabled = false;
+  }
+
+  function updateProgress(percent) {
+    progressContainer.style.display = 'block';
+    progressBar.style.width = percent + '%';
   }
 
   async function upload() {
@@ -195,48 +177,35 @@
     const subCounty = subCountySelect.value;
     const files = filesInput.files;
 
-    if (!evidenceName || !category || !subCounty) {
-      showError('Please fill in all required fields.');
-      return;
-    }
-    if (files.length === 0) {
-      showError('Please select at least one PDF file.');
-      return;
-    }
-    if (files.length > 5) {
-      showError('You can upload a maximum of 5 files.');
-      return;
-    }
+    if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
+    if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
+    if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
 
     for (let f of files) {
-      if (f.size > 20 * 1024 * 1024) {
-        showError(`File ${f.name} exceeds the 20MB size limit.`);
-        return;
-      }
-      if (f.type !== 'application/pdf') {
-        showError(`File ${f.name} is not a PDF.`);
-        return;
-      }
+      if (f.size > 20 * 1024 * 1024) { showError(`File ${f.name} exceeds the 20MB size limit.`); return; }
+      if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
     }
 
     spinner.style.display = 'block';
     uploadBtn.disabled = true;
     successMsg.style.display = 'none';
     errorMsg.style.display = 'none';
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
 
     try {
       const fileData = await Promise.all(
-        Array.from(files).map(
-          (file) =>
-            new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                const base64 = e.target.result.split(',')[1];
-                resolve({ name: file.name, type: file.type, data: base64 });
-              };
-              reader.onerror = (e) => reject(e);
-              reader.readAsDataURL(file);
-            })
+        Array.from(files).map((file, idx) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              updateProgress(Math.round(((idx+1)/files.length)*100));
+              const base64 = e.target.result.split(',')[1];
+              resolve({ name: file.name, type: file.type, data: base64 });
+            };
+            reader.onerror = (e) => reject(e);
+            reader.readAsDataURL(file);
+          })
         )
       );
 
@@ -272,19 +241,19 @@
   uploadBtn.addEventListener('click', upload);
 </script>
 
-<!-- Tawk.to Widget -->
+<!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
 s1.async=true;
-s1.src='https://embed.tawk.to/YOUR_WIDGET_ID/default';
+s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
 s1.charset='UTF-8';
 s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-<!-- End of Tawk.to Widget -->
+<!--End of Tawk.to Script-->
 
 </body>
 </html>
