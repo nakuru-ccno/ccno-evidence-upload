@@ -126,7 +126,7 @@ document.getElementById("uploadBtn").addEventListener("click", () => {
 
     const xhr = new XMLHttpRequest();
     xhr.withCredentials = false; // ✅ important for Google Apps Script CORS
-    xhr.open("POST", "https://script.google.com/macros/s/AKfycbxEWQeq5x4xavrqCSlWNYhC8Q694mJx7x57MiNL6YhdbonD7zNCoCsdSvjxkVhPmtGIeA/exec", true);
+    xhr.open("POST", "https://script.google.com/macros/s/AKfycbw_k_YzDIK3I-ci87rUUy6-mqTfbX10lxrTpcz5JF3xU1FpDiWydqB-D0A_my-PSiTang/exec", true);
 
     xhr.upload.onprogress = function (event) {
       if (event.lengthComputable) {
