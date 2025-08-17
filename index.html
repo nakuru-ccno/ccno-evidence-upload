@@ -1,35 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nakuru County CCNO PC Evidence Upload</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
-    header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-    header img { height: 50px; }
-    .container { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    label { font-weight: bold; margin-top: 10px; display: block; }
-    input, select, button { margin-top: 5px; margin-bottom: 15px; width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
-    button { background: #0066cc; color: white; border: none; cursor: pointer; }
-    button:hover { background: #004c99; }
-    .spinner { display: none; font-weight: bold; color: orange; }
-    .success { display: none; color: green; font-weight: bold; }
-    .error { display: none; color: red; font-weight: bold; }
-    .progress-bar-container { width: 100%; background: #ddd; height: 20px; border-radius: 5px; margin: 10px 0; display: none; }
-    .progress-bar { height: 100%; width: 0%; background: green; border-radius: 5px; transition: width 0.3s; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CCNO Evidence Upload</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9f9f9;
+    margin: 0; padding: 0;
+    color: #000;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    background: #0277bd;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2em;
+  }
+  header img {
+    height: 50px;
+    margin-right: 15px;
+  }
+  .container {
+    max-width: 650px;
+    background: white;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 8px;
+    border: 2px solid #2e7d32;
+  }
+  h2 {
+    text-align: center;
+    font-weight: bold;
+    color: #b71c1c;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+    color: #2e7d32;
+  }
+  input[type="text"], select, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+  }
+  input[type="file"] { padding: 5px; }
+  small { display: block; font-size: 0.85em; color: #666; margin-top: 4px; }
+  button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1em;
+    background-color: #b71c1c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.25s ease;
+  }
+  button:hover { background-color: #d32f2f; }
+  .spinner { display: none; margin: 20px 0; text-align: center; color: #b71c1c; font-weight: 600; }
+  .progress-bar-container { display: none; width: 100%; background: #eee; border-radius: 4px; margin-top: 15px; }
+  .progress-bar { width: 0%; height: 20px; background: #2e7d32; border-radius: 4px; transition: width 0.3s ease; }
+  .success { display: none; margin: 20px 0; padding: 15px; background: #bbdefb; color: #0d47a1; border-radius: 4px; font-weight: 600; }
+  .error { display: none; margin: 20px 0; padding: 15px; background: #ffcdd2; color: #b71c1c; border-radius: 4px; font-weight: 600; }
+</style>
 </head>
 <body>
 <header>
   <img src="https://www.nakurucountychiefnursingofficer.site/lovable-uploads/00cc8120-039e-4419-8b2b-e07e69d6fdd8.png" alt="Nakuru County Logo" />
-  <h2>Q1 FY 25/26 Performance Contract</h2>
+  Q1 FY 25/26 Performance Contract
 </header>
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
   <label for="evidenceName">Evidence Name:</label>
-  <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
+  <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
+  <small>Give a short descriptive name for this evidence.</small>
 
   <label for="category">Evidence Category:</label>
   <select id="category" required>
@@ -64,9 +121,9 @@
     <option value="Gilgil Sub County">Gilgil Sub County</option>
   </select>
 
-  <label for="files">Choose PDF file(s) (max 30MB each, up to 5 files):</label>
-  <input type="file" id="files" accept="application/pdf" multiple />
-  <small>You can select multiple PDF files (maximum 5). Files larger than 30MB will be rejected.</small> 
+  <label for="files">Choose PDF file(s) (max 20MB each, up to 5 files):</label>
+  <input type="file" id="files" accept="application/pdf" multiple required />
+  <small>You can select multiple PDF files (maximum 5). Files larger than 20MB will be rejected.</small>
 
   <div class="spinner" id="spinner">⏳ Uploading...</div>
   <div class="progress-bar-container" id="progressContainer">
@@ -79,100 +136,124 @@
 </div>
 
 <script>
-document.getElementById("uploadBtn").addEventListener("click", () => {
-  const evidenceName = document.getElementById("evidenceName").value.trim();
-  const category = document.getElementById("category").value;
-  const subCounty = document.getElementById("subCounty").value;
-  const files = document.getElementById("files").files;
+  const PROXY_URL = 'https://ccno-proxy-production.up.railway.app/upload-evidence';
 
-  const spinner = document.getElementById("spinner");
-  const success = document.getElementById("success");
-  const error = document.getElementById("error");
-  const progressContainer = document.getElementById("progressContainer");
-  const progressBar = document.getElementById("progressBar");
+  const evidenceNameInput = document.getElementById('evidenceName');
+  const categorySelect = document.getElementById('category');
+  const subCountySelect = document.getElementById('subCounty');
+  const filesInput = document.getElementById('files');
+  const spinner = document.getElementById('spinner');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  const successMsg = document.getElementById('success');
+  const errorMsg = document.getElementById('error');
+  const uploadBtn = document.getElementById('uploadBtn');
 
-  success.style.display = "none";
-  error.style.display = "none";
-
-  if (!evidenceName || !category || !subCounty || files.length === 0) {
-    error.textContent = "⚠️ Please fill all fields and select at least one PDF file.";
-    error.style.display = "block";
-    return;
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+    successMsg.style.display = 'none';
+    spinner.style.display = 'none';
+    progressContainer.style.display = 'none';
+    uploadBtn.disabled = false;
   }
 
-  if (files.length > 5) {
-    error.textContent = "⚠️ You can only upload up to 5 files.";
-    error.style.display = "block";
-    return;
+  function showSuccess() {
+    successMsg.style.display = 'block';
+    errorMsg.style.display = 'none';
+    spinner.style.display = 'none';
+    progressContainer.style.display = 'none';
+    uploadBtn.disabled = false;
   }
 
-  spinner.style.display = "block";
-  progressContainer.style.display = "block";
-  progressBar.style.width = "0%";
+  function updateProgress(percent) {
+    progressContainer.style.display = 'block';
+    progressBar.style.width = percent + '%';
+  }
 
-  try {
-    const formData = new FormData();
-    formData.append("evidenceName", evidenceName);
-    formData.append("category", category);
-    formData.append("subCounty", subCounty);
+  async function upload() {
+    const evidenceName = evidenceNameInput.value.trim();
+    const category = categorySelect.value;
+    const subCounty = subCountySelect.value;
+    const files = filesInput.files;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file.size > 30 * 1024 * 1024) {
-        throw new Error(`File ${file.name} exceeds 30MB limit.`);
-      }
-      formData.append("files[]", file, file.name);
+    if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
+    if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
+    if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
+
+    for (let f of files) {
+      if (f.size > 20 * 1024 * 1024) { showError(`File ${f.name} exceeds the 20MB size limit.`); return; }
+      if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
     }
 
-    const xhr = new XMLHttpRequest();
-    xhr.withCredentials = false; // ✅ important for Google Apps Script CORS
-    xhr.open("POST", "https://script.google.com/macros/s/AKfycbw_k_YzDIK3I-ci87rUUy6-mqTfbX10lxrTpcz5JF3xU1FpDiWydqB-D0A_my-PSiTang/exec", true);
+    spinner.style.display = 'block';
+    uploadBtn.disabled = true;
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
 
-    xhr.upload.onprogress = function (event) {
-      if (event.lengthComputable) {
-        const percent = (event.loaded / event.total) * 100;
-        progressBar.style.width = percent + "%";
+    try {
+      const fileData = await Promise.all(
+        Array.from(files).map((file, idx) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              updateProgress(Math.round(((idx+1)/files.length)*100));
+              const base64 = e.target.result.split(',')[1];
+              resolve({ name: file.name, type: file.type, data: base64 });
+            };
+            reader.onerror = (e) => reject(e);
+            reader.readAsDataURL(file);
+          })
+        )
+      );
+
+      const payload = { evidenceName, category, subCounty, files: fileData };
+
+      const response = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
       }
-    };
 
-    xhr.onload = function () {
-      spinner.style.display = "none";
-      if (xhr.status === 200) {
-        const res = JSON.parse(xhr.responseText);
-        if (res.success) {
-          success.textContent = "✅ Uploaded: " + res.files.map(f => f.name).join(", ");
-          success.style.display = "block";
+      const data = await response.json();
 
-          // ✅ auto-clear form
-          document.getElementById("evidenceName").value = "";
-          document.getElementById("category").selectedIndex = 0;
-          document.getElementById("subCounty").selectedIndex = 0;
-          document.getElementById("files").value = "";
-          progressBar.style.width = "0%";
-          progressContainer.style.display = "none";
-        } else {
-          error.textContent = "❌ " + res.message;
-          error.style.display = "block";
-        }
+      if (data.success) {
+        showSuccess();
+        evidenceNameInput.value = '';
+        categorySelect.value = '';
+        subCountySelect.value = '';
+        filesInput.value = '';
       } else {
-        error.textContent = "❌ Upload failed. Server error.";
-        error.style.display = "block";
+        showError(data.message || 'Upload failed');
       }
-    };
-
-    xhr.onerror = function() {
-      spinner.style.display = "none";
-      error.textContent = "❌ Upload failed due to network error.";
-      error.style.display = "block";
-    };
-
-    xhr.send(formData);
-  } catch (err) {
-    spinner.style.display = "none";
-    error.textContent = "❌ " + err.message;
-    error.style.display = "block";
+    } catch (error) {
+      showError('Upload failed: ' + error.message);
+    }
   }
-});
+
+  uploadBtn.addEventListener('click', upload);
 </script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+
 </body>
 </html>
