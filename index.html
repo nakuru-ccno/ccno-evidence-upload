@@ -79,7 +79,7 @@
 </div>
 
 <script>
-document.getElementById("uploadBtn").addEventListener("click", async () => {
+document.getElementById("uploadBtn").addEventListener("click", () => {
   const evidenceName = document.getElementById("evidenceName").value.trim();
   const category = document.getElementById("category").value;
   const subCounty = document.getElementById("subCounty").value;
@@ -125,6 +125,7 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
     }
 
     const xhr = new XMLHttpRequest();
+    xhr.withCredentials = false; // ✅ important for Google Apps Script CORS
     xhr.open("POST", "https://script.google.com/macros/s/AKfycbxEWQeq5x4xavrqCSlWNYhC8Q694mJx7x57MiNL6YhdbonD7zNCoCsdSvjxkVhPmtGIeA/exec", true);
 
     xhr.upload.onprogress = function (event) {
@@ -157,6 +158,12 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
         error.textContent = "❌ Upload failed. Server error.";
         error.style.display = "block";
       }
+    };
+
+    xhr.onerror = function() {
+      spinner.style.display = "none";
+      error.textContent = "❌ Upload failed due to network error.";
+      error.style.display = "block";
     };
 
     xhr.send(formData);
