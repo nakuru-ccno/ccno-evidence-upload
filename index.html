@@ -20,7 +20,10 @@
     font-weight: 600;
     font-size: 1.2em;
   }
-  header img { height: 50px; margin-right: 15px; }
+  header img {
+    height: 50px;
+    margin-right: 15px;
+  }
   .container {
     max-width: 650px;
     background: white;
@@ -68,7 +71,7 @@
   button:hover { background-color: #d32f2f; }
   .spinner { display: none; margin: 20px 0; text-align: center; color: #b71c1c; font-weight: 600; }
   .progress-bar-container { display: none; width: 100%; background: #eee; border-radius: 4px; margin-top: 15px; }
-  .progress-bar { width: 0%; height: 20px; background: #2e7d32; border-radius: 4px; transition: width 0.3s ease; text-align: center; color: white; font-weight: bold; line-height: 20px; }
+  .progress-bar { width: 0%; height: 20px; background: #2e7d32; border-radius: 4px; transition: width 0.2s ease; }
   .success { display: none; margin: 20px 0; padding: 15px; background: #bbdefb; color: #0d47a1; border-radius: 4px; font-weight: 600; }
   .error { display: none; margin: 20px 0; padding: 15px; background: #ffcdd2; color: #b71c1c; border-radius: 4px; font-weight: 600; }
 </style>
@@ -78,7 +81,6 @@
   <img src="https://www.nakurucountychiefnursingofficer.site/lovable-uploads/00cc8120-039e-4419-8b2b-e07e69d6fdd8.png" alt="Nakuru County Logo" />
   Q1 FY 25/26 Performance Contract
 </header>
-
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
@@ -118,13 +120,13 @@
     <option value="Gilgil Sub County">Gilgil Sub County</option>
   </select>
 
-  <label for="files">Choose PDF file(s) (max 30MB each, up to 5 files):</label>
+  <label for="files">Choose PDF file(s) (max 20MB each, up to 5 files):</label>
   <input type="file" id="files" accept="application/pdf" multiple required />
-  <small>You can select multiple PDF files (maximum 5). Files larger than 30MB will be rejected.</small>
+  <small>You can select multiple PDF files (maximum 5). Files larger than 20MB will be rejected.</small>
 
-  <div class="spinner" id="spinner">⏳ Uploading... 0%</div>
+  <div class="spinner" id="spinner">⏳ Uploading...</div>
   <div class="progress-bar-container" id="progressContainer">
-    <div class="progress-bar" id="progressBar">0%</div>
+    <div class="progress-bar" id="progressBar"></div>
   </div>
   <div class="success" id="success">✅ Upload successful!</div>
   <div class="error" id="error"></div>
@@ -133,117 +135,124 @@
 </div>
 
 <script>
-const PROXY_URL = 'https://ccno-proxy-production.up.railway.app/upload-evidence';
+  const PROXY_URL = 'https://ccno-proxy-production.up.railway.app/upload-evidence';
 
-const evidenceNameInput = document.getElementById('evidenceName');
-const categorySelect = document.getElementById('category');
-const subCountySelect = document.getElementById('subCounty');
-const filesInput = document.getElementById('files');
-const spinner = document.getElementById('spinner');
-const progressContainer = document.getElementById('progressContainer');
-const progressBar = document.getElementById('progressBar');
-const successMsg = document.getElementById('success');
-const errorMsg = document.getElementById('error');
-const uploadBtn = document.getElementById('uploadBtn');
+  const evidenceNameInput = document.getElementById('evidenceName');
+  const categorySelect = document.getElementById('category');
+  const subCountySelect = document.getElementById('subCounty');
+  const filesInput = document.getElementById('files');
+  const spinner = document.getElementById('spinner');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  const successMsg = document.getElementById('success');
+  const errorMsg = document.getElementById('error');
+  const uploadBtn = document.getElementById('uploadBtn');
 
-function showError(msg) {
-  errorMsg.textContent = msg;
-  errorMsg.style.display = 'block';
-  successMsg.style.display = 'none';
-  spinner.style.display = 'none';
-  progressContainer.style.display = 'none';
-  uploadBtn.disabled = false;
-}
-
-function showSuccess() {
-  successMsg.style.display = 'block';
-  errorMsg.style.display = 'none';
-  spinner.style.display = 'none';
-  progressContainer.style.display = 'none';
-  uploadBtn.disabled = false;
-  progressBar.style.width = '0%';
-  progressBar.textContent = '0%';
-  spinner.textContent = '⏳ Uploading... 0%';
-  evidenceNameInput.value = '';
-  categorySelect.value = '';
-  subCountySelect.value = '';
-  filesInput.value = '';
-}
-
-function updateProgress(percent) {
-  progressContainer.style.display = 'block';
-  progressBar.style.width = percent + '%';
-  progressBar.textContent = percent + '%';
-  spinner.textContent = `⏳ Uploading... ${percent}%`;
-}
-
-async function upload() {
-  const evidenceName = evidenceNameInput.value.trim();
-  const category = categorySelect.value;
-  const subCounty = subCountySelect.value;
-  const files = filesInput.files;
-
-  if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
-  if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
-  if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
-
-  for (let f of files) {
-    if (f.size > 30 * 1024 * 1024) { showError(`File ${f.name} exceeds the 30MB size limit.`); return; }
-    if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+    successMsg.style.display = 'none';
+    spinner.style.display = 'none';
+    progressContainer.style.display = 'none';
+    uploadBtn.disabled = false;
   }
 
-  spinner.style.display = 'block';
-  uploadBtn.disabled = true;
-  successMsg.style.display = 'none';
-  errorMsg.style.display = 'none';
-  progressContainer.style.display = 'block';
-  progressBar.style.width = '0%';
-  progressBar.textContent = '0%';
-  spinner.textContent = '⏳ Uploading... 0%';
+  function showSuccess() {
+    successMsg.style.display = 'block';
+    errorMsg.style.display = 'none';
+    spinner.style.display = 'none';
+    progressContainer.style.display = 'none';
+    uploadBtn.disabled = false;
+    // Clear after 3 seconds
+    setTimeout(() => { successMsg.style.display = 'none'; }, 3000);
+  }
 
-  try {
-    const fileData = await Promise.all(
-      Array.from(files).map((file, idx) =>
-        new Promise((resolve, reject) => {
+  function updateProgress(percent) {
+    progressContainer.style.display = 'block';
+    progressBar.style.width = percent + '%';
+  }
+
+  async function upload() {
+    const evidenceName = evidenceNameInput.value.trim();
+    const category = categorySelect.value;
+    const subCounty = subCountySelect.value;
+    const files = filesInput.files;
+
+    if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
+    if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
+    if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
+
+    for (let f of files) {
+      if (f.size > 20 * 1024 * 1024) { showError(`File ${f.name} exceeds the 20MB size limit.`); return; }
+      if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
+    }
+
+    spinner.style.display = 'block';
+    uploadBtn.disabled = true;
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+
+    let totalSize = 0;
+    for (let f of files) totalSize += f.size;
+    let uploadedSize = 0;
+
+    try {
+      const fileData = await Promise.all(
+        Array.from(files).map(file => new Promise((resolve, reject) => {
           const reader = new FileReader();
+
+          reader.onprogress = (e) => {
+            if (e.lengthComputable) {
+              const totalPercent = Math.round(((uploadedSize + e.loaded) / totalSize) * 100);
+              updateProgress(totalPercent);
+            }
+          };
+
           reader.onload = (e) => {
-            const percent = Math.round(((idx + 1) / files.length) * 100);
-            updateProgress(percent);
+            uploadedSize += file.size;
             const base64 = e.target.result.split(',')[1];
             resolve({ name: file.name, type: file.type, data: base64 });
           };
+
           reader.onerror = (e) => reject(e);
           reader.readAsDataURL(file);
-        })
-      )
-    );
+        }))
+      );
 
-    const payload = { evidenceName, category, subCounty, files: fileData };
+      const payload = { evidenceName, category, subCounty, files: fileData };
+      const response = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    const response = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server error: ${errorText}`);
+      const data = await response.json();
+      if (data.success) {
+        updateProgress(100);
+        showSuccess();
+        evidenceNameInput.value = '';
+        categorySelect.value = '';
+        subCountySelect.value = '';
+        filesInput.value = '';
+      } else {
+        showError(data.message || 'Upload failed');
+      }
+    } catch (error) {
+      showError('Upload failed: ' + error.message);
     }
-
-    const data = await response.json();
-
-    if (data.success) showSuccess();
-    else showError(data.message || 'Upload failed');
-  } catch (error) {
-    showError('Upload failed: ' + error.message);
   }
-}
 
-uploadBtn.addEventListener('click', upload);
+  uploadBtn.addEventListener('click', upload);
 </script>
 
-<!--Start of Tawk.to Script-->
+<!-- Tawk.to Live Chat -->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
@@ -255,7 +264,6 @@ s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-<!--End of Tawk.to Script-->
 
 </body>
 </html>
