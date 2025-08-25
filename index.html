@@ -79,7 +79,7 @@
 <body>
 <header>
   <img src="https://www.nakurucountychiefnursingofficer.site/lovable-uploads/00cc8120-039e-4419-8b2b-e07e69d6fdd8.png" alt="Nakuru County Logo" />
-  Q1 FY 25/26 Performance Contract
+  Q2 FY 25/26 Performance Contract
 </header>
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
@@ -120,9 +120,9 @@
     <option value="Gilgil Sub County">Gilgil Sub County</option>
   </select>
 
-  <label for="files">Choose PDF file(s) (max 20MB each, up to 5 files):</label>
+  <label for="files">Choose PDF file(s) (max 30MB each, up to 5 files):</label>
   <input type="file" id="files" accept="application/pdf" multiple required />
-  <small>You can select multiple PDF files (maximum 5). Files larger than 20MB will be rejected.</small>
+  <small>You can select multiple PDF files (maximum 5). Files larger than 30MB will be rejected.</small>
 
   <div class="spinner" id="spinner">⏳ Uploading...</div>
   <div class="progress-bar-container" id="progressContainer">
@@ -163,8 +163,8 @@
     spinner.style.display = 'none';
     progressContainer.style.display = 'none';
     uploadBtn.disabled = false;
-    // Clear after 3 seconds
-    setTimeout(() => { successMsg.style.display = 'none'; }, 3000);
+    // Clear after 2 seconds
+    setTimeout(() => { successMsg.style.display = 'none'; }, 2000);
   }
 
   function updateProgress(percent) {
@@ -183,7 +183,7 @@
     if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
 
     for (let f of files) {
-      if (f.size > 20 * 1024 * 1024) { showError(`File ${f.name} exceeds the 20MB size limit.`); return; }
+      if (f.size > 30 * 1024 * 1024) { showError(`File ${f.name} exceeds the 30MB size limit.`); return; }
       if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
     }
 
