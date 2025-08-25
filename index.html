@@ -163,7 +163,6 @@
     spinner.style.display = 'none';
     progressContainer.style.display = 'none';
     uploadBtn.disabled = false;
-    // Clear after 2 seconds
     setTimeout(() => { successMsg.style.display = 'none'; }, 2000);
   }
 
@@ -194,76 +193,56 @@
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
 
-    let totalSize = 0;
-    for (let f of files) totalSize += f.size;
-    let uploadedSize = 0;
-
     try {
-      const fileData = await Promise.all(
-        Array.from(files).map(file => new Promise((resolve, reject) => {
-          const reader = new FileReader();
-
-          reader.onprogress = (e) => {
-            if (e.lengthComputable) {
-              const totalPercent = Math.round(((uploadedSize + e.loaded) / totalSize) * 100);
-              updateProgress(totalPercent);
-            }
-          };
-
-          reader.onload = (e) => {
-            uploadedSize += file.size;
-            const base64 = e.target.result.split(',')[1];
-            resolve({ name: file.name, type: file.type, data: base64 });
-          };
-
-          reader.onerror = (e) => reject(e);
-          reader.readAsDataURL(file);
-        }))
-      );
-
-      const payload = { evidenceName, category, subCounty, files: fileData };
-      const response = await fetch(PROXY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const formData = new FormData();
+      formData.append("evidenceName", evidenceName);
+      formData.append("category", category);
+      formData.append("subCounty", subCounty);
+      Array.from(files).forEach((file, i) => {
+        formData.append("file" + i, file, file.name);
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server error: ${errorText}`);
-      }
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", PROXY_URL, true);
 
-      const data = await response.json();
-      if (data.success) {
-        updateProgress(100);
-        showSuccess();
-        evidenceNameInput.value = '';
-        categorySelect.value = '';
-        subCountySelect.value = '';
-        filesInput.value = '';
-      } else {
-        showError(data.message || 'Upload failed');
-      }
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          updateProgress(percent);
+        }
+      };
+
+      xhr.onload = () => {
+        spinner.style.display = "none";
+        if (xhr.status === 200) {
+          const data = JSON.parse(xhr.responseText);
+          if (data.success) {
+            updateProgress(100);
+            showSuccess();
+            evidenceNameInput.value = '';
+            categorySelect.value = '';
+            subCountySelect.value = '';
+            filesInput.value = '';
+          } else {
+            showError(data.message || "Upload failed");
+          }
+        } else {
+          showError("Server error: " + xhr.statusText);
+        }
+      };
+
+      xhr.onerror = () => {
+        showError("Upload failed: Network error");
+      };
+
+      xhr.send(formData);
+
     } catch (error) {
-      showError('Upload failed: ' + error.message);
+      showError("Upload failed: " + error.message);
     }
   }
 
   uploadBtn.addEventListener('click', upload);
 </script>
-
-<!-- Tawk.to Live Chat -->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-
 </body>
 </html>
