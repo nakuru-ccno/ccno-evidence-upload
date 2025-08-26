@@ -182,7 +182,7 @@
     if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
 
     for (let f of files) {
-      if (f.size > 30 * 1024 * 1024) { showError(`File ${f.name} exceeds the 30MB size limit.`); return; }
+      if (f.size > 30 * 1024 * 1024) { showError(`File ${f.name} exceeds 30MB.`); return; }
       if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
     }
 
@@ -193,17 +193,15 @@
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
 
-    try {
-      const formData = new FormData();
-      formData.append("evidenceName", evidenceName);
-      formData.append("category", category);
-      formData.append("subCounty", subCounty);
-      Array.from(files).forEach((file, i) => {
-        formData.append("file" + i, file, file.name);
-      });
+    const formData = new FormData();
+    formData.append('evidenceName', evidenceName);
+    formData.append('category', category);
+    formData.append('subCounty', subCounty);
+    for (const file of files) formData.append('files', file);
 
+    try {
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", PROXY_URL, true);
+      xhr.open('POST', PROXY_URL, true);
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
@@ -213,8 +211,7 @@
       };
 
       xhr.onload = () => {
-        spinner.style.display = "none";
-        if (xhr.status === 200) {
+        if (xhr.status >= 200 && xhr.status < 300) {
           const data = JSON.parse(xhr.responseText);
           if (data.success) {
             updateProgress(100);
@@ -224,25 +221,36 @@
             subCountySelect.value = '';
             filesInput.value = '';
           } else {
-            showError(data.message || "Upload failed");
+            showError(data.message || 'Upload failed');
           }
         } else {
-          showError("Server error: " + xhr.statusText);
+          showError('Server error: ' + xhr.statusText);
         }
       };
 
-      xhr.onerror = () => {
-        showError("Upload failed: Network error");
-      };
+      xhr.onerror = () => showError('Upload failed due to a network error.');
 
       xhr.send(formData);
-
     } catch (error) {
-      showError("Upload failed: " + error.message);
+      showError('Upload failed: ' + error.message);
     }
   }
 
   uploadBtn.addEventListener('click', upload);
 </script>
+
+<!-- Tawk.to Live Chat -->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+
 </body>
 </html>
