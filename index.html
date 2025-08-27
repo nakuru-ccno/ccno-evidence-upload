@@ -5,75 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload</title>
 <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f9f9f9;
-    margin: 0; padding: 0;
-    color: #000;
-  }
-  header {
-    display: flex;
-    align-items: center;
-    background: #0277bd;
-    padding: 10px 20px;
-    color: white;
-    font-weight: 600;
-    font-size: 1.2em;
-  }
-  header img {
-    height: 50px;
-    margin-right: 15px;
-  }
-  .container {
-    max-width: 650px;
-    background: white;
-    margin: 40px auto;
-    padding: 30px;
-    border-radius: 8px;
-    border: 2px solid #2e7d32;
-  }
-  h2 {
-    text-align: center;
-    font-weight: bold;
-    color: #b71c1c;
-    margin-top: 0;
-    margin-bottom: 20px;
-  }
-  label {
-    display: block;
-    margin-top: 15px;
-    font-weight: 600;
-    color: #2e7d32;
-  }
-  input[type="text"], select, input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
-  }
-  input[type="file"] { padding: 5px; }
-  small { display: block; font-size: 0.85em; color: #666; margin-top: 4px; }
-  button {
-    margin-top: 25px;
-    width: 100%;
-    padding: 14px;
-    font-size: 1.1em;
-    background-color: #b71c1c;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background-color 0.25s ease;
-  }
-  button:hover { background-color: #d32f2f; }
-  .spinner { display: none; margin: 20px 0; text-align: center; color: #b71c1c; font-weight: 600; }
-  .progress-bar-container { display: none; width: 100%; background: #eee; border-radius: 4px; margin-top: 15px; }
-  .progress-bar { width: 0%; height: 20px; background: #2e7d32; border-radius: 4px; transition: width 0.2s ease; }
-  .success { display: none; margin: 20px 0; padding: 15px; background: #bbdefb; color: #0d47a1; border-radius: 4px; font-weight: 600; }
-  .error { display: none; margin: 20px 0; padding: 15px; background: #ffcdd2; color: #b71c1c; border-radius: 4px; font-weight: 600; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f9f9f9; margin:0; padding:0; color:#000;}
+  header { display:flex; align-items:center; background:#0277bd; padding:10px 20px; color:white; font-weight:600; font-size:1.2em;}
+  header img { height:50px; margin-right:15px; }
+  .container { max-width:650px; background:white; margin:40px auto; padding:30px; border-radius:8px; border:2px solid #2e7d32;}
+  h2 { text-align:center; font-weight:bold; color:#b71c1c; margin-top:0; margin-bottom:20px;}
+  label { display:block; margin-top:15px; font-weight:600; color:#2e7d32;}
+  input[type="text"], select, input[type="file"] { width:100%; padding:10px; margin-top:6px; border:1px solid #ccc; border-radius:4px; font-size:1em;}
+  input[type="file"] { padding:5px; }
+  small { display:block; font-size:0.85em; color:#666; margin-top:4px; }
+  button { margin-top:25px; width:100%; padding:14px; font-size:1.1em; background-color:#b71c1c; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:700; transition: background-color 0.25s ease; }
+  button:hover { background-color:#d32f2f; }
+  .spinner { display:none; margin:20px 0; text-align:center; color:#b71c1c; font-weight:600; }
+  .progress-bar-container { display:none; width:100%; background:#eee; border-radius:4px; margin-top:15px; }
+  .progress-bar { width:0%; height:20px; background:#2e7d32; border-radius:4px; transition: width 0.2s ease; }
+  .success { display:none; margin:20px 0; padding:15px; background:#bbdefb; color:#0d47a1; border-radius:4px; font-weight:600; }
+  .error { display:none; margin:20px 0; padding:15px; background:#ffcdd2; color:#b71c1c; border-radius:4px; font-weight:600; }
 </style>
 </head>
 <body>
@@ -135,122 +82,109 @@
 </div>
 
 <script>
-  const PROXY_URL = 'https://ccno-proxy-production.up.railway.app/upload-evidence';
+const PROXY_URL = 'https://script.google.com/macros/s/AKfycbxH-oKIj24QF7ce-LeETyqxbH9CVB0g8Gor2AIpE6caZs2hqhYPPtOCT39ktBwwQLWo0w/exec';
 
-  const evidenceNameInput = document.getElementById('evidenceName');
-  const categorySelect = document.getElementById('category');
-  const subCountySelect = document.getElementById('subCounty');
-  const filesInput = document.getElementById('files');
-  const spinner = document.getElementById('spinner');
-  const progressContainer = document.getElementById('progressContainer');
-  const progressBar = document.getElementById('progressBar');
-  const successMsg = document.getElementById('success');
-  const errorMsg = document.getElementById('error');
-  const uploadBtn = document.getElementById('uploadBtn');
+const evidenceNameInput = document.getElementById('evidenceName');
+const categorySelect = document.getElementById('category');
+const subCountySelect = document.getElementById('subCounty');
+const filesInput = document.getElementById('files');
+const spinner = document.getElementById('spinner');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const successMsg = document.getElementById('success');
+const errorMsg = document.getElementById('error');
+const uploadBtn = document.getElementById('uploadBtn');
 
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.style.display = 'block';
-    successMsg.style.display = 'none';
-    spinner.style.display = 'none';
-    progressContainer.style.display = 'none';
-    uploadBtn.disabled = false;
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorMsg.style.display = 'block';
+  successMsg.style.display = 'none';
+  spinner.style.display = 'none';
+  progressContainer.style.display = 'none';
+  uploadBtn.disabled = false;
+}
+
+function showSuccess() {
+  successMsg.style.display = 'block';
+  errorMsg.style.display = 'none';
+  spinner.style.display = 'none';
+  progressContainer.style.display = 'none';
+  uploadBtn.disabled = false;
+  setTimeout(() => { successMsg.style.display = 'none'; }, 3000);
+}
+
+function updateProgress(percent) {
+  progressContainer.style.display = 'block';
+  progressBar.style.width = percent + '%';
+}
+
+async function upload() {
+  const evidenceName = evidenceNameInput.value.trim();
+  const category = categorySelect.value;
+  const subCounty = subCountySelect.value;
+  const files = filesInput.files;
+
+  if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
+  if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
+  if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
+
+  for (let f of files) {
+    if (f.size > 30 * 1024 * 1024) { showError(`File ${f.name} exceeds the 30MB size limit.`); return; }
+    if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
   }
 
-  function showSuccess() {
-    successMsg.style.display = 'block';
-    errorMsg.style.display = 'none';
-    spinner.style.display = 'none';
-    progressContainer.style.display = 'none';
-    uploadBtn.disabled = false;
-    setTimeout(() => { successMsg.style.display = 'none'; }, 2000);
-  }
+  spinner.style.display = 'block';
+  uploadBtn.disabled = true;
+  successMsg.style.display = 'none';
+  errorMsg.style.display = 'none';
+  progressContainer.style.display = 'block';
+  progressBar.style.width = '0%';
 
-  function updateProgress(percent) {
-    progressContainer.style.display = 'block';
-    progressBar.style.width = percent + '%';
-  }
-
-  async function upload() {
-    const evidenceName = evidenceNameInput.value.trim();
-    const category = categorySelect.value;
-    const subCounty = subCountySelect.value;
-    const files = filesInput.files;
-
-    if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
-    if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
-    if (files.length > 5) { showError('You can upload a maximum of 5 files.'); return; }
-
-    for (let f of files) {
-      if (f.size > 30 * 1024 * 1024) { showError(`File ${f.name} exceeds 30MB.`); return; }
-      if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
-    }
-
-    spinner.style.display = 'block';
-    uploadBtn.disabled = true;
-    successMsg.style.display = 'none';
-    errorMsg.style.display = 'none';
-    progressContainer.style.display = 'block';
-    progressBar.style.width = '0%';
-
+  try {
     const formData = new FormData();
-    formData.append('evidenceName', evidenceName);
-    formData.append('category', category);
-    formData.append('subCounty', subCounty);
-    for (const file of files) formData.append('files', file);
+    formData.append("evidenceName", evidenceName);
+    formData.append("category", category);
+    formData.append("subCounty", subCounty);
+    Array.from(files).forEach((file, i) => { formData.append("file" + i, file, file.name); });
 
-    try {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', PROXY_URL, true);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", PROXY_URL, true);
 
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
-          updateProgress(percent);
-        }
-      };
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        updateProgress(percent);
+      }
+    };
 
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          const data = JSON.parse(xhr.responseText);
-          if (data.success) {
-            updateProgress(100);
-            showSuccess();
-            evidenceNameInput.value = '';
-            categorySelect.value = '';
-            subCountySelect.value = '';
-            filesInput.value = '';
-          } else {
-            showError(data.message || 'Upload failed');
-          }
+    xhr.onload = () => {
+      spinner.style.display = "none";
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        if (data.success) {
+          updateProgress(100);
+          showSuccess();
+          evidenceNameInput.value = '';
+          categorySelect.value = '';
+          subCountySelect.value = '';
+          filesInput.value = '';
         } else {
-          showError('Server error: ' + xhr.statusText);
+          showError(data.message || "Upload failed");
         }
-      };
+      } else {
+        showError("Server error: " + xhr.statusText);
+      }
+    };
 
-      xhr.onerror = () => showError('Upload failed due to a network error.');
+    xhr.onerror = () => { showError("Upload failed: Network error"); };
+    xhr.send(formData);
 
-      xhr.send(formData);
-    } catch (error) {
-      showError('Upload failed: ' + error.message);
-    }
+  } catch (error) {
+    showError("Upload failed: " + error.message);
   }
+}
 
-  uploadBtn.addEventListener('click', upload);
+uploadBtn.addEventListener('click', upload);
 </script>
-
-<!-- Tawk.to Live Chat -->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/689f96a3afd36319238be667/1j2nm8s6m';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-
 </body>
 </html>
