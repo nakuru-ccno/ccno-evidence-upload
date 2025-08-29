@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload</title>
 <style>
-  /* your styles unchanged */
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f9f9f9;
@@ -108,7 +107,7 @@
 </div>
 
 <script>
-  // ✅ Use the correct backend endpoint
+  // ✅ Backend endpoint
   const PROXY_URL = 'https://ccno-proxy3.vercel.app/api/upload-evidence';
 
   const evidenceNameInput = document.getElementById('evidenceName');
@@ -190,6 +189,8 @@
             categorySelect.value = '';
             subCountySelect.value = '';
             filesInput.value = '';
+            console.log('Fields:', data.fields);
+            console.log('Files:', data.files);
           } else {
             showError(data.message || 'Upload failed');
           }
@@ -212,8 +213,7 @@
   uploadBtn.addEventListener('click', upload);
 </script>
 
-
-<!-- Tawk.to chat script unchanged -->
+<!-- Tawk.to chat script -->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
