@@ -107,104 +107,108 @@
 </div>
 
 <script>
-  // ✅ Proxy endpoint (your Render server)
-  const PROXY_URL = 'https://nccnoproxyy.onrender.com/upload-evidence';
+const PROXY_URL = 'https://nccnoproxyy.onrender.com/upload-evidence';
 
-  const evidenceNameInput = document.getElementById('evidenceName');
-  const categorySelect = document.getElementById('category');
-  const subCountySelect = document.getElementById('subCounty');
-  const filesInput = document.getElementById('files');
-  const spinner = document.getElementById('spinner');
-  const progressContainer = document.getElementById('progressContainer');
-  const progressBar = document.getElementById('progressBar');
-  const successMsg = document.getElementById('success');
-  const errorMsg = document.getElementById('error');
-  const uploadBtn = document.getElementById('uploadBtn');
+const evidenceNameInput = document.getElementById('evidenceName');
+const categorySelect = document.getElementById('category');
+const subCountySelect = document.getElementById('subCounty');
+const filesInput = document.getElementById('files');
+const spinner = document.getElementById('spinner');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const successMsg = document.getElementById('success');
+const errorMsg = document.getElementById('error');
+const uploadBtn = document.getElementById('uploadBtn');
 
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.style.display = 'block';
-    successMsg.style.display = 'none';
-    spinner.style.display = 'none';
-    progressContainer.style.display = 'none';
-    uploadBtn.disabled = false;
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorMsg.style.display = 'block';
+  successMsg.style.display = 'none';
+  spinner.style.display = 'none';
+  progressContainer.style.display = 'none';
+  uploadBtn.disabled = false;
+}
+
+function showSuccess(fileNames) {
+  successMsg.style.display = 'block';
+  successMsg.textContent = `✅ Upload successful! Files: ${fileNames.join(', ')}`;
+  errorMsg.style.display = 'none';
+  spinner.style.display = 'none';
+  progressContainer.style.display = 'none';
+  uploadBtn.disabled = false;
+}
+
+async function upload() {
+  const evidenceName = evidenceNameInput.value.trim();
+  const category = categorySelect.value;
+  const subCounty = subCountySelect.value;
+  const files = filesInput.files;
+
+  if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
+  if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
+  if (files.length > 5) { showError('Maximum 5 files allowed.'); return; }
+
+  for (let f of files) {
+    if (f.size > 20 * 1024 * 1024) { showError(`File ${f.name} exceeds 20MB.`); return; }
+    if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
   }
 
-  function showSuccess() {
-    successMsg.style.display = 'block';
-    errorMsg.style.display = 'none';
-    spinner.style.display = 'none';
-    progressContainer.style.display = 'none';
-    uploadBtn.disabled = false;
-  }
+  spinner.style.display = 'block';
+  uploadBtn.disabled = true;
+  progressContainer.style.display = 'block';
+  progressBar.style.width = '0%';
+  successMsg.style.display = 'none';
+  errorMsg.style.display = 'none';
 
-  async function upload() {
-    const evidenceName = evidenceNameInput.value.trim();
-    const category = categorySelect.value;
-    const subCounty = subCountySelect.value;
-    const files = filesInput.files;
+  try {
+    const formData = new FormData();
+    formData.append("evidenceName", evidenceName);
+    formData.append("category", category);
+    formData.append("subCounty", subCounty);
 
-    if (!evidenceName || !category || !subCounty) { showError('Please fill in all required fields.'); return; }
-    if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
-    if (files.length > 5) { showError('Maximum 5 files allowed.'); return; }
-
-    for (let f of files) {
-      if (f.size > 20 * 1024 * 1024) { showError(`File ${f.name} exceeds 20MB.`); return; }
-      if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i], files[i].name);
     }
 
-    spinner.style.display = 'block';
-    uploadBtn.disabled = true;
-    progressContainer.style.display = 'block';
-    progressBar.style.width = '0%';
-    successMsg.style.display = 'none';
-    errorMsg.style.display = 'none';
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", PROXY_URL, true);
 
-    try {
-      const formData = new FormData();
-      formData.append("evidenceName", evidenceName);
-      formData.append("category", category);
-      formData.append("subCounty", subCounty);
-
-      for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i], files[i].name);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        progressBar.style.width = percent + "%";
       }
+    };
 
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", PROXY_URL, true);
+    xhr.onload = () => {
+      spinner.style.display = 'none';
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        // Apps Script response contains success and message
+        if (data.appsScriptResponse && data.appsScriptResponse.success) {
+          // List uploaded files (from request)
+          const uploadedFileNames = Array.from(files).map(f => f.name);
+          showSuccess(uploadedFileNames);
 
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percent = Math.round((event.loaded / event.total) * 100);
-          progressBar.style.width = percent + "%";
-        }
-      };
-
-      xhr.onload = () => {
-        spinner.style.display = 'none';
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
-          if (data.success) {
-            showSuccess();
-            evidenceNameInput.value = '';
-            categorySelect.value = '';
-            subCountySelect.value = '';
-            filesInput.value = '';
-          } else {
-            showError(data.message || 'Upload failed. Check proxy.');
-          }
+          evidenceNameInput.value = '';
+          categorySelect.value = '';
+          subCountySelect.value = '';
+          filesInput.value = '';
         } else {
-          showError('Server error: ' + xhr.status);
+          showError(data.appsScriptResponse?.message || 'Upload failed. Check proxy.');
         }
-      };
+      } else {
+        showError('Server error: ' + xhr.status);
+      }
+    };
 
-      xhr.onerror = () => { showError('Network error. Try again.'); };
+    xhr.onerror = () => { showError('Network error. Try again.'); };
 
-      xhr.send(formData);
-    } catch (err) {
-      showError('Upload failed: ' + err.message);
-    }
+    xhr.send(formData);
+  } catch (err) {
+    showError('Upload failed: ' + err.message);
   }
+}
 
-  uploadBtn.addEventListener('click', upload);
+uploadBtn.addEventListener('click', upload);
 </script>
