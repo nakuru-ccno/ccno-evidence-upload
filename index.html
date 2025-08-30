@@ -131,7 +131,7 @@ function showError(msg) {
 
 function showSuccess(fileNames) {
   successMsg.style.display = 'block';
-  successMsg.textContent = `✅ Upload successful! Files: ${fileNames.join(', ')}`;
+  successMsg.textContent = `✅ Upload initiated! Files: ${fileNames.join(', ')}`;
   errorMsg.style.display = 'none';
   spinner.style.display = 'none';
   progressContainer.style.display = 'none';
@@ -181,11 +181,11 @@ async function upload() {
     };
 
     xhr.onload = () => {
-      // Immediately mark success (fire-and-forget)
+      // Immediately show success (fire-and-forget)
       const uploadedFileNames = Array.from(files).map(f => `${evidenceName} – ${subCounty}.pdf`);
       showSuccess(uploadedFileNames);
 
-      // Reset fields
+      // Reset inputs
       evidenceNameInput.value = '';
       categorySelect.value = '';
       subCountySelect.value = '';
@@ -205,3 +205,5 @@ async function upload() {
 
 uploadBtn.addEventListener('click', upload);
 </script>
+</body>
+</html>
