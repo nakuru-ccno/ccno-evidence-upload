@@ -138,6 +138,18 @@ function showSuccess(fileNames) {
   uploadBtn.disabled = false;
 }
 
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1]; // remove prefix
+      resolve({ name: file.name, content: base64 });
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
 async function upload() {
   const evidenceName = evidenceNameInput.value.trim();
   const category = categorySelect.value;
@@ -161,44 +173,34 @@ async function upload() {
   errorMsg.style.display = 'none';
 
   try {
-    const formData = new FormData();
-    formData.append("evidenceName", evidenceName);
-    formData.append("category", category);
-    formData.append("subCounty", subCounty);
-
+    // Convert files to base64
+    const base64Files = [];
     for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i], files[i].name);
+      const base64File = await readFileAsBase64(files[i]);
+      base64Files.push(base64File);
+      const percent = Math.round(((i+1)/files.length)*100);
+      progressBar.style.width = percent + '%';
     }
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", PROXY_URL, true);
+    // Send JSON to proxy
+    const response = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ evidenceName, category, subCounty, files: base64Files })
+    });
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        progressBar.style.width = percent + "%";
-      }
-    };
+    const result = await response.json();
 
-    xhr.onload = () => {
-      spinner.style.display = 'none';
-      if (xhr.status === 200) {
-        // Consider upload successful as soon as file is sent
-        const uploadedFileNames = Array.from(files).map(f => f.name);
-        showSuccess(uploadedFileNames);
+    if (response.ok && result.appsScriptResponse && result.appsScriptResponse.success) {
+      showSuccess(base64Files.map(f => f.name));
+      evidenceNameInput.value = '';
+      categorySelect.value = '';
+      subCountySelect.value = '';
+      filesInput.value = '';
+    } else {
+      showError(result.appsScriptResponse?.message || 'Upload failed.');
+    }
 
-        evidenceNameInput.value = '';
-        categorySelect.value = '';
-        subCountySelect.value = '';
-        filesInput.value = '';
-      } else {
-        showError('Server error: ' + xhr.status);
-      }
-    };
-
-    xhr.onerror = () => { showError('Network error. Try again.'); };
-
-    xhr.send(formData);
   } catch (err) {
     showError('Upload failed: ' + err.message);
   }
