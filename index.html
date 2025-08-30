@@ -183,20 +183,14 @@ async function upload() {
     xhr.onload = () => {
       spinner.style.display = 'none';
       if (xhr.status === 200) {
-        const data = JSON.parse(xhr.responseText);
-        // Apps Script response contains success and message
-        if (data.appsScriptResponse && data.appsScriptResponse.success) {
-          // List uploaded files (from request)
-          const uploadedFileNames = Array.from(files).map(f => f.name);
-          showSuccess(uploadedFileNames);
+        // Consider upload successful as soon as file is sent
+        const uploadedFileNames = Array.from(files).map(f => f.name);
+        showSuccess(uploadedFileNames);
 
-          evidenceNameInput.value = '';
-          categorySelect.value = '';
-          subCountySelect.value = '';
-          filesInput.value = '';
-        } else {
-          showError(data.appsScriptResponse?.message || 'Upload failed. Check proxy.');
-        }
+        evidenceNameInput.value = '';
+        categorySelect.value = '';
+        subCountySelect.value = '';
+        filesInput.value = '';
       } else {
         showError('Server error: ' + xhr.status);
       }
