@@ -5,20 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload</title>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f9f9f9; margin: 0; padding: 0; color: #000; }
-  header { display: flex; align-items: center; background: #0277bd; padding: 10px 20px; color: white; font-weight: 600; font-size: 1.2em; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9f9f9;
+    margin: 0; padding: 0;
+    color: #000;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    background: #0277bd;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2em;
+  }
   header img { height: 50px; margin-right: 15px; }
-  .container { max-width: 650px; background: white; margin: 40px auto; padding: 30px; border-radius: 8px; border: 2px solid #2e7d32; }
+  .container {
+    max-width: 650px; background: white; margin: 40px auto;
+    padding: 30px; border-radius: 8px; border: 2px solid #2e7d32;
+  }
   h2 { text-align: center; font-weight: bold; color: #b71c1c; margin-top: 0; margin-bottom: 20px; }
   label { display: block; margin-top: 15px; font-weight: 600; color: #2e7d32; }
-  input[type="text"], select, input[type="file"] { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+  input[type="text"], select, input[type="file"] {
+    width: 100%; padding: 10px; margin-top: 6px;
+    border: 1px solid #ccc; border-radius: 4px; font-size: 1em;
+  }
   input[type="file"] { padding: 5px; }
   small { display: block; font-size: 0.85em; color: #666; margin-top: 4px; }
-  button { margin-top: 25px; width: 100%; padding: 14px; font-size: 1.1em; background-color: #b71c1c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 700; transition: background-color 0.25s ease; }
+  button {
+    margin-top: 25px; width: 100%; padding: 14px;
+    font-size: 1.1em; background-color: #b71c1c; color: white;
+    border: none; border-radius: 5px; cursor: pointer;
+    font-weight: 700; transition: background-color 0.25s ease;
+  }
   button:hover { background-color: #d32f2f; }
   .spinner { display: none; margin: 20px 0; text-align: center; color: #b71c1c; font-weight: 600; }
   .progress-bar-container { display: none; width: 100%; background: #eee; border-radius: 4px; margin-top: 15px; }
-  .progress-bar { width: 0%; height: 20px; background: #2e7d32; border-radius: 4px; transition: width 0.3s ease; }
+  .progress-bar { width: 0%; height: 20px; background: #2e7d32; border-radius: 4px; transition: width 0.3s ease; text-align: center; color: white; font-weight: 600; line-height: 20px; }
   .success { display: none; margin: 20px 0; padding: 15px; background: #bbdefb; color: #0d47a1; border-radius: 4px; font-weight: 600; }
   .error { display: none; margin: 20px 0; padding: 15px; background: #ffcdd2; color: #b71c1c; border-radius: 4px; font-weight: 600; }
 </style>
@@ -32,10 +56,11 @@
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
   <label for="evidenceName">Evidence Name:</label>
-  <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
+  <input type="text" id="evidenceName" name="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
+  <small>Give a short descriptive name for this evidence.</small>
 
   <label for="category">Evidence Category:</label>
-  <select id="category">
+  <select id="category" name="category" required>
     <option value="">Select Evidence Category</option>
     <option value="C02 Referral System Improved">C02 Referral System Improved</option>
     <option value="C04 Operationalization of Health Facilities to Better Services">C04 Operationalization of Health Facilities to Better Services</option>
@@ -52,7 +77,7 @@
   </select>
 
   <label for="subCounty">Sub County:</label>
-  <select id="subCounty">
+  <select id="subCounty" name="subCounty" required>
     <option value="">Select Sub County</option>
     <option value="Nakuru West Sub County">Nakuru West Sub County</option>
     <option value="Nakuru East Sub County">Nakuru East Sub County</option>
@@ -68,12 +93,12 @@
   </select>
 
   <label for="files">Choose PDF file(s) (max 20MB each, up to 5 files):</label>
-  <input type="file" id="files" accept="application/pdf" multiple />
+  <input type="file" id="files" name="files" accept="application/pdf" multiple />
   <small>You can select multiple PDF files (maximum 5). Files larger than 20MB will be rejected.</small>
 
   <div class="spinner" id="spinner">⏳ Uploading...</div>
   <div class="progress-bar-container" id="progressContainer">
-    <div class="progress-bar" id="progressBar"></div>
+    <div class="progress-bar" id="progressBar">0%</div>
   </div>
   <div class="success" id="success">✅ Upload successful!</div>
   <div class="error" id="error"></div>
@@ -111,6 +136,8 @@ function showSuccess(fileNames) {
   spinner.style.display = 'none';
   progressContainer.style.display = 'none';
   uploadBtn.disabled = false;
+
+  setTimeout(() => { successMsg.style.display = 'none'; }, 4000); // auto-clear after 4s
 }
 
 async function upload() {
@@ -132,6 +159,7 @@ async function upload() {
   uploadBtn.disabled = true;
   progressContainer.style.display = 'block';
   progressBar.style.width = '0%';
+  progressBar.textContent = '0%';
   successMsg.style.display = 'none';
   errorMsg.style.display = 'none';
 
@@ -152,11 +180,12 @@ async function upload() {
       if (event.lengthComputable) {
         const percent = Math.round((event.loaded / event.total) * 100);
         progressBar.style.width = percent + "%";
+        progressBar.textContent = percent + "%"; // show numeric percentage
       }
     };
 
     xhr.onload = () => {
-      // Immediately mark success (fire-and-forget)
+      // Fire-and-forget: mark success immediately
       const uploadedFileNames = Array.from(files).map(f => `${evidenceName} – ${subCounty}.pdf`);
       showSuccess(uploadedFileNames);
 
