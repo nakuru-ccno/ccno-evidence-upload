@@ -5,70 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload</title>
 <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f4f6f9;
-    margin: 0; padding: 0;
-    color: #333;
-  }
-  header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #0277bd;
-    padding: 12px 18px;
-    color: #fff;
-    font-weight: 700;
-    font-size: 1.05rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  header img {
-    height: 52px;
-    width: 52px;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 50%;
-    padding: 4px;
-  }
-
-  .container {
-    max-width: 720px; background: #fff; margin: 36px auto;
-    padding: 28px 32px; border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    border-top: 6px solid #2e7d32;
-  }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+  header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
+  .container { max-width: 720px; background: #fff; margin: 36px auto; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
   h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
-
   label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
-  input[type="text"], select, input[type="file"] {
-    width: 100%; padding: 12px 14px; margin-top: 8px;
-    border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem;
-    background: #fff; transition: border 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box;
-  }
-  input[type="text"]:focus, select:focus, input[type="file"]:focus {
-    outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
-  }
+  input[type="text"], select, input[type="file"] { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; transition: border 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; }
+  input[type="text"]:focus, select:focus, input[type="file"]:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
   small { display: block; font-size: 0.85em; color: #607d8b; margin-top: 6px; }
-
-  button {
-    margin-top: 22px; width: 100%; padding: 14px 16px;
-    font-size: 1.05rem; background: #b71c1c; color: #fff;
-    border: none; border-radius: 10px; cursor: pointer; font-weight: 800;
-    transition: background 0.25s ease, transform 0.08s ease;
-  }
+  button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; transition: background 0.25s ease, transform 0.08s ease; }
   button:hover { background: #d32f2f; }
   button:active { transform: translateY(1px); }
-
   .spinner { display: none; margin: 16px 0; text-align: center; color: #b71c1c; font-weight: 700; }
-
   .progress-bar-container { display: none; width: 100%; background: #eceff1; border-radius: 8px; margin-top: 14px; overflow: hidden; }
-  .progress-bar { width: 0%; height: 22px; background: #2e7d32; transition: width 0.3s ease;
-    text-align: center; color: #fff; font-weight: 700; line-height: 22px; font-size: 0.9rem; }
-
-  .success, .error {
-    display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700;
-  }
+  .progress-bar { width: 0%; height: 22px; background: #2e7d32; transition: width 0.3s ease; text-align: center; color: #fff; font-weight: 700; line-height: 22px; font-size: 0.9rem; }
+  .success, .error { display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700; }
   .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
   .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
 </style>
@@ -83,33 +35,30 @@
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
   <label for="evidenceName">Evidence Name:</label>
-  <input type="text" id="evidenceName" name="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
-  <small>Give a short descriptive name for this evidence.</small>
+  <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
 
   <label for="category">Evidence Category:</label>
-  <select id="category" name="category" required>
+  <select id="category">
     <option value="">Select Evidence Category</option>
-    <option value="D3 Immunization Coverage Increased">D3 Immunization Coverage Increased</option>
-    <option value="D12 Referral system improved">D12 Referral system improved</option>
-    <option value="D14 Operationalization of health facilities to offer better services">D14 Operationalization of health facilities to offer better services</option>
-    <option value="D19 Theatre Services improved">D19 Theatre Services improved</option>
-    <option value="D20 In-patient Services Improved">D20 In-patient Services Improved</option>
-    <option value="D23 Antenatal Care Services improved">D23 Antenatal Care Services improved</option>
-    <option value="D24 Postnatal Care Improved">D24 Postnatal Care Improved</option>
-    <option value="D25 Maternal Perinatal Deaths Audited">D25 Maternal Perinatal Deaths Audited</option>
-    <option value="D26 Family Planning Uptake improved">D26 Family Planning Uptake improved</option>
-    <option value="D27 Burden of Cancer Reduced">D27 Burden of Cancer Reduced</option>
-    <option value="D29 Health Services Supervision">D29 Health Services Supervision</option>
-    <option value="D35 Youth Empowerment Initiatives">D35 Youth Empowerment Initiatives</option>
+    <option value="D3 - Immunization Coverage Increased">D3 - Immunization Coverage Increased</option>
+    <option value="D12 - Referral system improved">D12 - Referral system improved</option>
+    <option value="D14 - Operationalization of health facilities to offer better services">D14 - Operationalization of health facilities to offer better services</option>
+    <option value="D19 - Theatre Services improved">D19 - Theatre Services improved</option>
+    <option value="D20 - In-patient Services Improved">D20 - In-patient Services Improved</option>
+    <option value="D23 - Antenatal Care Services improved">D23 - Antenatal Care Services improved</option>
+    <option value="D24 - Postnatal Care Improved">D24 - Postnatal Care Improved</option>
+    <option value="D25 - Maternal Perinatal Deaths Audited">D25 - Maternal Perinatal Deaths Audited</option>
+    <option value="D26 - Family Planning Uptake improved">D26 - Family Planning Uptake improved</option>
+    <option value="D27 - Burden of Cancer Reduced">D27 - Burden of Cancer Reduced</option>
+    <option value="D29 - Health Services Supervision">D29 - Health Services Supervision</option>
+    <option value="D35 - Youth Empowerment Initiatives">D35 - Youth Empowerment Initiatives</option>
   </select>
 
   <label for="indicator">Indicator:</label>
-  <select id="indicator" name="indicator" required>
-    <option value="">Select Indicator</option>
-  </select>
+  <select id="indicator"><option value="">Select Indicator</option></select>
 
   <label for="subCounty">Sub County:</label>
-  <select id="subCounty" name="subCounty" required>
+  <select id="subCounty">
     <option value="">Select Sub County</option>
     <option value="Nakuru West Sub County">Nakuru West Sub County</option>
     <option value="Nakuru East Sub County">Nakuru East Sub County</option>
@@ -125,14 +74,13 @@
   </select>
 
   <label for="files">Choose PDF file(s) (max 20MB each, up to 5 files):</label>
-  <input type="file" id="files" name="files" accept="application/pdf" multiple />
-  <small>You can select multiple PDF files (maximum 5). Files larger than 20MB will be rejected.</small>
+  <input type="file" id="files" accept="application/pdf" multiple />
 
   <div class="spinner" id="spinner">⏳ Uploading...</div>
   <div class="progress-bar-container" id="progressContainer">
     <div class="progress-bar" id="progressBar">0%</div>
   </div>
-  <div class="success" id="success">✅ Upload successful!</div>
+  <div class="success" id="success"></div>
   <div class="error" id="error"></div>
 
   <button id="uploadBtn">Upload PDF Evidence</button>
@@ -140,7 +88,6 @@
 
 <script>
 const PROXY_URL = 'https://nccnoproxyy.onrender.com/upload-evidence';
-
 const evidenceNameInput = document.getElementById('evidenceName');
 const categorySelect = document.getElementById('category');
 const indicatorSelect = document.getElementById('indicator');
@@ -153,72 +100,78 @@ const successMsg = document.getElementById('success');
 const errorMsg = document.getElementById('error');
 const uploadBtn = document.getElementById('uploadBtn');
 
-// EXACT indicators map (from your list)
+// Indicators aligned exactly with Apps Script folderMap
 const indicatorsMap = {
-  "D3 Immunization Coverage Increased": [
+  "D3 - Immunization Coverage Increased": [
     "Avail immunization services on daily basis 8am-5pm",
     "Conduct continuous Immunization defaulter tracing",
     "Conduct quarterly CCE assessment in all the immunizing facilities",
     "Conduct monthly integrated outreaches"
   ],
-  "D12 Referral system improved": [
+  "D12 - Referral system improved": [
     "Strengthen referral system-Revise and disseminate SOPs",
     "Formulate ambulance checklist to ensure consistent availability of emergency response commodities",
     "Procure 2 ACLS ambulances for Naivasha and Molo",
     "Relocate the call Centre to NCRTH and strengthen the call Centre by acquiring a dedicated toll free number"
   ],
-  "D14 Operationalization of health facilities to offer better services": [
+  "D14 - Operationalization of health facilities to offer better services": [
     "Equip 6 new health facilities",
-    "Operationalize Level 4 new Maternity units in Bondeni, Molo,Gilgil and Githioro L3"
-  ],
-  "D19 Theatre Services improved": [
+    "Operationalize Level 4 new Maternity units in Bondeni, Molo, Gilgil and Githioro L3",
     "Operationalize the theatre at Bondeni SCH",
     "Procurement of Theater equipment for Subukia",
     "Deployment of HRH to operationalize Subukia, Elburgon and Gilgil Theatres"
   ],
-  "D20 In-patient Services Improved": [
+  "D19 - Theatre Services improved": [
     "Conduct quarterly Supportive Supervision of all the 16 Level IV & V Hospitals (50%)",
     "Hold Hospital Quarterly clinical audit team meetings in level IV / V hospitals (50%)"
   ],
-  "D23 Antenatal Care Services improved": [
+  "D20 - In-patient Services Improved": [
     "Establish/Strengthen cohort group ANC(GANC)",
     "Procure essential and emergency neonatal care equipment",
-    "Scale up the number of facilities Enrolling ANC mothers to SMS PROMPTS from 57 to 90"
+    "Scale up the number of facilities Enrolling ANC mothers to SMS PROMPTS from 57 to 90",
+    "Provision of PNC within the first 48 hours in all the delivery units"
   ],
-  "D24 Postnatal Care Improved": [
-    "Provision of PNC within the first 48 hours in all the delivery units",
-    "Integrate cervical cancer screening in postnatal clinic"
-  ],
-  "D25 Maternal Perinatal Deaths Audited": [
+  "D23 - Antenatal Care Services improved": [
+    "Integrate cervical cancer screening in postnatal clinic",
     "Conduct monthly facility and sub county MPDSR Audit meeting",
     "Conduct weekly virtual MPDSR meeting at all levels of care",
     "Track and Implement recommendations of the action points from the MPDSR meetings"
   ],
-  "D26 Family Planning Uptake improved": [
+  "D24 - Postnatal Care Improved": [
     "Requisition of family planning commodities",
     "Roll out the self-care initiative in reproductive health and DMPA-SC injection",
     "Mentorship / OJT on long acting and reversible contraceptive methods, including Hormonal IUD",
     "Operationalization of the 2 AYSRH centres .( Ronda HC and Mau Narok HC)"
   ],
-  "D27 Burden of Cancer Reduced": [
+  "D25 - Maternal Perinatal Deaths Audited": [
     "Undertake cervical cancer Screening",
     "Treatment of cervical cancer lesions",
     "Administration of the HPV 1 vaccine to girls 10 years-14 years.",
     "Conduct psychosocial support counselling for cancer survivors"
   ],
-  "D29 Health Services Supervision": [
+  "D26 - Family Planning Uptake improved": [
     "Undertake 3 CHMT supervisions per quarter",
     "SCHMT undertake 33 supervisions",
     "Report on implementation of CHMT  and SCHMT supervision"
   ],
-  "D35 Youth Empowerment Initiatives": [
+  "D27 - Burden of Cancer Reduced": [
+    "Establishment of youth Friendly Centres in Facilities",
+    "Sensitize the youth on YFS,Live saving skills  and Alcohol & Substance Abuse integrate into school health programme",
+    "Provision of psychological counselling services in youth friendly centres"
+  ],
+  "D29 - Health Services Supervision": [
+    "Undertake 3 CHMT supervisions per quarter",
+    "SCHMT undertake 33 supervisions",
+    "Report on implementation of CHMT  and SCHMT supervision"
+  ],
+  "D35 - Youth Empowerment Initiatives": [
     "Establishment of youth Friendly Centres in Facilities",
     "Sensitize the youth on YFS,Live saving skills  and Alcohol & Substance Abuse integrate into school health programme",
     "Provision of psychological counselling services in youth friendly centres"
   ]
 };
 
-// Populate indicators dynamically when category changes
+// Populate indicators dynamically
 categorySelect.addEventListener('change', () => {
   const category = categorySelect.value;
   indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
@@ -233,21 +186,16 @@ categorySelect.addEventListener('change', () => {
 });
 
 function showError(msg) {
-  errorMsg.textContent = msg;
-  errorMsg.style.display = 'block';
-  successMsg.style.display = 'none';
-  spinner.style.display = 'none';
-  progressContainer.style.display = 'none';
-  uploadBtn.disabled = false;
+  errorMsg.textContent = msg; errorMsg.style.display = 'block';
+  successMsg.style.display = 'none'; spinner.style.display = 'none';
+  progressContainer.style.display = 'none'; uploadBtn.disabled = false;
 }
 
 function showSuccess(fileNames) {
   successMsg.style.display = 'block';
   successMsg.textContent = `✅ Upload successful! Files: ${fileNames.join(', ')}`;
-  errorMsg.style.display = 'none';
-  spinner.style.display = 'none';
-  progressContainer.style.display = 'none';
-  uploadBtn.disabled = false;
+  errorMsg.style.display = 'none'; spinner.style.display = 'none';
+  progressContainer.style.display = 'none'; uploadBtn.disabled = false;
   setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
 }
 
@@ -267,50 +215,40 @@ async function upload() {
     if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
   }
 
-  spinner.style.display = 'block';
-  uploadBtn.disabled = true;
-  progressContainer.style.display = 'block';
-  progressBar.style.width = '0%';
-  progressBar.textContent = '0%';
-  successMsg.style.display = 'none';
-  errorMsg.style.display = 'none';
+  spinner.style.display = 'block'; uploadBtn.disabled = true;
+  progressContainer.style.display = 'block'; progressBar.style.width = '0%'; progressBar.textContent = '0%';
+  successMsg.style.display = 'none'; errorMsg.style.display = 'none';
 
   try {
-    const formData = new FormData();
-    formData.append("evidenceName", evidenceName);
-    formData.append("category", category);
-    formData.append("indicator", indicator);
-    formData.append("subCounty", subCounty);
-
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i], files[i].name);
+    // Convert files to base64
+    const filesData = [];
+    for (let f of files) {
+      const arrayBuffer = await f.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      filesData.push({ name: f.name, content: base64 });
     }
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", PROXY_URL, true);
+    const payload = { evidenceName, category, indicator, subCounty, files: filesData };
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        progressBar.style.width = percent + "%";
-        progressBar.textContent = percent + "%";
-      }
-    };
+    const response = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-    xhr.onload = () => {
-      const uploadedFileNames = Array.from(files).map(() => `${evidenceName} – ${subCounty}.pdf`);
-      showSuccess(uploadedFileNames);
+    if (!response.ok) {
+      const err = await response.json();
+      showError(err.error || 'Upload failed');
+      return;
+    }
 
-      // Reset fields
-      evidenceNameInput.value = '';
-      categorySelect.value = '';
-      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-      subCountySelect.value = '';
-      filesInput.value = '';
-    };
-
-    xhr.onerror = () => { showError('Network error. Try again.'); };
-    xhr.send(formData);
+    showSuccess(filesData.map(f => f.name));
+    // Reset form
+    evidenceNameInput.value = '';
+    categorySelect.value = '';
+    indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+    subCountySelect.value = '';
+    filesInput.value = '';
 
   } catch (err) { showError('Upload failed: ' + err.message); }
 }
