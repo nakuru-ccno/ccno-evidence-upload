@@ -20,6 +20,10 @@
   .success, .error { display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700; }
   .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
   .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+
+  /* Progress bar */
+  .progress-container { display: none; margin-top: 16px; background: #eee; border-radius: 8px; height: 18px; overflow: hidden; }
+  .progress-bar { height: 100%; width: 0%; background: #2e7d32; transition: width 0.2s ease; }
 </style>
 </head>
 <body>
@@ -76,6 +80,9 @@
   <input type="file" id="files" accept="application/pdf" multiple />
 
   <div class="spinner" id="spinner">⏳ Uploading...</div>
+  <div class="progress-container" id="progressContainer">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
   <div class="success" id="success"></div>
   <div class="error" id="error"></div>
 
@@ -94,9 +101,11 @@ const spinner = document.getElementById("spinner");
 const successMsg = document.getElementById("success");
 const errorMsg = document.getElementById("error");
 const uploadBtn = document.getElementById("uploadBtn");
+const progressContainer = document.getElementById("progressContainer");
+const progressBar = document.getElementById("progressBar");
 
 // Indicators aligned with Apps Script folderMap
-const indicatorsMap = {
+const indicatorsMap = { /* unchanged, same as your version */ 
   "D3 - Immunization Coverage Increased": [
     "Avail immunization services on daily basis 8am-5pm",
     "Conduct continuous Immunization defaulter tracing",
@@ -186,7 +195,6 @@ function showSuccess(msg) {
   successMsg.textContent = msg;
   errorMsg.style.display = "none";
 
-  // Auto-hide after 4 seconds
   setTimeout(() => {
     successMsg.style.display = "none";
   }, 4000);
@@ -198,9 +206,11 @@ function resetForm() {
   indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
   subCountySelect.value = "";
   filesInput.value = "";
+  progressBar.style.width = "0%";
+  progressContainer.style.display = "none";
 }
 
-uploadBtn.addEventListener("click", async () => {
+uploadBtn.addEventListener("click", () => {
   const evidenceName = evidenceNameInput.value.trim();
   const category = categorySelect.value;
   const indicator = indicatorSelect.value;
@@ -212,36 +222,45 @@ uploadBtn.addEventListener("click", async () => {
   }
 
   spinner.style.display = "block";
+  progressContainer.style.display = "block";
+  progressBar.style.width = "0%";
   showError("");
 
-  try {
-    const formData = new FormData();
-    formData.append("evidenceName", evidenceName);
-    formData.append("category", category);
-    formData.append("indicator", indicator);
-    formData.append("subCounty", subCounty);
-    for (let file of files) {
-      formData.append("files", file, file.name);
+  const formData = new FormData();
+  formData.append("evidenceName", evidenceName);
+  formData.append("category", category);
+  formData.append("indicator", indicator);
+  formData.append("subCounty", subCounty);
+  for (let file of files) {
+    formData.append("files", file, file.name);
+  }
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", PROXY_URL, true);
+
+  xhr.upload.onprogress = (event) => {
+    if (event.lengthComputable) {
+      const percent = (event.loaded / event.total) * 100;
+      progressBar.style.width = percent + "%";
     }
+  };
 
-    const response = await fetch(PROXY_URL, {
-      method: "POST",
-      body: formData
-    });
-
-    const result = await response.json();
+  xhr.onload = () => {
     spinner.style.display = "none";
-
-    if (response.ok) {
-      showSuccess(`${evidenceName} - ${subCounty}.pdf submitted successfully!`);
+    if (xhr.status >= 200 && xhr.status < 300) {
+      showSuccess(`${evidenceName}_${subCounty}.pdf submitted successfully`);
       resetForm();
     } else {
-      showError(result.error || "Upload failed. Try again.");
+      showError("Upload failed. Try again.");
     }
-  } catch (err) {
+  };
+
+  xhr.onerror = () => {
     spinner.style.display = "none";
-    showError("Network error: " + err.message);
-  }
+    showError("Network error. Try again.");
+  };
+
+  xhr.send(formData);
 });
 </script>
 </body>
