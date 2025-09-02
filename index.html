@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload</title>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
   header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
   header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
   .container { max-width: 720px; background: #fff; margin: 36px auto; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
@@ -75,11 +75,11 @@
   <label for="files">Choose PDF file(s):</label>
   <input type="file" id="files" accept="application/pdf" multiple />
 
-  <div class="spinner" id="spinner">⏳ Uploading...</div>
+  <div class="spinner" id="spinner">⏳ Sending to proxy...</div>
   <div class="progress-bar-container" id="progressContainer">
     <div class="progress-bar" id="progressBar">0%</div>
   </div>
-  <div class="success" id="success">✅ Upload successful!</div>
+  <div class="success" id="success"></div>
   <div class="error" id="error"></div>
 
   <button id="uploadBtn">Upload PDF Evidence</button>
@@ -99,37 +99,47 @@ const successMsg = document.getElementById('success');
 const errorMsg = document.getElementById('error');
 const uploadBtn = document.getElementById('uploadBtn');
 
-// Correctly aligned indicators
+// Indicators aligned with App Script folderMap
 const indicatorsMap = {
+  "D3 - Immunization Coverage Increased": [
+    "Avail immunization services on daily basis 8am-5pm",
+    "Conduct continuous Immunization defaulter tracing",
+    "Conduct quarterly CCE assessment in all the immunizing facilities",
+    "Conduct monthly integrated outreaches"
+  ],
+  "D12 - Referral system improved": [
+    "Strengthen referral system-Revise and disseminate SOPs",
+    "Formulate ambulance checklist to ensure consistent availability of emergency response commodities",
+    "Procure 2 ACLS ambulances for Naivasha and Molo",
+    "Relocate the call Centre to NCRTH and strengthen the call Centre by acquiring a dedicated toll free number"
+  ],
   "D14 - Operationalization of health facilities to offer better services": [
-    "Equip 6 new health facilities",
-    "Operationalize Level 4 new Maternity units in Bondeni, Molo, Gilgil and Githioro L3"
+    "Operationalize Level 4 new Maternity units in Bondeni, Molo, Gilgil and Githioro L3",
+    "Equip 6 new health facilities"
+  ],
+  "D19 - Theatre Services improved": [
+    "Deployment of HRH to operationalize Subukia, Elburgon and Gilgil Theatres",
+    "Procurement of Theater equipment for Subukia",
+    "Operationalize the theatre at Bondeni SCH"
+  ],
+  "D20 - In-patient Services Improved": [
+    "Hold Hospital Quarterly clinical audit team meetings in level IV / V hospitals (50%)",
+    "Conduct quarterly Supportive Supervision of all the 16 Level IV & V Hospitals (50%)"
+  ],
+  "D23 - Antenatal Care Services improved": [
+    "Establish/Strengthen cohort group ANC(GANC)",
+    "Scale up the number of facilities Enrolling ANC mothers to SMS PROMPTS from 57 to 90",
+    "Procure essential and emergency neonatal care equipment",
+    "Establish/Strengthen cohort group ANC(GANC)"
+  ],
+  "D24 - Postnatal Care Improved": [
+    "Integrate cervical cancer screening in postnatal clinic",
+    "Provision of PNC within the first 48 hours in all the delivery units"
   ],
   "D25 - Maternal Perinatal Deaths Audited": [
     "Conduct monthly facility and sub county MPDSR Audit meeting",
     "Track and Implement recommendations of the action points from the MPDSR meetings",
     "Conduct weekly virtual MPDSR meeting at all levels of care"
-  ],
-  "D23 - Antenatal Care Services improved": [
-    "Establish/Strengthen cohort group ANC(GANC)",
-    "Scale up the number of facilities Enrolling ANC mothers to SMS PROMPTS from 57 to 90",
-    "Procure essential and emergency neonatal care equipment"
-  ],
-  "D35 - Youth Empowerment Initiatives": [
-    "Provision of psychological counselling services in youth friendly centres",
-    "Sensitize the youth on YFS,Live saving skills  and Alcohol & Substance Abuse integrate into school health programme",
-    "Establishment of youth Friendly Centres in Facilities"
-  ],
-  "D29 - Health Services Supervision": [
-    "Report on implementation of CHMT  and SCHMT supervision",
-    "SCHMT undertake 33 supervisions",
-    "Undertake 3 CHMT supervisions per quarter"
-  ],
-  "D27 - Burden of Cancer Reduced": [
-    "Conduct psychosocial support counselling for cancer survivors",
-    "Administration of the HPV 1 vaccine to girls 10 years-14 years.",
-    "Treatment of cervical cancer lesions",
-    "Undertake cervical cancer Screening"
   ],
   "D26 - Family Planning Uptake improved": [
     "Operationalization of the 2 AYSRH centres .( Ronda HC and Mau Narok HC)",
@@ -137,34 +147,25 @@ const indicatorsMap = {
     "Roll out the self-care initiative in reproductive health and DMPA-SC injection",
     "Requisition of family planning commodities"
   ],
-  "D24 - Postnatal Care Improved": [
-    "Integrate cervical cancer screening in postnatal clinic",
-    "Provision of PNC within the first 48 hours in all the delivery units"
+  "D27 - Burden of Cancer Reduced": [
+    "Undertake cervical cancer Screening",
+    "Treatment of cervical cancer lesions",
+    "Administration of the HPV 1 vaccine to girls 10 years-14 years.",
+    "Conduct psychosocial support counselling for cancer survivors"
   ],
-  "D20 - In-patient Services Improved": [
-    "Hold Hospital Quarterly clinical audit team meetings in level IV / V hospitals (50%)",
-    "Conduct quarterly Supportive Supervision of all the 16 Level IV & V Hospitals (50%)"
+  "D29 - Health Services Supervision": [
+    "Undertake 3 CHMT supervisions per quarter",
+    "SCHMT undertake 33 supervisions",
+    "Report on implementation of CHMT  and SCHMT supervision"
   ],
-  "D19 - Theatre Services improved": [
-    "Deployment of HRH to operationalize Subukia, Elburgon and Gilgil Theatres",
-    "Procurement of Theater equipment for Subukia",
-    "Operationalize the theatre at Bondeni SCH"
-  ],
-  "D12 - Referral system improved": [
-    "Relocate the call Centre to NCRTH and strengthen the call Centre by acquiring a dedicated toll free number",
-    "Procure 2 ACLS ambulances for Naivasha and Molo",
-    "Formulate ambulance checklist to ensure consistent availability of emergency response commodities",
-    "Strengthen referral system-Revise and disseminate SOPs"
-  ],
-  "D3 - Immunization Coverage Increased": [
-    "Avail immunization services on daily basis 8am-5pm",
-    "Conduct continuous Immunization defaulter tracing",
-    "Conduct quarterly CCE assessment in all the immunizing facilities",
-    "Conduct monthly integrated outreaches"
+  "D35 - Youth Empowerment Initiatives": [
+    "Establishment of youth Friendly Centres in Facilities",
+    "Sensitize the youth on YFS,Live saving skills  and Alcohol & Substance Abuse integrate into school health programme",
+    "Provision of psychological counselling services in youth friendly centres"
   ]
 };
 
-// Populate indicators dynamically based on category
+// Populate indicators dynamically
 categorySelect.addEventListener('change', () => {
   const category = categorySelect.value;
   indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
@@ -187,14 +188,13 @@ function showError(msg) {
   uploadBtn.disabled = false;
 }
 
-function showSuccess(fileNames) {
-  successMsg.style.display = 'block';
-  successMsg.textContent = `✅ Upload successful! Files: ${fileNames.join(', ')}`;
-  errorMsg.style.display = 'none';
-  spinner.style.display = 'none';
-  progressContainer.style.display = 'none';
-  uploadBtn.disabled = false;
-  setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve({ name: file.name, content: reader.result.split(',')[1] });
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
 }
 
 async function upload() {
@@ -208,11 +208,6 @@ async function upload() {
   if (files.length === 0) { showError('Please select at least one PDF file.'); return; }
   if (files.length > 5) { showError('Maximum 5 files allowed.'); return; }
 
-  for (let f of files) {
-    if (f.size > 20 * 1024 * 1024) { showError(`File ${f.name} exceeds 20MB.`); return; }
-    if (f.type !== 'application/pdf') { showError(`File ${f.name} is not a PDF.`); return; }
-  }
-
   spinner.style.display = 'block';
   uploadBtn.disabled = true;
   progressContainer.style.display = 'block';
@@ -222,18 +217,13 @@ async function upload() {
   errorMsg.style.display = 'none';
 
   try {
-    const formData = new FormData();
-    formData.append("evidenceName", evidenceName);
-    formData.append("category", category);
-    formData.append("indicator", indicator);
-    formData.append("subCounty", subCounty);
+    const filesBase64 = await Promise.all(Array.from(files).map(fileToBase64));
 
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i], files[i].name);
-    }
+    const payload = { evidenceName, category, indicator, subCounty, files: filesBase64 };
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", PROXY_URL, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
@@ -243,22 +233,24 @@ async function upload() {
       }
     };
 
+    // Success immediately after proxy receives
     xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const uploadedFileNames = Array.from(files).map(f => f.name);
-        showSuccess(uploadedFileNames);
-        evidenceNameInput.value = '';
-        categorySelect.value = '';
-        indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-        subCountySelect.value = '';
-        filesInput.value = '';
-      } else {
-        showError(`Upload failed: ${xhr.statusText}`);
-      }
+      successMsg.style.display = 'block';
+      successMsg.textContent = `✅ Files sent successfully to proxy! They will be uploaded to Drive in the background.`;
+      spinner.style.display = 'none';
+      progressContainer.style.display = 'none';
+      uploadBtn.disabled = false;
+
+      evidenceNameInput.value = '';
+      categorySelect.value = '';
+      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+      subCountySelect.value = '';
+      filesInput.value = '';
     };
 
     xhr.onerror = () => { showError('Network error. Try again.'); };
-    xhr.send(formData);
+
+    xhr.send(JSON.stringify(payload));
 
   } catch (err) { showError('Upload failed: ' + err.message); }
 }
