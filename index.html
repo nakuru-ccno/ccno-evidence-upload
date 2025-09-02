@@ -176,7 +176,7 @@ categorySelect.addEventListener("change", () => {
 });
 
 function showError(msg) {
-  errorMsg.style.display = "block";
+  errorMsg.style.display = msg ? "block" : "none";
   errorMsg.textContent = msg;
   successMsg.style.display = "none";
 }
@@ -185,6 +185,19 @@ function showSuccess(msg) {
   successMsg.style.display = "block";
   successMsg.textContent = msg;
   errorMsg.style.display = "none";
+
+  // Auto-hide after 4 seconds
+  setTimeout(() => {
+    successMsg.style.display = "none";
+  }, 4000);
+}
+
+function resetForm() {
+  evidenceNameInput.value = "";
+  categorySelect.value = "";
+  indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+  subCountySelect.value = "";
+  filesInput.value = "";
 }
 
 uploadBtn.addEventListener("click", async () => {
@@ -200,7 +213,6 @@ uploadBtn.addEventListener("click", async () => {
 
   spinner.style.display = "block";
   showError("");
-  showSuccess("");
 
   try {
     const formData = new FormData();
@@ -221,7 +233,8 @@ uploadBtn.addEventListener("click", async () => {
     spinner.style.display = "none";
 
     if (response.ok) {
-      showSuccess(`✅ Upload received by proxy: ${result.uploadedFiles.join(", ")}`);
+      showSuccess(`${evidenceName} - ${subCounty}.pdf submitted successfully!`);
+      resetForm();
     } else {
       showError(result.error || "Upload failed. Try again.");
     }
