@@ -6,132 +6,71 @@
 <title>CCNO Evidence Upload</title>
 <style>
   body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f6f9;
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     color: #333;
   }
   header {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     background: #0277bd;
-    padding: 15px 20px;
+    padding: 12px 18px;
     color: #fff;
-    font-weight: 600;
-    font-size: 1.2em;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
   header img {
-    height: 55px;
+    height: 52px;
+    width: 52px;
+    object-fit: contain;
     background: #fff;
     border-radius: 50%;
     padding: 4px;
   }
+
   .container {
-    max-width: 700px;
-    background: #fff;
-    margin: 40px auto;
-    padding: 30px 35px;
-    border-radius: 12px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    max-width: 720px; background: #fff; margin: 36px auto;
+    padding: 28px 32px; border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     border-top: 6px solid #2e7d32;
   }
-  h2 {
-    text-align: center;
-    font-weight: 700;
-    color: #b71c1c;
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-size: 1.4em;
-  }
-  label {
-    display: block;
-    margin-top: 18px;
-    font-weight: 600;
-    color: #2e7d32;
-  }
+  h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
+
+  label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
   input[type="text"], select, input[type="file"] {
-    width: 100%;
-    padding: 12px 14px;
-    margin-top: 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1em;
+    width: 100%; padding: 12px 14px; margin-top: 8px;
+    border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem;
+    background: #fff; transition: border 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box;
-    transition: border 0.2s ease;
   }
   input[type="text"]:focus, select:focus, input[type="file"]:focus {
-    border-color: #0277bd;
-    outline: none;
+    outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
   }
-  small {
-    display: block;
-    font-size: 0.85em;
-    color: #666;
-    margin-top: 5px;
-  }
+  small { display: block; font-size: 0.85em; color: #607d8b; margin-top: 6px; }
+
   button {
-    margin-top: 30px;
-    width: 100%;
-    padding: 15px;
-    font-size: 1.1em;
-    background-color: #b71c1c;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background 0.25s ease, transform 0.1s ease;
+    margin-top: 22px; width: 100%; padding: 14px 16px;
+    font-size: 1.05rem; background: #b71c1c; color: #fff;
+    border: none; border-radius: 10px; cursor: pointer; font-weight: 800;
+    transition: background 0.25s ease, transform 0.08s ease;
   }
-  button:hover {
-    background-color: #d32f2f;
-    transform: translateY(-1px);
-  }
-  .spinner {
-    display: none;
-    margin: 20px 0;
-    text-align: center;
-    color: #b71c1c;
-    font-weight: 600;
-  }
-  .progress-bar-container {
-    display: none;
-    width: 100%;
-    background: #eee;
-    border-radius: 6px;
-    margin-top: 15px;
-    overflow: hidden;
-  }
-  .progress-bar {
-    width: 0%;
-    height: 22px;
-    background: #2e7d32;
-    transition: width 0.3s ease;
-    text-align: center;
-    color: white;
-    font-weight: 600;
-    line-height: 22px;
-    font-size: 0.9em;
-  }
+  button:hover { background: #d32f2f; }
+  button:active { transform: translateY(1px); }
+
+  .spinner { display: none; margin: 16px 0; text-align: center; color: #b71c1c; font-weight: 700; }
+
+  .progress-bar-container { display: none; width: 100%; background: #eceff1; border-radius: 8px; margin-top: 14px; overflow: hidden; }
+  .progress-bar { width: 0%; height: 22px; background: #2e7d32; transition: width 0.3s ease;
+    text-align: center; color: #fff; font-weight: 700; line-height: 22px; font-size: 0.9rem; }
+
   .success, .error {
-    display: none;
-    margin: 20px 0;
-    padding: 15px;
-    border-radius: 6px;
-    font-weight: 600;
+    display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700;
   }
-  .success {
-    background: #e3f2fd;
-    color: #0d47a1;
-    border: 1px solid #90caf9;
-  }
-  .error {
-    background: #ffebee;
-    color: #b71c1c;
-    border: 1px solid #ef9a9a;
-  }
+  .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+  .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
 </style>
 </head>
 <body>
@@ -139,6 +78,7 @@
   <img src="https://www.nakurucountychiefnursingofficer.site/lovable-uploads/00cc8120-039e-4419-8b2b-e07e69d6fdd8.png" alt="Nakuru County Logo" />
   Q1 FY 25/26 Performance Contract
 </header>
+
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
@@ -213,6 +153,7 @@ const successMsg = document.getElementById('success');
 const errorMsg = document.getElementById('error');
 const uploadBtn = document.getElementById('uploadBtn');
 
+// EXACT indicators map (from your list)
 const indicatorsMap = {
   "D3 Immunization Coverage Increased": [
     "Avail immunization services on daily basis 8am-5pm",
@@ -222,9 +163,9 @@ const indicatorsMap = {
   ],
   "D12 Referral system improved": [
     "Strengthen referral system-Revise and disseminate SOPs",
-    "Formulate ambulance checklist",
+    "Formulate ambulance checklist to ensure consistent availability of emergency response commodities",
     "Procure 2 ACLS ambulances for Naivasha and Molo",
-    "Relocate the call Centre to NCRTH and strengthen"
+    "Relocate the call Centre to NCRTH and strengthen the call Centre by acquiring a dedicated toll free number"
   ],
   "D14 Operationalization of health facilities to offer better services": [
     "Equip 6 new health facilities",
@@ -236,44 +177,44 @@ const indicatorsMap = {
     "Deployment of HRH to operationalize Subukia, Elburgon and Gilgil Theatres"
   ],
   "D20 In-patient Services Improved": [
-    "Conduct quarterly Supportive Supervision",
-    "Hold Hospital Quarterly clinical audit team meetings"
+    "Conduct quarterly Supportive Supervision of all the 16 Level IV & V Hospitals (50%)",
+    "Hold Hospital Quarterly clinical audit team meetings in level IV / V hospitals (50%)"
   ],
   "D23 Antenatal Care Services improved": [
     "Establish/Strengthen cohort group ANC(GANC)",
     "Procure essential and emergency neonatal care equipment",
-    "Scale up ANC mothers enrolled in SMS PROMPTS from 57 to 90"
+    "Scale up the number of facilities Enrolling ANC mothers to SMS PROMPTS from 57 to 90"
   ],
   "D24 Postnatal Care Improved": [
-    "Provision of PNC within the first 48 hours",
+    "Provision of PNC within the first 48 hours in all the delivery units",
     "Integrate cervical cancer screening in postnatal clinic"
   ],
   "D25 Maternal Perinatal Deaths Audited": [
     "Conduct monthly facility and sub county MPDSR Audit meeting",
-    "Conduct weekly virtual MPDSR meeting",
-    "Track and implement MPDSR recommendations"
+    "Conduct weekly virtual MPDSR meeting at all levels of care",
+    "Track and Implement recommendations of the action points from the MPDSR meetings"
   ],
   "D26 Family Planning Uptake improved": [
     "Requisition of family planning commodities",
-    "Roll out the self-care initiative and DMPA-SC injection",
-    "Mentorship / OJT on LARC methods including Hormonal IUD",
-    "Operationalization of 2 AYSRH centres (Ronda HC, Mau Narok HC)"
+    "Roll out the self-care initiative in reproductive health and DMPA-SC injection",
+    "Mentorship / OJT on long acting and reversible contraceptive methods, including Hormonal IUD",
+    "Operationalization of the 2 AYSRH centres .( Ronda HC and Mau Narok HC)"
   ],
   "D27 Burden of Cancer Reduced": [
     "Undertake cervical cancer Screening",
     "Treatment of cervical cancer lesions",
-    "Administration of the HPV 1 vaccine (10-14 yrs)",
-    "Conduct psychosocial support counselling for survivors"
+    "Administration of the HPV 1 vaccine to girls 10 years-14 years.",
+    "Conduct psychosocial support counselling for cancer survivors"
   ],
   "D29 Health Services Supervision": [
     "Undertake 3 CHMT supervisions per quarter",
     "SCHMT undertake 33 supervisions",
-    "Report on implementation of CHMT and SCHMT supervision"
+    "Report on implementation of CHMT  and SCHMT supervision"
   ],
   "D35 Youth Empowerment Initiatives": [
-    "Establishment of youth Friendly Centres",
-    "Sensitize youth on YFS, life skills, and ASA",
-    "Provision of psychological counselling in youth centres"
+    "Establishment of youth Friendly Centres in Facilities",
+    "Sensitize the youth on YFS,Live saving skills  and Alcohol & Substance Abuse integrate into school health programme",
+    "Provision of psychological counselling services in youth friendly centres"
   ]
 };
 
@@ -357,8 +298,10 @@ async function upload() {
     };
 
     xhr.onload = () => {
-      const uploadedFileNames = Array.from(files).map(f => `${evidenceName} – ${subCounty}.pdf`);
+      const uploadedFileNames = Array.from(files).map(() => `${evidenceName} – ${subCounty}.pdf`);
       showSuccess(uploadedFileNames);
+
+      // Reset fields
       evidenceNameInput.value = '';
       categorySelect.value = '';
       indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
