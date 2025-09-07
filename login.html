@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCNO Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; margin: 0;
+    }
+    .login-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      width: 350px;
+    }
+    h2 { text-align: center; }
+    input, select {
+      width: 100%; padding: 10px;
+      margin: 8px 0; box-sizing: border-box;
+    }
+    button {
+      width: 100%; padding: 10px;
+      background: #007bff; border: none;
+      color: white; cursor: pointer; border-radius: 4px;
+    }
+    button:hover { background: #0056b3; }
+    .message {
+      margin-top: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <div class="message" id="loginMessage"></div>
+
+    <hr>
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="email" id="registerEmail" placeholder="Email" required>
+      <input type="password" id="registerPassword" placeholder="Password" required>
+      <select id="registerRole">
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button type="submit">Register</button>
+    </form>
+    <div class="message" id="registerMessage"></div>
+  </div>
+
+  <script>
+    // 🔹 Your Apps Script Web App URL
+    const API_URL = "https://script.google.com/macros/s/AKfycbyBCy4eowXs3ovP-FV6D-lGPDsVuSq_4A_Ht9WD8xOMmUasSYJyskR00dTYC5dqh-Ve/exec";
+
+    // Handle login
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "login", email, password })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        document.getElementById("loginMessage").innerText = "✅ " + data.message;
+        // save session
+        localStorage.setItem("ccno_user", JSON.stringify({
+          email: email,
+          role: data.role,
+          token: data.token
+        }));
+        // redirect
+        setTimeout(() => window.location.href = "dashboard.html", 1000);
+      } else {
+        document.getElementById("loginMessage").innerText = "❌ " + data.message;
+      }
+    });
+
+    // Handle register
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+      const role = document.getElementById("registerRole").value;
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "register", email, password, role })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        document.getElementById("registerMessage").innerText = "✅ " + data.message;
+      } else {
+        document.getElementById("registerMessage").innerText = "❌ " + data.message;
+      }
+    });
+  </script>
+</body>
+</html>
