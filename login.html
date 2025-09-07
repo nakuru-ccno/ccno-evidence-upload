@@ -132,7 +132,19 @@
         body: JSON.stringify({ action: "login", email, password }),
       });
       const data = await res.json();
-      document.getElementById('message').innerText = data.message;
+
+      if (data.success) {
+        // save token in localStorage for session
+        localStorage.setItem("ccno_token", data.token);
+        localStorage.setItem("ccno_email", email);
+        localStorage.setItem("ccno_role", data.role);
+
+        // ✅ redirect to main app
+        window.location.href = "index.html";
+      } else {
+        document.getElementById('message').innerText = data.message;
+        document.getElementById('message').style.color = "red";
+      }
     }
 
     async function register() {
@@ -144,7 +156,9 @@
         body: JSON.stringify({ action: "register", email, password, role }),
       });
       const data = await res.json();
+
       document.getElementById('message').innerText = data.message;
+      document.getElementById('message').style.color = data.success ? "green" : "red";
     }
   </script>
 </body>
