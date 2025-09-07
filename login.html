@@ -1,165 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CCNO Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CCNO Evidence Upload - Login</title>
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #333;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 1rem;
-      display: block;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    button {
-      width: 100%;
-      margin-top: 1.5rem;
-      padding: 12px;
-      background: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .toggle {
-      text-align: center;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #007BFF;
-      cursor: pointer;
-    }
-    .form {
-      display: none;
-    }
-    .form.active {
-      display: block;
-    }
-    .message {
-      text-align: center;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+  header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
+  .container { max-width: 480px; background: #fff; margin: 48px auto; padding: 32px 36px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
+  h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
+  label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
+  input, select { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
+  input:focus, select:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
+  button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
+  button:hover { background: #d32f2f; }
+  .toggle { text-align: center; margin-top: 16px; font-size: 0.9rem; color: #0277bd; font-weight: 600; cursor: pointer; }
+  .form { display: none; }
+  .form.active { display: block; }
+  .message { text-align: center; margin-top: 18px; font-size: 0.95rem; }
+  .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 12px; border-radius: 8px; }
+  .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; padding: 12px; border-radius: 8px; }
   </style>
 </head>
 <body>
+<header>
+  <img src="images/LOGO.png" alt="Nakuru County Logo" />
+  Performance Contract For Q1 FY 2025/26
+</header>
 
-  <div class="container">
-    <h2 id="formTitle">Login</h2>
+<div class="container">
+  <h2>CCNO Login</h2>
 
-    <!-- Login Form -->
-    <div id="loginForm" class="form active">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="Enter your email" required>
-      <label>Password</label>
-      <input type="password" id="loginPassword" placeholder="Enter your password" required>
-      <button onclick="login()">Login</button>
-      <div class="toggle" onclick="toggleForm('register')">Don't have an account? Register</div>
-    </div>
-
-    <!-- Register Form -->
-    <div id="registerForm" class="form">
-      <label>Email</label>
-      <input type="email" id="regEmail" placeholder="Enter your email" required>
-      <label>Password</label>
-      <input type="password" id="regPassword" placeholder="Enter your password" required>
-      <label>Role</label>
-      <select id="regRole">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
-      <button onclick="register()">Register</button>
-      <div class="toggle" onclick="toggleForm('login')">Already have an account? Login</div>
-    </div>
-
-    <div id="message" class="message"></div>
+  <!-- Login Form -->
+  <div id="loginForm" class="form active">
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+    <button onclick="login()">Login</button>
+    <div class="toggle" onclick="toggleForm('register')">Don't have an account? Register</div>
   </div>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyBCy4eowXs3ovP-FV6D-lGPDsVuSq_4A_Ht9WD8xOMmUasSYJyskR00dTYC5dqh-Ve/exec";
+  <!-- Register Form -->
+  <div id="registerForm" class="form">
+    <label>Email</label>
+    <input type="email" id="regEmail" placeholder="Enter your email" required>
+    <label>Password</label>
+    <input type="password" id="regPassword" placeholder="Enter your password" required>
+    <label>Role</label>
+    <select id="regRole">
+      <option value="user">User</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button onclick="register()">Register</button>
+    <div class="toggle" onclick="toggleForm('login')">Already have an account? Login</div>
+  </div>
 
-    function toggleForm(type) {
-      if (type === 'login') {
-        document.getElementById('formTitle').innerText = "Login";
-        document.getElementById('loginForm').classList.add('active');
-        document.getElementById('registerForm').classList.remove('active');
-      } else {
-        document.getElementById('formTitle').innerText = "Register";
-        document.getElementById('registerForm').classList.add('active');
-        document.getElementById('loginForm').classList.remove('active');
-      }
-      document.getElementById('message').innerText = "";
+  <div id="message" class="message"></div>
+</div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyBCy4eowXs3ovP-FV6D-lGPDsVuSq_4A_Ht9WD8xOMmUasSYJyskR00dTYC5dqh-Ve/exec";
+
+  function toggleForm(type) {
+    if (type === 'login') {
+      document.getElementById('loginForm').classList.add('active');
+      document.getElementById('registerForm').classList.remove('active');
+      document.querySelector("h2").innerText = "CCNO Login";
+    } else {
+      document.getElementById('registerForm').classList.add('active');
+      document.getElementById('loginForm').classList.remove('active');
+      document.querySelector("h2").innerText = "Register New User";
     }
+    document.getElementById('message').innerHTML = "";
+  }
 
-    async function login() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "login", email, password }),
-      });
-      const data = await res.json();
+  async function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "login", email, password }),
+    });
+    const data = await res.json();
 
-      if (data.success) {
-        // save token in localStorage for session
-        localStorage.setItem("ccno_token", data.token);
-        localStorage.setItem("ccno_email", email);
-        localStorage.setItem("ccno_role", data.role);
-
-        // ✅ redirect to main app
-        window.location.href = "index.html";
-      } else {
-        document.getElementById('message').innerText = data.message;
-        document.getElementById('message').style.color = "red";
-      }
+    if (data.success) {
+      localStorage.setItem("ccno_token", data.token);
+      localStorage.setItem("ccno_email", email);
+      localStorage.setItem("ccno_role", data.role);
+      window.location.href = "index.html"; // ✅ redirect
+    } else {
+      document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
     }
+  }
 
-    async function register() {
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-      const role = document.getElementById('regRole').value;
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "register", email, password, role }),
-      });
-      const data = await res.json();
+  async function register() {
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const role = document.getElementById('regRole').value;
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "register", email, password, role }),
+    });
+    const data = await res.json();
 
-      document.getElementById('message').innerText = data.message;
-      document.getElementById('message').style.color = data.success ? "green" : "red";
+    if (data.success) {
+      document.getElementById('message').innerHTML = `<div class="success">${data.message}</div>`;
+    } else {
+      document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
     }
-  </script>
+  }
+</script>
 </body>
 </html>
