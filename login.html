@@ -147,7 +147,7 @@
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "forgot", email }),
+        body: JSON.stringify({ action: "forgotPassword", email }),
       });
       const data = await res.json();
       loading.style.display = "none";
