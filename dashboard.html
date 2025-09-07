@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCNO Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .dashboard-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 400px;
+    }
+    h2 { margin-top: 0; }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #dc3545;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover { background: #b52a37; }
+  </style>
+</head>
+<body>
+  <div class="dashboard-box">
+    <h2>Welcome 🎉</h2>
+    <p id="userInfo">Loading...</p>
+    <button id="logoutBtn">Logout</button>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem("ccno_user"));
+
+    if (!user) {
+      // If no login data → redirect back to login
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("userInfo").innerText =
+        `Logged in as: ${user.email} (${user.role})`;
+    }
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("ccno_user"); // clear session
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>
