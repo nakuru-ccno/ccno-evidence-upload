@@ -15,8 +15,8 @@
   .container { max-width: 480px; background: #fff; margin: 48px auto; padding: 32px 36px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
   h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
   label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
-  input, select { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
-  input:focus, select:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
+  input { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
+  input:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
   button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
   button:hover { background: #d32f2f; }
   .toggle { text-align: center; margin-top: 16px; font-size: 0.9rem; color: #0277bd; font-weight: 600; cursor: pointer; }
@@ -25,6 +25,10 @@
   .message { text-align: center; margin-top: 18px; font-size: 0.95rem; }
   .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 12px; border-radius: 8px; }
   .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; padding: 12px; border-radius: 8px; }
+  /* Spinner */
+  .loading { display: none; text-align: center; margin-top: 14px; }
+  .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #2e7d32; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: auto; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -43,6 +47,7 @@
     <label>Password</label>
     <input type="password" id="loginPassword" placeholder="Enter your password" required>
     <button onclick="login()">Login</button>
+    <div class="loading" id="loginLoading"><div class="spinner"></div></div>
     <div class="toggle" onclick="toggleForm('register')">Don't have an account? Register</div>
   </div>
 
@@ -52,12 +57,8 @@
     <input type="email" id="regEmail" placeholder="Enter your email" required>
     <label>Password</label>
     <input type="password" id="regPassword" placeholder="Enter your password" required>
-    <label>Role</label>
-    <select id="regRole">
-      <option value="user">User</option>
-      <option value="admin">Admin</option>
-    </select>
     <button onclick="register()">Register</button>
+    <div class="loading" id="registerLoading"><div class="spinner"></div></div>
     <div class="toggle" onclick="toggleForm('login')">Already have an account? Login</div>
   </div>
 
@@ -65,54 +66,68 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbyBCy4eowXs3ovP-FV6D-lGPDsVuSq_4A_Ht9WD8xOMmUasSYJyskR00dTYC5dqh-Ve/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbw0Tj0l2QLOGKjZ6IxtsdnknVyRwPhjJQWCmDlMQG11vaC0iddzy9Z83tZa-W_M8FnP/exec";
 
   function toggleForm(type) {
-    if (type === 'login') {
-      document.getElementById('loginForm').classList.add('active');
-      document.getElementById('registerForm').classList.remove('active');
-      document.querySelector("h2").innerText = "CCNO Login";
-    } else {
-      document.getElementById('registerForm').classList.add('active');
-      document.getElementById('loginForm').classList.remove('active');
-      document.querySelector("h2").innerText = "Register New User";
-    }
+    document.getElementById('loginForm').classList.toggle('active', type === 'login');
+    document.getElementById('registerForm').classList.toggle('active', type === 'register');
+    document.querySelector("h2").innerText = type === 'login' ? "CCNO Login" : "Register New User";
     document.getElementById('message').innerHTML = "";
   }
 
   async function login() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "login", email, password }),
-    });
-    const data = await res.json();
+    const loading = document.getElementById('loginLoading');
+    loading.style.display = "block";
+    document.getElementById('message').innerHTML = "";
 
-    if (data.success) {
-      localStorage.setItem("ccno_token", data.token);
-      localStorage.setItem("ccno_email", email);
-      localStorage.setItem("ccno_role", data.role);
-      window.location.href = "index.html"; // ✅ redirect
-    } else {
-      document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "login", email, password }),
+      });
+      const data = await res.json();
+      loading.style.display = "none";
+
+      if (data.success) {
+        localStorage.setItem("ccno_token", data.token);
+        localStorage.setItem("ccno_email", email);
+        localStorage.setItem("ccno_role", data.role);
+        window.location.href = "index.html"; // ✅ redirect
+      } else {
+        document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
+      }
+    } catch (err) {
+      loading.style.display = "none";
+      document.getElementById('message').innerHTML = `<div class="error">Error connecting to server.</div>`;
     }
   }
 
   async function register() {
     const email = document.getElementById('regEmail').value;
     const password = document.getElementById('regPassword').value;
-    const role = document.getElementById('regRole').value;
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "register", email, password, role }),
-    });
-    const data = await res.json();
+    const loading = document.getElementById('registerLoading');
+    loading.style.display = "block";
+    document.getElementById('message').innerHTML = "";
 
-    if (data.success) {
-      document.getElementById('message').innerHTML = `<div class="success">${data.message}</div>`;
-    } else {
-      document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "register", email, password }),
+      });
+      const data = await res.json();
+      loading.style.display = "none";
+
+      if (data.success) {
+        document.getElementById('message').innerHTML = `<div class="success">✅ Account created! Check your email. Wait for admin approval.</div>`;
+        toggleForm('login');
+      } else {
+        document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
+      }
+    } catch (err) {
+      loading.style.display = "none";
+      document.getElementById('message').innerHTML = `<div class="error">Error connecting to server.</div>`;
     }
   }
 </script>
