@@ -43,20 +43,19 @@
   </div>
 
   <script>
-    // Check if user is logged in
+    // ✅ Check login
     const user = JSON.parse(localStorage.getItem("ccno_user"));
 
     if (!user) {
-      // If no login data → redirect back to login
-      window.location.href = "login.html";
+      window.location.href = "login.html"; // not logged in
     } else {
       document.getElementById("userInfo").innerText =
         `Logged in as: ${user.email} (${user.role})`;
     }
 
-    // Logout
+    // ✅ Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.removeItem("ccno_user"); // clear session
+      localStorage.removeItem("ccno_user");
       window.location.href = "login.html";
     });
   </script>
