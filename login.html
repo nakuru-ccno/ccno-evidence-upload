@@ -67,7 +67,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbxb1JGCK2Sp2oCtp4UtzVvYW9w4RIchaVD4UthhDLRO30bnzju-ZDsXDgRF7FtJuB4/exec";
+  const API_URL = "https://script.google.com/macros/library/d/1I2R8fb7iwtzcD-z8KgXmPUng_GoNo5wv9YgQNbL8N29mC3z3PWSp47E4/108";
 
   function toggleForm(type) {
     document.getElementById('loginForm').classList.toggle('active', type === 'login');
@@ -92,9 +92,14 @@
       loading.style.display = "none";
 
       if (data.success) {
-        localStorage.setItem("ccno_token", data.token);
-        localStorage.setItem("ccno_email", email);
-        window.location.href = "index.html"; // ✅ redirect after login
+        // ✅ Store everything in ONE object
+        localStorage.setItem("ccno_user", JSON.stringify({
+          email: email,
+          token: data.token,
+          role: data.role || "user"
+        }));
+
+        window.location.href = "dashboard.html"; // redirect to dashboard
       } else {
         document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
       }
