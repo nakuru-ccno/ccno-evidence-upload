@@ -3,42 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CCNO Evidence Upload - Login</title>
+  <title>Nakuru County CCNO PC Evidence Upload</title>
 
-  <!-- ✅ Favicon -->
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
   <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
-  header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-  header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
-  .container { max-width: 480px; background: #fff; margin: 48px auto; padding: 32px 36px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
-  h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
-  label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
-  input { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
-  input:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
-  button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; transition: background 0.2s; }
-  button:hover { background: #d32f2f; }
-  .toggle { text-align: center; margin-top: 16px; font-size: 0.9rem; color: #0277bd; font-weight: 600; cursor: pointer; }
-  .form { display: none; }
-  .form.active { display: block; }
-  .message { text-align: center; margin-top: 18px; font-size: 0.95rem; }
-  .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 12px; border-radius: 8px; }
-  .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; padding: 12px; border-radius: 8px; }
-  /* Spinner */
-  .loading { display: none; text-align: center; margin-top: 14px; }
-  .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #2e7d32; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: auto; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+    header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
+    .container { max-width: 480px; background: #fff; margin: 48px auto; padding: 32px 36px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
+    h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
+    label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
+    input, select { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
+    input:focus, select:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
+    button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; transition: background 0.2s; }
+    button:hover { background: #d32f2f; }
+    .toggle { text-align: center; margin-top: 16px; font-size: 0.9rem; color: #0277bd; font-weight: 600; cursor: pointer; }
+    .form { display: none; }
+    .form.active { display: block; }
+    .message { text-align: center; margin-top: 18px; font-size: 0.95rem; }
+    .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 12px; border-radius: 8px; }
+    .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; padding: 12px; border-radius: 8px; }
+    .loading { display: none; text-align: center; margin-top: 14px; }
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #2e7d32; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 <header>
   <img src="images/LOGO.png" alt="Nakuru County Logo" />
-  Performance Contract For Q1 FY 2025/26
+  Nakuru County CCNO Performance Contract Evidence Upload
 </header>
 
 <div class="container">
-  <h2>CCNO Login</h2>
+  <h2 id="formTitle">Login</h2>
 
   <!-- Login Form -->
   <div id="loginForm" class="form active">
@@ -54,11 +52,30 @@
 
   <!-- Register Form -->
   <div id="registerForm" class="form">
+    <label>Full Name</label>
+    <input type="text" id="regFullName" placeholder="Enter your full name" required>
+
     <label>Email</label>
     <input type="email" id="regEmail" placeholder="Enter your email" required>
+
     <label>Password</label>
     <input type="password" id="regPassword" placeholder="Enter your password" required>
-    <button onclick="register()">Register</button>
+
+    <label>Role / Position</label>
+    <input type="text" id="regRole" placeholder="e.g., Health Officer, Data Manager" required>
+
+    <label>Sub County</label>
+    <select id="regSubCounty" required>
+      <option value="">Select Sub County</option>
+      <option value="Naivasha">Naivasha</option>
+      <option value="Molo">Molo</option>
+      <option value="Gilgil">Gilgil</option>
+      <option value="Nakuru East">Nakuru East</option>
+      <option value="Nakuru West">Nakuru West</option>
+      <option value="Nakuru Town">Nakuru Town</option>
+    </select>
+
+    <button onclick="register()">Create Account</button>
     <div class="loading" id="registerLoading"><div class="spinner"></div></div>
     <div class="toggle" onclick="toggleForm('login')">Already have an account? Login</div>
   </div>
@@ -67,18 +84,18 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbxNqMliqNWMeD7b6ozd5MPrcrKPWBVi8SbBy5P9sx7Sf9OZkLciAK42lL73MAWhu1ud/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbwOukMzmXy62GAM17q2r1mcZnNZ-3ovX1euWMXcto7OIHTUhzaBSNvttCuApcp_AGtr/exec";
 
   function toggleForm(type) {
     document.getElementById('loginForm').classList.toggle('active', type === 'login');
     document.getElementById('registerForm').classList.toggle('active', type === 'register');
-    document.querySelector("h2").innerText = type === 'login' ? "CCNO Login" : "Register New User";
+    document.getElementById("formTitle").innerText = type === 'login' ? "Login" : "Create Account";
     document.getElementById('message').innerHTML = "";
   }
 
   async function login() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
     const loading = document.getElementById('loginLoading');
     loading.style.display = "block";
     document.getElementById('message').innerHTML = "";
@@ -92,14 +109,16 @@
       loading.style.display = "none";
 
       if (data.success) {
-        // ✅ Store everything in ONE object
         localStorage.setItem("ccno_user", JSON.stringify({
-          email: email,
-          token: data.token,
-          role: data.role || "user"
+          fullName: data.fullName,
+          email: data.email,
+          role: data.role,
+          subCounty: data.subCounty,
+          status: data.status,
+          token: data.token
         }));
-
-        window.location.href = "dashboard.html"; // redirect to dashboard
+        // Redirect to index.html or dashboard
+        window.location.href = "index.html";
       } else {
         document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
       }
@@ -110,8 +129,11 @@
   }
 
   async function register() {
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
+    const fullName = document.getElementById('regFullName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const role = document.getElementById('regRole').value.trim();
+    const subCounty = document.getElementById('regSubCounty').value;
     const loading = document.getElementById('registerLoading');
     loading.style.display = "block";
     document.getElementById('message').innerHTML = "";
@@ -119,7 +141,14 @@
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "register", email, password }),
+        body: JSON.stringify({
+          action: "register",
+          fullName,
+          email,
+          password,
+          role,
+          subCounty
+        }),
       });
       const data = await res.json();
       loading.style.display = "none";
@@ -136,16 +165,11 @@
     }
   }
 
-  function openForgot() {
-    document.getElementById("forgotModal").style.display = "block";
-  }
-
-  function closeForgot() {
-    document.getElementById("forgotModal").style.display = "none";
-  }
-
+  // Forgot Password Modal
+  function openForgot() { document.getElementById("forgotModal").style.display = "block"; }
+  function closeForgot() { document.getElementById("forgotModal").style.display = "none"; }
   async function sendReset() {
-    const email = document.getElementById("forgotEmail").value;
+    const email = document.getElementById("forgotEmail").value.trim();
     const loading = document.getElementById("forgotLoading");
     loading.style.display = "block";
 
