@@ -4,76 +4,149 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CCNO Evidence Upload</title>
-  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+
   <style>
-    body { display: flex; margin: 0; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #333; }
-    .sidebar {
-      width: 250px; background: #e0f2f1;
-      padding: 20px; display: flex; flex-direction: column;
-      justify-content: space-between; box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    body {
+      display: flex;
+      margin: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      color: #333;
+      overflow-x: hidden;
     }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #e0f2f1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+    }
+
     .user-info { color: #1b5e20; font-size: 0.95rem; }
     .user-info div { margin-bottom: 8px; }
+
     .logout-btn {
-      background: #b71c1c; color: #fff; border: none;
-      padding: 10px; border-radius: 6px;
-      cursor: pointer; font-weight: 700;
+      background: #b71c1c;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
     }
     .logout-btn:hover { background: #d32f2f; }
+
+    /* Main content */
     .main-content { flex: 1; display: flex; flex-direction: column; }
+
     header {
-      display: flex; align-items: center; gap: 12px;
-      background: #0277bd; padding: 12px 18px;
-      color: #fff; font-weight: 700; font-size: 1.05rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #0277bd;
+      padding: 12px 18px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.05rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      justify-content: space-between;
     }
     header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
+
+    /* Toggle button */
+    .menu-toggle {
+      display: none;
+      background: #fff;
+      color: #0277bd;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Upload form container */
     .container {
-      max-width: 720px; background: #fff;
-      margin: 36px auto; padding: 28px 32px;
-      border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      max-width: 720px;
+      background: #fff;
+      margin: 24px auto;
+      padding: 28px 32px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       border-top: 6px solid #2e7d32;
     }
-    h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
+
+    h2 { text-align: center; font-weight: 800; color: #b71c1c; margin-bottom: 20px; }
     label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
-    input[type="text"], select, input[type="file"] {
+    input, select {
       width: 100%; padding: 12px 14px; margin-top: 8px;
       border: 1px solid #cfd8dc; border-radius: 8px;
       font-size: 1rem; background: #fff; box-sizing: border-box;
     }
-    input:focus, select:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
+    input:focus, select:focus {
+      outline: none; border-color: #0277bd;
+      box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
+    }
+
     button {
       margin-top: 22px; width: 100%; padding: 14px 16px;
-      font-size: 1.05rem; background: #b71c1c; color: #fff;
-      border: none; border-radius: 10px; cursor: pointer; font-weight: 800;
+      font-size: 1.05rem; background: #b71c1c;
+      color: #fff; border: none; border-radius: 10px;
+      cursor: pointer; font-weight: 800;
     }
     button:hover { background: #d32f2f; }
+
     .spinner { display: none; margin: 16px 0; text-align: center; color: #b71c1c; font-weight: 700; }
     .success, .error { display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700; }
     .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
     .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+
+    /* Progress bar */
     .progress-container { display: none; margin-top: 16px; background: #eee; border-radius: 8px; height: 18px; overflow: hidden; }
     .progress-bar { height: 100%; width: 0%; background: #2e7d32; transition: width 0.2s ease; }
     #progressText { text-align:right; font-size:0.9rem; color:#2e7d32; display:none; margin-top:4px; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar {
+        position: fixed; top: 0; left: 0;
+        height: 100%; transform: translateX(-100%);
+      }
+      .sidebar.active { transform: translateX(0); }
+      .menu-toggle { display: inline-block; }
+      .main-content { flex: unset; }
+    }
   </style>
 </head>
 <body>
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="user-info">
-      <div id="userName"></div>
-      <div id="userEmail"></div>
-      <div id="userRole"></div>
-      <div id="userStatus"></div>
+      <div class="user-name" id="userName">Loading...</div>
+      <div class="user-email" id="userEmail"></div>
+      <div class="user-role" id="userRole"></div>
+      <div class="user-status">Status: <span>Active</span></div>
     </div>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
-  <!-- Main Content -->
+  <!-- Main content -->
   <div class="main-content">
     <header>
-      <img src="images/LOGO.png" alt="Nakuru County Logo" />
-      Performance Contract For FY 2025/26
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <img src="images/LOGO.png" alt="Nakuru County Logo" />
+        Performance Contract For FY 2025/26
+      </div>
     </header>
 
     <div class="container">
@@ -88,7 +161,7 @@
         <option value="D3 - Immunization Coverage Increased">D3 - Immunization Coverage Increased</option>
         <option value="D11 - Mental health services improved">D11 - Mental health services improved</option>
         <option value="D12 - Referral system improved">D12 - Referral system improved</option>
-        <option value="D14 - Operationalization of health facilities to offer better services">D14 - Operationalization of health facilities to offer better services</option>
+        <option value="D14 - Operationalization of health facilities">D14 - Operationalization of health facilities</option>
         <option value="D19 - Theatre Services improved">D19 - Theatre Services improved</option>
         <option value="D20 - In-patient Services Improved">D20 - In-patient Services Improved</option>
         <option value="D23 - Antenatal Care Services improved">D23 - Antenatal Care Services improved</option>
@@ -137,54 +210,103 @@
   </div>
 
   <script>
-    const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
-    const indicatorSelect = document.getElementById("indicator");
-    const categorySelect = document.getElementById("category");
-    const successMsg = document.getElementById("success");
-    const errorMsg = document.getElementById("error");
-    const spinner = document.getElementById("spinner");
-    const progressContainer = document.getElementById("progressContainer");
-    const progressBar = document.getElementById("progressBar");
-    const progressText = document.getElementById("progressText");
+    // Simulated login data (should come from backend login)
+    const user = JSON.parse(localStorage.getItem("ccno_user")) || {
+      name: "Matoka",
+      email: "mbiunancy27@gmail.com",
+      role: "Nurse"
+    };
+
+    document.getElementById("userName").textContent = user.name;
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("userRole").textContent = "(" + user.role + ")";
 
     function logout() {
       localStorage.removeItem("ccno_user");
       window.location.href = "login.html";
     }
+    function toggleSidebar() {
+      document.querySelector(".sidebar").classList.toggle("active");
+    }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const user = JSON.parse(localStorage.getItem("ccno_user"));
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-      document.getElementById("userName").textContent = user.name;
-      document.getElementById("userEmail").textContent = user.email;
-      document.getElementById("userRole").textContent = "Role: " + user.role;
-      document.getElementById("userStatus").textContent = "Status: " + user.status;
-    });
-
-    const indicatorsMap = { 
+    // Indicators
+    const indicatorsMap = {
       "D3 - Immunization Coverage Increased": [
-        "Avail immunization services on daily basis 8am-5pm",
-        "Conduct continuous Immunization defaulter tracing",
-        "Conduct quarterly CCE assessment in all the immunizing facilities",
-        "Conduct monthly integrated outreaches"
+        "Avail immunization services daily 8am-5pm",
+        "Conduct immunization defaulter tracing",
+        "Quarterly CCE assessment",
+        "Monthly integrated outreaches"
       ],
       "D11 - Mental health services improved": [
-        "Training of skilled HCWs on mental health and common mental health disorders (mhGAP)",
-        "Conduct quarterly debrief/self care sessions for HCWs",
-        "Train 3000 CHPs on mental health and psychological first aid",
-        "Identification and referral on mental health disorders by CHPs to health facilities "
+        "Training HCWs on mhGAP",
+        "Quarterly debrief/self care sessions",
+        "Train CHPs on psychological first aid",
+        "Referral of mental health disorders"
       ],
       "D12 - Referral system improved": [
-        "Strengthen referral system-Revise and disseminate SOPs",
-        "Formulate ambulance checklist",
-        "Procure 2 ACLS ambulances",
-        "Relocate and strengthen the call Centre"
+        "Strengthen referral system SOPs",
+        "Ambulance checklist",
+        "Procure ACLS ambulances",
+        "Relocate call Centre and toll free number"
+      ],
+      "D14 - Operationalization of health facilities": [
+        "Operationalize new maternity units",
+        "Equip new health facilities",
+        "Upgrade level II facilities"
+      ],
+      "D19 - Theatre Services improved": [
+        "Deploy HRH for theatres",
+        "Procure theatre equipment",
+        "Operationalize Bondeni SCH theatre",
+        "Improve access to safe caesarean sections"
+      ],
+      "D20 - In-patient Services Improved": [
+        "Quarterly audit team meetings",
+        "Supportive supervision of hospitals",
+        "IPC committees in facilities",
+        "Audit committees with clear TORs"
+      ],
+      "D23 - Antenatal Care Services improved": [
+        "Strengthen cohort ANC groups",
+        "Scale SMS PROMPTS for ANC mothers",
+        "Procure neonatal equipment"
+      ],
+      "D24 - Postnatal Care Improved": [
+        "Integrate cervical cancer screening in PNC",
+        "Provide PNC within 48 hours"
+      ],
+      "D25 - Maternal Perinatal Deaths Audited": [
+        "Monthly MPDSR meetings",
+        "Track and implement recommendations",
+        "Weekly virtual MPDSR meetings"
+      ],
+      "D26 - Family Planning Uptake improved": [
+        "Operationalize AYSRH centres",
+        "Mentorship on contraceptives",
+        "Roll out self-care initiative",
+        "Requisition FP commodities"
+      ],
+      "D27 - Burden of Cancer Reduced": [
+        "Cervical cancer screening",
+        "Treatment of lesions",
+        "Administer HPV vaccine",
+        "Quarterly psychosocial support"
+      ],
+      "D29 - Health Services Supervision": [
+        "Undertake CHMT supervisions",
+        "Report implementation of CHMT supervision",
+        "SCHMT undertake 33 supervisions",
+        "Report SCHMT supervision implementation"
+      ],
+      "D35 - Youth Empowerment Initiatives": [
+        "Establish youth Friendly Centres",
+        "Sensitize youth on YFS & life skills",
+        "Provide counselling in youth centres"
       ]
-      // 🔽 continue filling other categories as in your original code
     };
+
+    const categorySelect = document.getElementById("category");
+    const indicatorSelect = document.getElementById("indicator");
 
     categorySelect.addEventListener("change", () => {
       const category = categorySelect.value;
@@ -199,20 +321,52 @@
       }
     });
 
-    document.getElementById("uploadBtn").addEventListener("click", () => {
-      const user = JSON.parse(localStorage.getItem("ccno_user"));
-      if (!user) return;
+    // Upload
+    const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
+    const evidenceNameInput = document.getElementById("evidenceName");
+    const subCountySelect = document.getElementById("subCounty");
+    const filesInput = document.getElementById("files");
+    const spinner = document.getElementById("spinner");
+    const successMsg = document.getElementById("success");
+    const errorMsg = document.getElementById("error");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
 
-      const evidenceName = document.getElementById("evidenceName").value.trim();
+    function showError(msg) {
+      errorMsg.style.display = msg ? "block" : "none";
+      errorMsg.textContent = msg;
+      successMsg.style.display = "none";
+    }
+
+    function showSuccess(msg) {
+      successMsg.style.display = "block";
+      successMsg.textContent = msg;
+      errorMsg.style.display = "none";
+      setTimeout(() => { successMsg.style.display = "none"; }, 4000);
+    }
+
+    function resetForm() {
+      evidenceNameInput.value = "";
+      categorySelect.value = "";
+      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+      subCountySelect.value = "";
+      filesInput.value = "";
+      progressBar.style.width = "0%";
+      progressContainer.style.display = "none";
+      progressText.style.display = "none";
+    }
+
+    uploadBtn.addEventListener("click", () => {
+      const evidenceName = evidenceNameInput.value.trim();
       const category = categorySelect.value;
       const indicator = indicatorSelect.value;
-      const subCounty = document.getElementById("subCounty").value;
-      const files = document.getElementById("files").files;
+      const subCounty = subCountySelect.value;
+      const files = filesInput.files;
 
       if (!evidenceName || !category || !indicator || !subCounty || !files.length) {
-        errorMsg.style.display = "block";
-        errorMsg.textContent = "Please fill all fields and select at least one PDF file.";
-        return;
+        return showError("Please fill all fields and select at least one PDF file.");
       }
 
       spinner.style.display = "block";
@@ -220,18 +374,17 @@
       progressBar.style.width = "0%";
       progressText.style.display = "block";
       progressText.innerText = "0%";
-      errorMsg.style.display = "none";
-      successMsg.style.display = "none";
+      showError("");
 
       const formData = new FormData();
       formData.append("uploaderEmail", user.email);
-      formData.append("uploaderName", user.name);
-      formData.append("role", user.role);
       formData.append("evidenceName", evidenceName);
       formData.append("category", category);
       formData.append("indicator", indicator);
       formData.append("subCounty", subCounty);
-      for (let file of files) formData.append("files", file, file.name);
+      for (let file of files) {
+        formData.append("files", file, file.name);
+      }
 
       const xhr = new XMLHttpRequest();
       xhr.open("POST", PROXY_URL, true);
@@ -247,27 +400,16 @@
       xhr.onload = () => {
         spinner.style.display = "none";
         if (xhr.status >= 200 && xhr.status < 300) {
-          successMsg.style.display = "block";
-          successMsg.textContent = `${user.name}_${evidenceName}_${subCounty}.pdf submitted successfully`;
-          setTimeout(() => { successMsg.style.display = "none"; }, 4000);
-          document.getElementById("evidenceName").value = "";
-          categorySelect.value = "";
-          indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-          document.getElementById("subCounty").value = "";
-          document.getElementById("files").value = "";
-          progressBar.style.width = "0%";
-          progressContainer.style.display = "none";
-          progressText.style.display = "none";
+          showSuccess(`${evidenceName}_${subCounty}.pdf submitted successfully`);
+          resetForm();
         } else {
-          errorMsg.style.display = "block";
-          errorMsg.textContent = "Upload failed. Try again.";
+          showError("Upload failed. Try again.");
         }
       };
 
       xhr.onerror = () => {
         spinner.style.display = "none";
-        errorMsg.style.display = "block";
-        errorMsg.textContent = "Network error. Try again.";
+        showError("Network error. Try again.");
       };
 
       xhr.send(formData);
