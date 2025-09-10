@@ -99,19 +99,7 @@
   <button id="uploadBtn">Upload Performance Evidence</button>
 </div>
 
-<script>
-  // ✅ Protect upload portal
-  (function checkAuth() {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (!user || !user.email) {
-      alert("Please log in first.");
-      window.location.href = "auth.html";
-    } else {
-      console.log("✅ Logged in as", user.email);
-      document.getElementById("uploaderEmail").value = user.email;
-    }
-  })();
-  
+<script>  
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 const uploaderEmailInput = document.getElementById("uploaderEmail");
