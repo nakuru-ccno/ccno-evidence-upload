@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CCNO Evidence Upload - Authentication</title>
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+  <style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+  header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
+  .container { max-width: 480px; background: #fff; margin: 48px auto; padding: 32px 36px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
+  h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
+  label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
+  input, select { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
+  input:focus, select:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
+  button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; transition: background 0.2s; }
+  button:hover { background: #d32f2f; }
+  .toggle { text-align: center; margin-top: 16px; font-size: 0.9rem; color: #0277bd; font-weight: 600; cursor: pointer; }
+  .form { display: none; }
+  .form.active { display: block; }
+  .message { text-align: center; margin-top: 18px; font-size: 0.95rem; }
+  .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 12px; border-radius: 8px; }
+  .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; padding: 12px; border-radius: 8px; }
+  .loading { display: none; text-align: center; margin-top: 14px; }
+  .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #2e7d32; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: auto; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<header>
+  <img src="images/LOGO.png" alt="Nakuru County Logo" />
+  Performance Contract For Q1 FY 2025/26
+</header>
+
+<div class="container">
+
+  <!-- Sign-In Form -->
+  <div id="signInPage" class="form active">
+    <h2>🔐 Sign In</h2>
+    <input type="email" id="loginEmail" placeholder="Email" required>
+    <input type="password" id="loginPassword" placeholder="Password" required>
+    <button id="loginBtn">Sign In</button>
+    <div class="toggle" id="toSignUp">Don't have an account? Sign up</div>
+    <div class="toggle" id="toReset">Forgot Password?</div>
+    <div class="message" id="loginMessage"></div>
+    <div class="loading" id="loginLoading"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Sign-Up Form -->
+  <div id="signUpPage" class="form">
+    <h2>📝 Create Account</h2>
+    <input type="text" id="signUpName" placeholder="Full Name" required>
+    <input type="email" id="signUpEmail" placeholder="Email" required>
+    <input type="text" id="signUpRole" placeholder="Role/Position" required>
+    <select id="signUpSubCounty" required>
+      <option value="">Select Sub County</option>
+      <option value="Nakuru East">Nakuru East</option>
+      <option value="Nakuru West">Nakuru West</option>
+      <option value="Nakuru Town">Nakuru Town</option>
+    </select>
+    <input type="password" id="signUpPassword" placeholder="Password" required>
+    <button id="signUpBtn">Create Account</button>
+    <div class="toggle" id="toSignInFromSignUp">Already have an account? Sign in</div>
+    <div class="message" id="signUpMessage"></div>
+    <div class="loading" id="signUpLoading"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Reset Password Form -->
+  <div id="resetPage" class="form">
+    <h2>🔄 Reset Password</h2>
+    <input type="email" id="resetEmail" placeholder="Registered Email" required>
+    <button id="resetBtn">Reset Password</button>
+    <div class="toggle" id="toSignInFromReset">Back to Sign In</div>
+    <div class="message" id="resetMessage"></div>
+    <div class="loading" id="resetLoading"><div class="spinner"></div></div>
+  </div>
+
+</div>
+
+<script>
+// ------------------ Page toggle ------------------
+function showPage(id){
+  ['signInPage','signUpPage','resetPage'].forEach(p=>{
+    const el = document.getElementById(p);
+    el.classList.toggle('active', p===id);
+    document.getElementById(p+'Message').innerText='';
+  });
+}
+
+// Links
+document.getElementById('toSignUp').addEventListener('click',()=>showPage('signUpPage'));
+document.getElementById('toSignInFromSignUp').addEventListener('click',()=>showPage('signInPage'));
+document.getElementById('toReset').addEventListener('click',()=>showPage('resetPage'));
+document.getElementById('toSignInFromReset').addEventListener('click',()=>showPage('signInPage'));
+
+// ------------------ Sign-Up ------------------
+document.getElementById('signUpBtn').addEventListener('click',()=>{
+  const data={
+    fullName: document.getElementById('signUpName').value,
+    email: document.getElementById('signUpEmail').value,
+    role: document.getElementById('signUpRole').value || 'User',
+    subCounty: document.getElementById('signUpSubCounty').value,
+    password: document.getElementById('signUpPassword').value
+  };
+  document.getElementById('signUpLoading').style.display='block';
+  google.script.run.withSuccessHandler(res=>{
+    document.getElementById('signUpLoading').style.display='none';
+    document.getElementById('signUpMessage').innerText = res.message;
+    if(res.success) setTimeout(()=>showPage('signInPage'),1500);
+  }).registerUser(data);
+});
+
+// ------------------ Sign-In ------------------
+document.getElementById('loginBtn').addEventListener('click',()=>{
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  document.getElementById('loginLoading').style.display='block';
+  google.script.run.withSuccessHandler(res=>{
+    document.getElementById('loginLoading').style.display='none';
+    document.getElementById('loginMessage').innerText = res.message;
+    if(res.success){
+      localStorage.setItem('role', res.role);
+      if(res.role==='Admin') window.location.href='admin.html';
+      else window.location.href='index.html';
+    }
+  }).signInUser(email,password);
+});
+
+// ------------------ Reset Password ------------------
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  const email = document.getElementById('resetEmail').value;
+  document.getElementById('resetLoading').style.display='block';
+  google.script.run.withSuccessHandler(res=>{
+    document.getElementById('resetLoading').style.display='none';
+    document.getElementById('resetMessage').innerText = res.message;
+  }).resetPassword(email);
+});
+
+// Show Sign-In on load
+showPage('signInPage');
+</script>
+</body>
+</html>
