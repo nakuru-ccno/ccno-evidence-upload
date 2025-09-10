@@ -40,29 +40,30 @@
     <h2>Welcome 🎉</h2>
     <p id="userInfo">Loading...</p>
     <button id="logoutBtn">Logout</button>
-    <br><br>
-    <button id="goToIndex">Go to Upload Form</button>
   </div>
 
   <script>
-    // ✅ Check login
+    // ✅ Get user from localStorage
     const user = JSON.parse(localStorage.getItem("ccno_user"));
-    if (!user) {
-      window.location.href = "login.html"; // redirect if not logged in
+
+    if (!user || user.status !== "Active") {
+      // Not logged in or not approved
+      window.location.href = "login.html";
     } else {
+      // Show user info (optional)
       document.getElementById("userInfo").innerText =
-        `Logged in as: ${user.email} (${user.role})`;
+        `Logged in as: ${user.fullName} (${user.role}) - ${user.subCounty}`;
+
+      // ✅ Redirect automatically to the upload/index page
+      setTimeout(() => {
+        window.location.href = "index.html"; // your upload page
+      }, 1500); // 1.5 seconds delay for welcome message
     }
 
     // ✅ Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem("ccno_user");
       window.location.href = "login.html";
-    });
-
-    // ✅ Redirect to index.html (upload form)
-    document.getElementById("goToIndex").addEventListener("click", () => {
-      window.location.href = "index.html";
     });
   </script>
 </body>
