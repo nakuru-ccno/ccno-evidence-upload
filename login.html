@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nakuru County CCNO PC Evidence Upload</title>
-
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
   <style>
@@ -54,31 +53,27 @@
   <div id="registerForm" class="form">
     <label>Full Name</label>
     <input type="text" id="regFullName" placeholder="Enter your full name" required>
-
     <label>Email</label>
     <input type="email" id="regEmail" placeholder="Enter your email" required>
-
     <label>Password</label>
     <input type="password" id="regPassword" placeholder="Enter your password" required>
-
     <label>Role / Position</label>
     <input type="text" id="regRole" placeholder="e.g., Health Officer, Data Manager" required>
-
-   <select id="subCounty">
-    <option value="">Select Sub County</option>
-    <option value="Nakuru West Sub County">Nakuru West Sub County</option>
-    <option value="Nakuru East Sub County">Nakuru East Sub County</option>
-    <option value="Nakuru North Sub County">Nakuru North Sub County</option>
-    <option value="Naivasha Sub County">Naivasha Sub County</option>
-    <option value="Rongai Sub County">Rongai Sub County</option>
-    <option value="Kuresoi South Sub County">Kuresoi South Sub County</option>
-    <option value="Kuresoi North Sub County">Kuresoi North Sub County</option>
-    <option value="Subukia Sub County">Subukia Sub County</option>
-    <option value="Molo Sub County">Molo Sub County</option>
-    <option value="Njoro Sub County">Njoro Sub County</option>
-    <option value="Gilgil Sub County">Gilgil Sub County</option>
-  </select>
-
+    <label>Sub County</label>
+    <select id="regSubCounty">
+      <option value="">Select Sub County</option>
+      <option value="Nakuru West Sub County">Nakuru West Sub County</option>
+      <option value="Nakuru East Sub County">Nakuru East Sub County</option>
+      <option value="Nakuru North Sub County">Nakuru North Sub County</option>
+      <option value="Naivasha Sub County">Naivasha Sub County</option>
+      <option value="Rongai Sub County">Rongai Sub County</option>
+      <option value="Kuresoi South Sub County">Kuresoi South Sub County</option>
+      <option value="Kuresoi North Sub County">Kuresoi North Sub County</option>
+      <option value="Subukia Sub County">Subukia Sub County</option>
+      <option value="Molo Sub County">Molo Sub County</option>
+      <option value="Njoro Sub County">Njoro Sub County</option>
+      <option value="Gilgil Sub County">Gilgil Sub County</option>
+    </select>
     <button onclick="register()">Create Account</button>
     <div class="loading" id="registerLoading"><div class="spinner"></div></div>
     <div class="toggle" onclick="toggleForm('login')">Already have an account? Login</div>
@@ -88,7 +83,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbz_20z65La3SBT3xv7SdsCLeGY60L0_Hck7KOCse8kRCVc7Hr14g4_xHraZaNFKN2qp/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbz_20z65La3SBT3xv7SdsCLeGY60L0_Hck7KOCse8kRCVc7Hr14g4_xHraZaNFKN2qp/exec"; // replace with your script URL
 
   function toggleForm(type) {
     document.getElementById('loginForm').classList.toggle('active', type === 'login');
@@ -121,8 +116,14 @@
           status: data.status,
           token: data.token
         }));
-        // Redirect to index.html or dashboard
-        window.location.href = "index.html";
+
+        // Admin redirect logic
+        if(data.role === "admin") {
+          window.location.href = "admin.html"; // admin dashboard
+        } else {
+          window.location.href = "index.html"; // normal user dashboard
+        }
+
       } else {
         document.getElementById('message').innerHTML = `<div class="error">${data.message}</div>`;
       }
@@ -145,14 +146,7 @@
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify({
-          action: "register",
-          fullName,
-          email,
-          password,
-          role,
-          subCounty
-        }),
+        body: JSON.stringify({ action: "register", fullName, email, password, role, subCounty }),
       });
       const data = await res.json();
       loading.style.display = "none";
@@ -169,7 +163,6 @@
     }
   }
 
-  // Forgot Password Modal
   function openForgot() { document.getElementById("forgotModal").style.display = "block"; }
   function closeForgot() { document.getElementById("forgotModal").style.display = "none"; }
   async function sendReset() {
@@ -207,6 +200,5 @@
     <div class="toggle" onclick="closeForgot()" style="margin-top:12px;">Cancel</div>
   </div>
 </div>
-
 </body>
 </html>
