@@ -32,42 +32,87 @@
   </style>
 </head>
 <body>
-  <!-- ✅ User Info Bar -->
+  <!-- User Info Bar -->
+<div class="user-bar">
+  <div class="user-info">
+    <div class="user-name">Matoka <span class="role">(Nurse)</span></div>
+    <div class="user-email">mbiunancy27@gmail.com</div>
+    <div class="user-status">Status: <span>Active</span></div>
+  </div>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<style>
+.user-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e0f2f1; /* light green background */
+  padding: 12px 20px;
+  border-radius: 12px;
+  max-width: 900px;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #1b5e20;
+}
+
+.role {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #2e7d32;
+  margin-left: 4px;
+}
+
+.user-email {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.user-status {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.user-status span {
+  font-weight: 700;
+  color: #0d47a1; /* blue for status */
+}
+
+.logout-btn {
+  background: #b71c1c;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #d32f2f;
+}
+</style>
+
 <script>
-  const user = JSON.parse(localStorage.getItem("ccno_user"));
-
-  if (!user) {
-    window.location.href = "login.html";
-  } else {
-    const userInfoDiv = document.createElement("div");
-    userInfoDiv.style.background = "#e3f2fd";
-    userInfoDiv.style.padding = "12px 20px";
-    userInfoDiv.style.borderRadius = "8px";
-    userInfoDiv.style.margin = "16px auto";
-    userInfoDiv.style.maxWidth = "720px";
-    userInfoDiv.style.display = "flex";
-    userInfoDiv.style.justifyContent = "space-between";
-    userInfoDiv.style.alignItems = "center";
-    userInfoDiv.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
-
-    userInfoDiv.innerHTML = `
-      <div>
-        <strong>${user.fullName}</strong> (${user.role})<br>
-        ${user.email} | ${user.subCounty} | Status: ${user.status}
-      </div>
-      <button id="logoutBtn" style="
-        background:#b71c1c; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;
-      ">Logout</button>
-    `;
-
-    document.body.prepend(userInfoDiv);
-
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.removeItem("ccno_user");
-      window.location.href = "login.html";
-    });
-  }
+function logout() {
+  localStorage.removeItem("ccno_user");
+  window.location.href = "login.html"; // redirect to login
+}
 </script>
+
 
 <header>
   <img src="images/LOGO.png" alt="Nakuru County Logo" />
