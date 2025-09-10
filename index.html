@@ -32,6 +32,43 @@
   </style>
 </head>
 <body>
+  <!-- ✅ User Info Bar -->
+<script>
+  const user = JSON.parse(localStorage.getItem("ccno_user"));
+
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    const userInfoDiv = document.createElement("div");
+    userInfoDiv.style.background = "#e3f2fd";
+    userInfoDiv.style.padding = "12px 20px";
+    userInfoDiv.style.borderRadius = "8px";
+    userInfoDiv.style.margin = "16px auto";
+    userInfoDiv.style.maxWidth = "720px";
+    userInfoDiv.style.display = "flex";
+    userInfoDiv.style.justifyContent = "space-between";
+    userInfoDiv.style.alignItems = "center";
+    userInfoDiv.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+
+    userInfoDiv.innerHTML = `
+      <div>
+        <strong>${user.fullName}</strong> (${user.role})<br>
+        ${user.email} | ${user.subCounty} | Status: ${user.status}
+      </div>
+      <button id="logoutBtn" style="
+        background:#b71c1c; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;
+      ">Logout</button>
+    `;
+
+    document.body.prepend(userInfoDiv);
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("ccno_user");
+      window.location.href = "login.html";
+    });
+  }
+</script>
+
 <header>
   <img src="images/LOGO.png" alt="Nakuru County Logo" />
   Performance Contract For FY 2025/26
