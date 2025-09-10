@@ -100,6 +100,18 @@
 </div>
 
 <script>
+  // ✅ Protect upload portal
+  (function checkAuth() {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!user || !user.email) {
+      alert("Please log in first.");
+      window.location.href = "auth.html";
+    } else {
+      console.log("✅ Logged in as", user.email);
+      document.getElementById("uploaderEmail").value = user.email;
+    }
+  })();
+  
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 const uploaderEmailInput = document.getElementById("uploaderEmail");
@@ -288,19 +300,6 @@ uploadBtn.addEventListener("click", () => {
 
   xhr.send(formData);
 });
-</script>
-   // Protect upload portal
-  (function checkAuth() {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (!user || !user.email) {
-      alert("Please log in first.");
-      window.location.href = "auth.html";
-    } else {
-      console.log("✅ Logged in as", user.email);
-      // You could also auto-fill their email into the uploaderEmail field:
-      document.getElementById("uploaderEmail").value = user.email;
-    }
-  })();
 </script>
 </body>
 </html>
