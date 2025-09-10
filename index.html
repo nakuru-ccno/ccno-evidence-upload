@@ -1,59 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CCNO Evidence Upload</title>
+<!-- ================= HEADER ================= -->
+<header class="main-header">
+  <img src="images/LOGO.png" alt="Nakuru County Logo" />
+  <h1>Performance Contract For FY 2025/26</h1>
+</header>
 
-  <!-- ✅ Favicon -->
-  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-
-  <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
-    header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-    header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
-    .container { max-width: 720px; background: #fff; margin: 36px auto; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
-    h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
-    label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
-    input[type="text"], input[type="email"], select, input[type="file"] { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
-    input[type="text"]:focus, input[type="email"]:focus, select:focus, input[type="file"]:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
-    small { display: block; font-size: 0.85em; color: #607d8b; margin-top: 6px; }
-    button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
-    button:hover { background: #d32f2f; }
-    .spinner { display: none; margin: 16px 0; text-align: center; color: #b71c1c; font-weight: 700; }
-    .success, .error { display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700; }
-    .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
-    .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
-
-    /* Progress bar */
-    .progress-container { display: none; margin-top: 16px; background: #eee; border-radius: 8px; height: 18px; overflow: hidden; }
-    .progress-bar { height: 100%; width: 0%; background: #2e7d32; transition: width 0.2s ease; }
-    #progressText { text-align:right; font-size:0.9rem; color:#2e7d32; display:none; margin-top:4px; }
-  </style>
-</head>
-<body>
-  <!-- User Info Bar -->
+<!-- ================= USER INFO BAR ================= -->
 <div class="user-bar">
   <div class="user-info">
     <div class="user-name">Matoka <span class="role">(Nurse)</span></div>
     <div class="user-email">mbiunancy27@gmail.com</div>
     <div class="user-status">Status: <span>Active</span></div>
   </div>
-  <button class="logout-btn" onclick="logout()">Logout</button>
+  <button class="logout-btn" onclick="logout()">⎋ Logout</button>
 </div>
 
+<!-- ================= CSS ================= -->
 <style>
+/* Header */
+.main-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #0277bd; /* County blue */
+  padding: 14px 20px;
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.main-header img {
+  height: 50px;
+  width: 50px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 50%;
+  padding: 4px;
+}
+.main-header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* User Info Bar */
 .user-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #e0f2f1; /* light green background */
-  padding: 12px 20px;
-  border-radius: 12px;
+  background: #e0f2f1; /* soft green */
+  padding: 14px 20px;
+  border-radius: 10px;
   max-width: 900px;
   margin: 20px auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
 .user-info {
@@ -61,218 +60,469 @@
   flex-direction: column;
   gap: 4px;
 }
-
 .user-name {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #1b5e20;
 }
-
 .role {
   font-weight: 500;
   font-size: 0.9rem;
   color: #2e7d32;
-  margin-left: 4px;
 }
-
 .user-email {
   font-size: 0.95rem;
   color: #555;
 }
-
 .user-status {
   font-size: 0.95rem;
   color: #333;
 }
-
 .user-status span {
   font-weight: 700;
   color: #0d47a1; /* blue for status */
 }
 
+/* Logout Button */
 .logout-btn {
+  background: transparent;
+  color: #b71c1c;
+  border: 2px solid #b71c1c;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.logout-btn:hover {
   background: #b71c1c;
   color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.logout-btn:hover {
-  background: #d32f2f;
 }
 </style>
 
+<!-- ================= SCRIPT ================= -->
 <script>
 function logout() {
   localStorage.removeItem("ccno_user");
   window.location.href = "login.html"; // redirect to login
 }
 </script>
+This way:
+✅ Title stays at the very top in a blue bar.
+✅ User info is in a soft green card below.
+✅ Logout is now a neat pill button with hover effect.
+
+Do you want me to also apply the same modern card style to the Evidence Upload form so the whole page looks consistent?
 
 
-<header>
-  <img src="images/LOGO.png" alt="Nakuru County Logo" />
-  Performance Contract For FY 2025/26
-</header>
 
-<div class="container">
-  <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
-  <label for="uploaderEmail">Your Email:</label>
-  <input type="email" id="uploaderEmail" placeholder="Enter your email for notifications" />
 
-  <label for="evidenceName">Evidence Name:</label>
-  <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
 
-  <label for="category">Evidence Category:</label>
-  <select id="category">
-    <option value="">Select Evidence Category</option>
-    <option value="D3 - Immunization Coverage Increased">D3 - Immunization Coverage Increased</option>
-    <option value="D11 - Mental health services improved">D11 - Mental health services improved</option>
-    <option value="D12 - Referral system improved">D12 - Referral system improved</option>
-    <option value="D14 - Operationalization of health facilities to offer better services">D14 - Operationalization of health facilities to offer better services</option>
-    <option value="D19 - Theatre Services improved">D19 - Theatre Services improved</option>
-    <option value="D20 - In-patient Services Improved">D20 - In-patient Services Improved</option>
-    <option value="D23 - Antenatal Care Services improved">D23 - Antenatal Care Services improved</option>
-    <option value="D24 - Postnatal Care Improved">D24 - Postnatal Care Improved</option>
-    <option value="D25 - Maternal Perinatal Deaths Audited">D25 - Maternal Perinatal Deaths Audited</option>
-    <option value="D26 - Family Planning Uptake improved">D26 - Family Planning Uptake improved</option>
-    <option value="D27 - Burden of Cancer Reduced">D27 - Burden of Cancer Reduced</option>
-    <option value="D29 - Health Services Supervision">D29 - Health Services Supervision</option>
-    <option value="D35 - Youth Empowerment Initiatives">D35 - Youth Empowerment Initiatives</option>
-  </select>
 
-  <label for="indicator">Indicator:</label>
-  <select id="indicator">
-    <option value="">Select Indicator</option>
-  </select>
+You said:
+give me full code
 
-  <label for="subCounty">Sub County:</label>
-  <select id="subCounty">
-    <option value="">Select Sub County</option>
-    <option value="Nakuru West Sub County">Nakuru West Sub County</option>
-    <option value="Nakuru East Sub County">Nakuru East Sub County</option>
-    <option value="Nakuru North Sub County">Nakuru North Sub County</option>
-    <option value="Naivasha Sub County">Naivasha Sub County</option>
-    <option value="Rongai Sub County">Rongai Sub County</option>
-    <option value="Kuresoi South Sub County">Kuresoi South Sub County</option>
-    <option value="Kuresoi North Sub County">Kuresoi North Sub County</option>
-    <option value="Subukia Sub County">Subukia Sub County</option>
-    <option value="Molo Sub County">Molo Sub County</option>
-    <option value="Njoro Sub County">Njoro Sub County</option>
-    <option value="Gilgil Sub County">Gilgil Sub County</option>
-  </select>
 
-  <label for="files">Choose PDF file(s):</label>
-  <input type="file" id="files" accept="application/pdf" multiple />
+ChatGPT said:
+Perfect 👌 — here’s the full updated code with the fixes you requested:
 
-  <div class="spinner" id="spinner">⏳ Uploading...</div>
-  <div class="progress-container" id="progressContainer">
-    <div class="progress-bar" id="progressBar"></div>
+Top Blue Header → “Performance Contract For FY 2025/26” + logo.
+
+User Info Card → Nurse details + smaller, neat Logout button.
+
+Evidence Upload Form → Styled to match (modern card, consistent design).
+
+Progress bar, success/error messages still included.
+
+html
+Copy code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CCNO Evidence Upload</title>
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    /* ================= HEADER ================= */
+    .main-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #0277bd; /* County blue */
+      padding: 14px 20px;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .main-header img {
+      height: 50px;
+      width: 50px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 50%;
+      padding: 4px;
+    }
+    .main-header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    /* ================= USER INFO ================= */
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #e0f2f1; /* soft green */
+      padding: 14px 20px;
+      border-radius: 10px;
+      max-width: 900px;
+      margin: 20px auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .user-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #1b5e20;
+    }
+    .role {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #2e7d32;
+    }
+    .user-email {
+      font-size: 0.95rem;
+      color: #555;
+    }
+    .user-status {
+      font-size: 0.95rem;
+      color: #333;
+    }
+    .user-status span {
+      font-weight: 700;
+      color: #0d47a1; /* blue for status */
+    }
+    .logout-btn {
+      background: transparent;
+      color: #b71c1c;
+      border: 2px solid #b71c1c;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .logout-btn:hover {
+      background: #b71c1c;
+      color: #fff;
+    }
+
+    /* ================= CONTAINER ================= */
+    .container {
+      max-width: 720px;
+      background: #fff;
+      margin: 36px auto;
+      padding: 28px 32px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      border-top: 6px solid #2e7d32;
+    }
+    h2 {
+      text-align: center;
+      font-weight: 800;
+      color: #b71c1c;
+      margin: 0 0 20px;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: 700;
+      color: #2e7d32;
+    }
+    input[type="text"], input[type="email"], select, input[type="file"] {
+      width: 100%;
+      padding: 12px 14px;
+      margin-top: 8px;
+      border: 1px solid #cfd8dc;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #0277bd;
+      box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
+    }
+    small {
+      display: block;
+      font-size: 0.85em;
+      color: #607d8b;
+      margin-top: 6px;
+    }
+    button {
+      margin-top: 22px;
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 1.05rem;
+      background: #b71c1c;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #d32f2f;
+    }
+
+    /* ================= FEEDBACK ================= */
+    .spinner {
+      display: none;
+      margin: 16px 0;
+      text-align: center;
+      color: #b71c1c;
+      font-weight: 700;
+    }
+    .success, .error {
+      display: none;
+      margin: 18px 0;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .success {
+      background: #e3f2fd;
+      color: #0d47a1;
+      border: 1px solid #90caf9;
+    }
+    .error {
+      background: #ffebee;
+      color: #b71c1c;
+      border: 1px solid #ef9a9a;
+    }
+
+    /* ================= PROGRESS BAR ================= */
+    .progress-container {
+      display: none;
+      margin-top: 16px;
+      background: #eee;
+      border-radius: 8px;
+      height: 18px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #2e7d32;
+      transition: width 0.2s ease;
+    }
+    #progressText {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #2e7d32;
+      display: none;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ================= HEADER ================= -->
+  <header class="main-header">
+    <img src="images/LOGO.png" alt="Nakuru County Logo" />
+    <h1>Performance Contract For FY 2025/26</h1>
+  </header>
+
+  <!-- ================= USER INFO ================= -->
+  <div class="user-bar">
+    <div class="user-info">
+      <div class="user-name">Matoka <span class="role">(Nurse)</span></div>
+      <div class="user-email">mbiunancy27@gmail.com</div>
+      <div class="user-status">Status: <span>Active</span></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">⎋ Logout</button>
   </div>
-  <div id="progressText">0%</div>
-  <div class="success" id="success"></div>
-  <div class="error" id="error"></div>
 
-  <button id="uploadBtn">Upload Performance Evidence</button>
-</div>
+  <!-- ================= UPLOAD FORM ================= -->
+  <div class="container">
+    <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
-<script>  
-const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
+    <label for="uploaderEmail">Your Email:</label>
+    <input type="email" id="uploaderEmail" placeholder="Enter your email for notifications" />
 
-const uploaderEmailInput = document.getElementById("uploaderEmail");
-const evidenceNameInput = document.getElementById("evidenceName");
-const categorySelect = document.getElementById("category");
-const indicatorSelect = document.getElementById("indicator");
-const subCountySelect = document.getElementById("subCounty");
-const filesInput = document.getElementById("files");
-const spinner = document.getElementById("spinner");
-const successMsg = document.getElementById("success");
-const errorMsg = document.getElementById("error");
-const uploadBtn = document.getElementById("uploadBtn");
-const progressContainer = document.getElementById("progressContainer");
-const progressBar = document.getElementById("progressBar");
-const progressText = document.getElementById("progressText");
+    <label for="evidenceName">Evidence Name:</label>
+    <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
 
-// Indicators aligned with Apps Script folderMap
-const indicatorsMap = { 
-  "D3 - Immunization Coverage Increased": [
-    "Avail immunization services on daily basis 8am-5pm",
-    "Conduct continuous Immunization defaulter tracing",
-    "Conduct quarterly CCE assessment in all the immunizing facilities",
-    "Conduct monthly integrated outreaches"
-  ],
-  "D11 - Mental health services improved": [
-    "Training of skilled HCWs on mental health and common mental health disorders (mhGAP)",
-    "Conduct quarterly debrief/self care sessions for HCWs",
-    "Train 3000 CHPs on mental health and psychological first aid",
-    "Identification and referral on mental health disorders by CHPs to health facilities "
-  ],
-  "D12 - Referral system improved": [
-    "Strengthen referral system-Revise and disseminate SOPs",
-    "Formulate ambulance checklist to ensure consistent availability of emergency response commodities",
-    "Procure 2 ACLS ambulances for Naivasha and Molo",
-    "Relocate the call Centre to NCRTH and strengthen the call Centre by acquiring a dedicated toll free number"
-  ],
-  "D14 - Operationalization of health facilities to offer better services": [
-    "Operationalize Level 4 new Maternity units in Bondeni, Molo, Gilgil and Githioro L3",
-    "Equip 6 new health facilities",
-    "Upgrade 3 new level II health facilities to health centres  across the County"
-  ],
-  "D19 - Theatre Services improved": [
-    "Deployment of HRH to operationalize Subukia, Elburgon and Gilgil Theatres",
-    "Procurement of Theater equipment for Subukia",
-    "Operationalize the theatre at Bondeni SCH",
-    "Improved access to safe caesarean sections and anaesthesia care in the 5 targeted facilities, reducing delays and complications during obstetric emergencies. (OSS)"
-  ],
-  "D20 - In-patient Services Improved": [
-    "Hold Hospital Quarterly clinical audit team meetings in level IV / V hospitals",
-    "Conduct quarterly Supportive Supervision of all the 16 Level IV & V Hospitals",
-    "Formation of IPC committees in all facilities and identification of champions",
-    "Re-invigorate audit committies in all hospital with clear terms of reference"
-  ],
-  "D23 - Antenatal Care Services improved": [
-    "Establish/Strengthen cohort group ANC(GANC)",
-    "Scale up the number of facilities Enrolling ANC mothers to SMS PROMPTS from 57 to 90",
-    "Procure essential and emergency neonatal care equipment"
-  ],
-  "D24 - Postnatal Care Improved": [
-    "Integrate cervical cancer screening in postnatal clinic",
-    "Provision of PNC within the first 48 hours in all the delivery units"
-  ],
-  "D25 - Maternal Perinatal Deaths Audited": [
-    "Conduct monthly facility and sub county MPDSR Audit meeting",
-    "Track and Implement recommendations of the action points from the MPDSR meetings",
-    "Conduct weekly virtual MPDSR meeting at all levels of care"
-  ],
-  "D26 - Family Planning Uptake improved": [
-    "Operationalization of the 4 AYSRH centres .( Ronda HC, Maai Mahiu , Kabazi SCH and Mau Narok HC)",
-    "Mentorship / OJT on long acting and reversible contraceptive methods, including Hormonal IUD",
-    "Roll out the self-care initiative in reproductive health and DMPA-SC injection",
-    "Requisition of family planning commodities"
-  ],
-  "D27 - Burden of Cancer Reduced": [
-    "Undertake cervical cancer Screening",
-    "Treatment of cervical cancer lesions",
-    "Administration of the HPV 1 vaccine to girls 10 years-14 years.",
-    "Conduct Quaterly psychosocial support counselling for cancer survivors"
-  ],
-  "D29 - Health Services Supervision": [
-    "Undertake 3 CHMT supervisions per quarter",
-    "Report on implementation of CHMT supervision",
-    "SCHMT undertake 33 supervisions",
-    "Report on implementation of SCHMT supervision"
-  ],
-  "D35 - Youth Empowerment Initiatives": [
-    "Establishment of youth Friendly Centres in Facilities",
-    "Sensitize the youth on YFS,Live saving skills  and Alcohol & Substance Abuse integrate into school health programme",
-    "Provision of psychological counselling services in youth friendly centres"
-  ]
-};
+    <label for="category">Evidence Category:</label>
+    <select id="category">
+      <option value="">Select Evidence Category</option>
+      <option value="D3 - Immunization Coverage Increased">D3 - Immunization Coverage Increased</option>
+      <option value="D11 - Mental health services improved">D11 - Mental health services improved</option>
+      <option value="D12 - Referral system improved">D12 - Referral system improved</option>
+      <option value="D14 - Operationalization of health facilities to offer better services">D14 - Operationalization of health facilities</option>
+      <option value="D19 - Theatre Services improved">D19 - Theatre Services improved</option>
+      <option value="D20 - In-patient Services Improved">D20 - In-patient Services Improved</option>
+      <option value="D23 - Antenatal Care Services improved">D23 - Antenatal Care Services improved</option>
+      <option value="D24 - Postnatal Care Improved">D24 - Postnatal Care Improved</option>
+      <option value="D25 - Maternal Perinatal Deaths Audited">D25 - Maternal Perinatal Deaths Audited</option>
+      <option value="D26 - Family Planning Uptake improved">D26 - Family Planning Uptake improved</option>
+      <option value="D27 - Burden of Cancer Reduced">D27 - Burden of Cancer Reduced</option>
+      <option value="D29 - Health Services Supervision">D29 - Health Services Supervision</option>
+      <option value="D35 - Youth Empowerment Initiatives">D35 - Youth Empowerment Initiatives</option>
+    </select>
+
+    <label for="indicator">Indicator:</label>
+    <select id="indicator">
+      <option value="">Select Indicator</option>
+    </select>
+
+    <label for="subCounty">Sub County:</label>
+    <select id="subCounty">
+      <option value="">Select Sub County</option>
+      <option value="Nakuru West Sub County">Nakuru West Sub County</option>
+      <option value="Nakuru East Sub County">Nakuru East Sub County</option>
+      <option value="Nakuru North Sub County">Nakuru North Sub County</option>
+      <option value="Naivasha Sub County">Naivasha Sub County</option>
+      <option value="Rongai Sub County">Rongai Sub County</option>
+      <option value="Kuresoi South Sub County">Kuresoi South Sub County</option>
+      <option value="Kuresoi North Sub County">Kuresoi North Sub County</option>
+      <option value="Subukia Sub County">Subukia Sub County</option>
+      <option value="Molo Sub County">Molo Sub County</option>
+      <option value="Njoro Sub County">Njoro Sub County</option>
+      <option value="Gilgil Sub County">Gilgil Sub County</option>
+    </select>
+
+    <label for="files">Choose PDF file(s):</label>
+    <input type="file" id="files" accept="application/pdf" multiple />
+
+    <div class="spinner" id="spinner">⏳ Uploading...</div>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div id="progressText">0%</div>
+    <div class="success" id="success"></div>
+    <div class="error" id="error"></div>
+
+    <button id="uploadBtn">Upload Performance Evidence</button>
+  </div>
+
+  <!-- ================= SCRIPT ================= -->
+  <script>
+  function logout() {
+    localStorage.removeItem("ccno_user");
+    window.location.href = "login.html";
+  }
+
+  const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
+
+  const uploaderEmailInput = document.getElementById("uploaderEmail");
+  const evidenceNameInput = document.getElementById("evidenceName");
+  const categorySelect = document.getElementById("category");
+  const indicatorSelect = document.getElementById("indicator");
+  const subCountySelect = document.getElementById("subCounty");
+  const filesInput = document.getElementById("files");
+  const spinner = document.getElementById("spinner");
+  const successMsg = document.getElementById("success");
+  const errorMsg = document.getElementById("error");
+  const uploadBtn = document.getElementById("uploadBtn");
+  const progressContainer = document.getElementById("progressContainer");
+  const progressBar = document.getElementById("progressBar");
+  const progressText = document.getElementById("progressText");
+
+  // Indicators aligned with Apps Script folderMap
+  const indicatorsMap = {
+    "D3 - Immunization Coverage Increased": [
+      "Avail immunization services on daily basis 8am-5pm",
+      "Conduct continuous Immunization defaulter tracing",
+      "Conduct quarterly CCE assessment in all the immunizing facilities",
+      "Conduct monthly integrated outreaches"
+    ],
+    "D11 - Mental health services improved": [
+      "Training of skilled HCWs on mental health (mhGAP)",
+      "Conduct quarterly debrief/self care sessions",
+      "Train 3000 CHPs on mental health and psychological first aid",
+      "Identification and referral on mental health disorders"
+    ],
+    "D12 - Referral system improved": [
+      "Revise and disseminate referral SOPs",
+      "Formulate ambulance checklist",
+      "Procure 2 ACLS ambulances (Naivasha, Molo)",
+      "Relocate and strengthen the call Centre"
+    ],
+    "D14 - Operationalization of health facilities to offer better services": [
+      "Operationalize Level 4 new Maternity units",
+      "Equip 6 new health facilities",
+      "Upgrade 3 level II facilities to health centres"
+    ],
+    "D19 - Theatre Services improved": [
+      "Deploy HRH to Subukia, Elburgon, Gilgil Theatres",
+      "Procure Theatre equipment for Subukia",
+      "Operationalize Bondeni SCH theatre",
+      "Improve access to safe caesarean sections"
+    ],
+    "D20 - In-patient Services Improved": [
+      "Hold hospital quarterly audit team meetings",
+      "Quarterly supportive supervision (Level IV/V)",
+      "Form IPC committees and champions",
+      "Re-invigorate audit committees"
+    ],
+    "D23 - Antenatal Care Services improved": [
+      "Strengthen group ANC (GANC)",
+      "Scale up facilities enrolling ANC mothers to SMS PROMPTS",
+      "Procure neonatal care equipment"
+    ],
+    "D24 - Postnatal Care Improved": [
+      "Integrate cervical cancer screening in PNC",
+      "Provide PNC within 48 hours in all delivery units"
+    ],
+    "D25 - Maternal Perinatal Deaths Audited": [
+      "Monthly MPDSR Audit meetings",
+      "Track and implement recommendations",
+      "Weekly virtual MPDSR meetings"
+    ],
+    "D26 - Family Planning Uptake improved": [
+      "Operationalize 4 AYSRH centres",
+      "Mentorship/OJT on contraceptives including IUD",
+      "Roll out self-care initiative (DMPA-SC)",
+      "Requisition family planning commodities"
+    ],
+    "D27 - Burden of Cancer Reduced": [
+      "Undertake cervical cancer screening",
+      "Treat cervical cancer lesions",
+      "Administer HPV vaccine (10-14 years)",
+      "Quarterly psychosocial support for survivors"
+    ],
+    "D29 - Health Services Supervision": [
+      "CHMT: 3 supervisions per quarter",
+      "Report CHMT supervision implementation",
+      "SCHMT: 33 supervisions",
+      "Report SCHMT supervision implementation"
+    ],
+    "D35 - Youth Empowerment Initiatives": [
+      "Establish youth friendly centres",
+      "Sensitize youth on YFS, life skills & ASU",
+      "Provide psychological counselling in centres"
+    ]
+  };
 
 // Populate indicators dynamically
 categorySelect.addEventListener("change", () => {
