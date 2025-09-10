@@ -47,7 +47,7 @@
     .sidebar {
       position: fixed;
       top: 0; right: 0;
-      width: 200px; height: 100%;
+      width: 220px; height: 100%;
       background: #e0f2f1;
       padding: 16px;
       display: flex;
@@ -199,7 +199,7 @@
     <div class="user-info">
       <div>Full Name: <span id="userName">Loading...</span></div>
       <div>Sub County: <span id="userSubCounty">Loading...</span></div>
-      <div>Status: <span>Active</span></div>
+      <div>Status: <span id="userStatus">Loading...</span></div>
     </div>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
@@ -222,7 +222,6 @@
     const progressBar = document.getElementById("progressBar");
     const progressText = document.getElementById("progressText");
 
-    // Sidebar toggle
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("active");
       document.getElementById("overlay").classList.toggle("active");
@@ -236,12 +235,13 @@
       window.location.href = "login.html";
     }
 
-    // Load user info from localStorage
-    const user = JSON.parse(localStorage.getItem("ccno_user")) || { name: "Matoka", subCounty: "Nakuru West" };
-    document.getElementById("userName").textContent = user.name || "Not Set";
-    document.getElementById("userSubCounty").textContent = user.subCounty || "Not Set";
+    // Load user info from localStorage (use keys exactly as in your sheet)
+    const user = JSON.parse(localStorage.getItem("ccno_user")) || {};
+    document.getElementById("userName").textContent = user["Full Name"] || "Not Set";
+    document.getElementById("userSubCounty").textContent = user["Sub County"] || "Not Set";
+    document.getElementById("userStatus").textContent = user["Status"] || "Active";
 
-    // Indicators mapping
+    // Indicators mapping (full)
     const indicatorsMap = {
       "D3 - Immunization Coverage Increased": [
         "Avail immunization services on daily basis 8am-5pm",
@@ -270,7 +270,7 @@
         "Deployment of HRH to operationalize Subukia, Elburgon and Gilgil Theatres",
         "Procurement of Theater equipment for Subukia",
         "Operationalize the theatre at Bondeni SCH",
-        "Improved access to safe caesarean sections and anaesthesia care in the 5 targeted facilities, reducing delays and complications during obstetric emergencies (OSS)"
+        "Improved access to safe caesarean sections and anaesthesia care in the 5 targeted facilities"
       ],
       "D20 - In-patient Services Improved": [
         "Hold Hospital Quarterly clinical audit team meetings in level IV / V hospitals",
@@ -293,7 +293,7 @@
         "Conduct weekly virtual MPDSR meeting at all levels of care"
       ],
       "D26 - Family Planning Uptake improved": [
-        "Operationalization of the 4 AYSRH centres (Ronda HC, Maai Mahiu, Kabazi SCH and Mau Narok HC)",
+        "Operationalization of the 4 AYSRH centres (Ronda HC, Maai Mahiu, Kabazi SCH, Mau Narok HC)",
         "Mentorship / OJT on long acting and reversible contraceptive methods, including Hormonal IUD",
         "Roll out the self-care initiative in reproductive health and DMPA-SC injection",
         "Requisition of family planning commodities"
@@ -301,8 +301,8 @@
       "D27 - Burden of Cancer Reduced": [
         "Undertake cervical cancer Screening",
         "Treatment of cervical cancer lesions",
-        "Administration of the HPV 1 vaccine to girls 10-14 years",
-        "Conduct quarterly psychosocial support counselling for cancer survivors"
+        "Administration of the HPV 1 vaccine to girls 10 years-14 years",
+        "Conduct Quarterly psychosocial support counselling for cancer survivors"
       ],
       "D29 - Health Services Supervision": [
         "Undertake 3 CHMT supervisions per quarter",
@@ -312,7 +312,7 @@
       ],
       "D35 - Youth Empowerment Initiatives": [
         "Establishment of youth Friendly Centres in Facilities",
-        "Sensitize the youth on YFS, Live saving skills and Alcohol & Substance Abuse integrate into school health programme",
+        "Sensitize the youth on YFS, Live saving skills and Alcohol & Substance Abuse integrated into school health programme",
         "Provision of psychological counselling services in youth friendly centres"
       ]
     };
