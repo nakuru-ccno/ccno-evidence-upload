@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nakuru County CCNO PC Evidence Upload</title>
+  <title>Nakuru County CCNO Login & Registration</title>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
   <style>
@@ -83,7 +83,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbz_20z65La3SBT3xv7SdsCLeGY60L0_Hck7KOCse8kRCVc7Hr14g4_xHraZaNFKN2qp/exec"; // replace with your script URL
+  const API_URL = "YOUR_APP_SCRIPT_URL_HERE"; // replace with your script URL
 
   function toggleForm(type) {
     document.getElementById('loginForm').classList.toggle('active', type === 'login');
@@ -108,16 +108,16 @@
       loading.style.display = "none";
 
       if (data.success) {
+        // Store user data with keys matching upload page
         localStorage.setItem("ccno_user", JSON.stringify({
-          fullName: data.fullName,
-          email: data.email,
-          role: data.role,
-          subCounty: data.subCounty,
-          status: data.status,
-          token: data.token
+          "Full Name": data.fullName,
+          "Email": data.email,
+          "Role": data.role,
+          "Sub County": data.subCounty,
+          "Status": data.status,
+          "Token": data.token
         }));
 
-        // Admin redirect logic
         if(data.role === "admin") {
           window.location.href = "admin.html"; // admin dashboard
         } else {
