@@ -21,9 +21,7 @@
       width: 350px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    h2 {
-      text-align: center;
-    }
+    h2 { text-align: center; }
     input, button {
       width: 100%;
       padding: 10px;
@@ -37,24 +35,10 @@
       border: none;
       cursor: pointer;
     }
-    button:hover {
-      background: #0056b3;
-    }
-    .link {
-      text-align: center;
-      margin-top: 10px;
-    }
-    .link a {
-      cursor: pointer;
-      color: #007bff;
-      text-decoration: none;
-    }
-    .message {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 14px;
-      color: #333;
-    }
+    button:hover { background: #0056b3; }
+    .link { text-align: center; margin-top: 10px; }
+    .link a { cursor: pointer; color: #007bff; text-decoration: none; }
+    .message { text-align: center; margin-top: 10px; font-size: 14px; color: #333; }
   </style>
 </head>
 <body>
@@ -72,7 +56,10 @@
     <!-- Sign Up -->
     <div id="signup-box" style="display:none;">
       <h2>Sign Up</h2>
+      <input type="text" id="signup-name" placeholder="Full Name" required />
       <input type="email" id="signup-email" placeholder="Email" required />
+      <input type="text" id="signup-role" placeholder="Role (e.g. Nurse, Admin)" required />
+      <input type="text" id="signup-subcounty" placeholder="Sub County" required />
       <input type="password" id="signup-password" placeholder="Password" required />
       <button onclick="signUp()">Register</button>
       <div class="link"><a onclick="showBox('signin-box')">Already have an account?</a></div>
@@ -90,8 +77,7 @@
   </div>
 
   <script>
-    // 🔴 Replace with your Apps Script URL
-    const API_URL = "https://script.google.com/macros/s/AKfycbzhHlWqE7Y8LqWTILxAi7_mdt86NJCnYy86OJN-qeZlNgvHsLeRNF2OSfjfdLcuGAKcfQ/exec";
+    const API_URL = "YOUR_APPS_SCRIPT_DEPLOYED_URL"; // replace with your backend URL
 
     function showBox(id) {
       document.getElementById("signin-box").style.display = "none";
@@ -101,16 +87,31 @@
     }
 
     async function signUp() {
+      const fullName = document.getElementById("signup-name").value.trim();
       const email = document.getElementById("signup-email").value.trim();
+      const role = document.getElementById("signup-role").value.trim();
+      const subCounty = document.getElementById("signup-subcounty").value.trim();
       const password = document.getElementById("signup-password").value.trim();
       const msg = document.getElementById("signup-message");
+
+      if (!fullName || !email || !role || !subCounty || !password) {
+        msg.innerText = "Please fill in all fields.";
+        return;
+      }
+
       msg.innerText = "Registering...";
 
       try {
         const res = await fetch(API_URL + "?action=register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ 
+            name: fullName, 
+            email, 
+            role, 
+            subCounty, 
+            password 
+          })
         });
         const data = await res.json();
         msg.innerText = data.message;
@@ -123,6 +124,12 @@
       const email = document.getElementById("login-email").value.trim();
       const password = document.getElementById("login-password").value.trim();
       const msg = document.getElementById("signin-message");
+
+      if (!email || !password) {
+        msg.innerText = "Please fill in all fields.";
+        return;
+      }
+
       msg.innerText = "Signing in...";
 
       try {
@@ -131,17 +138,18 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password })
         });
-        const data = await res.json();
+
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch { data = { success:false, message: text }; }
+
         if (data.success) {
-          msg.innerText = "Login successful!";
           localStorage.setItem("user", JSON.stringify(data));
-          if (data.role === "Admin") {
-            window.location.href = "admin.html";
-          } else {
-            window.location.href = "index.html";
-          }
+          const role = data.role || "User";
+          window.location.href = role === "Admin" ? "admin.html" : "index.html";
         } else {
-          msg.innerText = data.message;
+          msg.innerText = data.message || "Login failed.";
         }
       } catch (err) {
         msg.innerText = "Error: " + err.message;
@@ -151,6 +159,8 @@
     async function resetPassword() {
       const email = document.getElementById("reset-email").value.trim();
       const msg = document.getElementById("reset-message");
+      if (!email) { msg.innerText = "Please enter your email."; return; }
+
       msg.innerText = "Sending reset request...";
 
       try {
@@ -168,4 +178,3 @@
   </script>
 </body>
 </html>
-
