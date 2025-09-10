@@ -1,138 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CCNO Admin Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-    }
-    h2 {
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background: #007bff;
-      color: white;
-    }
-    button {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      color: #fff;
-    }
-    .approve {
-      background: #28a745;
-    }
-    .approve:hover {
-      background: #218838;
-    }
-    .logout {
-      background: #dc3545;
-      float: right;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; background:#f4f6f9; color:#333;}
+    header { display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:#0277bd; color:#fff; font-weight:700;}
+    header img { height:52px; width:52px; object-fit:contain; background:#fff; border-radius:50%; padding:4px;}
+    .container { max-width:1000px; margin:20px auto; padding:20px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,0.1);}
+    h2 { text-align:center; margin-bottom:20px; color:#b71c1c;}
+    nav { display:flex; gap:10px; margin-bottom:20px;}
+    nav button { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:700;}
+    nav button.active { background:#b71c1c; color:#fff;}
+    .section { display:none; }
+    .section.active { display:block; }
+    table { width:100%; border-collapse:collapse; margin-top:12px;}
+    table, th, td { border:1px solid #ccc;}
+    th, td { padding:8px; text-align:left;}
+    th { background:#e3f2fd;}
+    button.action-btn { padding:4px 8px; border:none; border-radius:4px; cursor:pointer; font-weight:700; margin-right:4px;}
+    button.approve { background:#2e7d32; color:#fff;}
+    button.delete { background:#b71c1c; color:#fff;}
   </style>
 </head>
 <body>
-  <h2>Admin Dashboard</h2>
-  <button class="logout" onclick="logout()">Logout</button>
-  <div id="message"></div>
 
-  <table id="users-table">
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Status</th>
-        <th>Role</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<script>
+  // Check if user is admin
+  const user = JSON.parse(localStorage.getItem("ccno_user"));
+  if (!user || user.role !== "admin") {
+    alert("Access denied. Admins only.");
+    window.location.href = "login.html";
+  }
+</script>
 
-  <script>
-    // 🔴 Replace with your Apps Script URL
-    const API_URL = "https://script.google.com/macros/s/AKfycbzhHlWqE7Y8LqWTILxAi7_mdt86NJCnYy86OJN-qeZlNgvHsLeRNF2OSfjfdLcuGAKcfQ/exec";
+<header>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <img src="images/LOGO.png" alt="Logo">
+    CCNO Admin Dashboard
+  </div>
+  <button id="logoutBtn" style="background:#b71c1c;color:#fff;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;">Logout</button>
+</header>
 
-    async function loadUsers() {
-      const tableBody = document.querySelector("#users-table tbody");
-      tableBody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+<div class="container">
+  <h2>Welcome, <span id="adminName"></span></h2>
 
-      try {
-        const res = await fetch(API_URL + "?action=getUsers");
-        const data = await res.json();
-        if (data.success) {
-          tableBody.innerHTML = "";
-          data.users.forEach(user => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${user.email}</td>
-              <td>${user.status}</td>
-              <td>${user.role || "User"}</td>
-              <td>
-                ${user.status !== "Active" ? 
-                  `<button class="approve" onclick="approveUser('${user.email}')">Approve</button>` 
-                  : "✔ Approved"}
-              </td>
-            `;
-            tableBody.appendChild(row);
-          });
-        } else {
-          tableBody.innerHTML = "<tr><td colspan='4'>" + data.message + "</td></tr>";
-        }
-      } catch (err) {
-        tableBody.innerHTML = "<tr><td colspan='4'>Error: " + err.message + "</td></tr>";
-      }
-    }
+  <nav>
+    <button class="tab-btn active" data-target="usersSection">Users</button>
+    <button class="tab-btn" data-target="reportsSection">Reports</button>
+  </nav>
 
-    async function approveUser(email) {
-      document.getElementById("message").innerText = "Approving " + email + "...";
-      try {
-        const res = await fetch(API_URL + "?action=approve", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-        const data = await res.json();
-        document.getElementById("message").innerText = data.message;
-        loadUsers(); // refresh list
-      } catch (err) {
-        document.getElementById("message").innerText = "Error: " + err.message;
-      }
-    }
+  <!-- Users Section -->
+  <div id="usersSection" class="section active">
+    <h3>All Users</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Sub County</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody">
+        <!-- Users will be dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
 
-    function logout() {
-      localStorage.removeItem("user");
-      window.location.href = "auth.html";
-    }
+  <!-- Reports Section -->
+  <div id="reportsSection" class="section">
+    <h3>All Reports</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Uploader</th>
+          <th>Evidence Name</th>
+          <th>Category</th>
+          <th>Indicator</th>
+          <th>Sub County</th>
+          <th>Files</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="reportsTableBody">
+        <!-- Reports will be dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    // ✅ Protect admin page
-    (function checkAuth() {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!user || user.role !== "Admin") {
-        alert("Access denied. Admins only.");
-        window.location.href = "auth.html";
-      } else {
-        loadUsers();
-      }
-    })();
-  </script>
+<script>
+  // Logout
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("ccno_user");
+    window.location.href = "login.html";
+  });
+
+  // Show admin name
+  document.getElementById("adminName").innerText = user.fullName;
+
+  // Tabs
+  const tabs = document.querySelectorAll(".tab-btn");
+  const sections = document.querySelectorAll(".section");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const target = tab.dataset.target;
+      sections.forEach(sec => sec.classList.remove("active"));
+      document.getElementById(target).classList.add("active");
+    });
+  });
+
+  // TODO: Fetch users and reports dynamically from backend or localStorage
+</script>
+
 </body>
 </html>
