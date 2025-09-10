@@ -32,28 +32,27 @@
       border-radius: 50%; padding: 4px;
     }
 
-    /* Toggle button (top-right inside header) */
     .menu-toggle {
-      margin-left: auto;    /* push to right */
+      margin-left: auto;
       background: transparent;
       color: #fff;
       border: none;
-      font-size: 1.2rem;    /* smaller size */
+      font-size: 1.2rem;
       cursor: pointer;
       padding: 4px 6px;
     }
     .menu-toggle:hover { color: #ffeb3b; }
 
-    /* Sidebar (right) */
+    /* Sidebar */
     .sidebar {
       position: fixed;
       top: 0; right: 0;
-      width: 180px; height: 100%;
+      width: 200px; height: 100%;
       background: #e0f2f1;
       padding: 16px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       box-shadow: -2px 0 8px rgba(0,0,0,0.1);
       transform: translateX(100%);
       transition: transform 0.3s ease-in-out;
@@ -61,18 +60,19 @@
     }
     .sidebar.active { transform: translateX(0); }
 
-    .user-info { color: #1b5e20; font-size: 0.9rem; }
-    .user-info div { margin-bottom: 8px; }
+    .user-info { color: #1b5e20; font-size: 0.95rem; }
+    .user-info div { margin-bottom: 12px; }
+    .user-info div span { font-weight: 700; }
 
     .logout-btn {
       background: #b71c1c;
       color: #fff;
       border: none;
-      padding: 8px;
+      padding: 10px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 0.9rem;
+      margin-top: 20px;
     }
     .logout-btn:hover { background: #d32f2f; }
 
@@ -121,7 +121,6 @@
     .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
     .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
 
-    /* Progress bar */
     .progress-container { display: none; margin-top: 16px; background: #eee; border-radius: 8px; height: 18px; overflow: hidden; }
     .progress-bar { height: 100%; width: 0%; background: #2e7d32; transition: width 0.2s ease; }
     #progressText { text-align:right; font-size:0.9rem; color:#2e7d32; display:none; margin-top:4px; }
@@ -198,14 +197,13 @@
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="user-info">
-      <div class="user-name" id="userName">Loading...</div>
-      <div class="user-role" id="userRole"></div>
-      <div class="user-status">Status: <span>Active</span></div>
+      <div>Full Name: <span id="userName">Loading...</span></div>
+      <div>Sub County: <span id="userSubCounty">Loading...</span></div>
+      <div>Status: <span>Active</span></div>
     </div>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
-  <!-- Overlay -->
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
   <script>
@@ -238,10 +236,10 @@
       window.location.href = "login.html";
     }
 
-    // Load user
-    const user = JSON.parse(localStorage.getItem("ccno_user")) || { name: "Matoka", role: "Nurse" };
+    // Load user info from localStorage
+    const user = JSON.parse(localStorage.getItem("ccno_user")) || { name: "Matoka", subCounty: "Nakuru West" };
     document.getElementById("userName").textContent = user.name;
-    document.getElementById("userRole").textContent = "(" + user.role + ")";
+    document.getElementById("userSubCounty").textContent = user.subCounty;
 
     // Indicators mapping
     const indicatorsMap = {
