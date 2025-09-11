@@ -181,12 +181,20 @@
   ]
 };
 
+  // Populate category dropdown dynamically
+  Object.keys(folderMap).forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
 
+  // Update indicators when category changes
   categorySelect.addEventListener("change", () => {
     const category = categorySelect.value;
     indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-    if (indicatorsMap[category]) {
-      indicatorsMap[category].forEach(ind => {
+    if (folderMap[category]) {
+      folderMap[category].forEach(ind => {
         const opt = document.createElement("option");
         opt.value = ind;
         opt.textContent = ind;
