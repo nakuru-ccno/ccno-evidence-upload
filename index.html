@@ -4,23 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CCNO Evidence Upload</title>
+
+  <!-- ✅ Favicon -->
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
-    header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-    header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
-    .container { max-width: 720px; background: #fff; margin: 36px auto; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
-    h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
-    label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
-    input[type="text"], select, input[type="file"] { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
-    button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
-    button:hover { background: #d32f2f; }
-    .spinner { display: none; margin: 16px 0; text-align: center; color: #b71c1c; font-weight: 700; }
-    .success, .error { display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700; }
-    .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
-    .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
-    .progress-container { display: none; margin-top: 16px; background: #eee; border-radius: 8px; height: 18px; overflow: hidden; }
-    .progress-bar { height: 100%; width: 0%; background: #2e7d32; transition: width 0.2s ease; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+  header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
+  .container { max-width: 720px; background: #fff; margin: 36px auto; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
+  h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
+  label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
+  input[type="text"], input[type="email"], select, input[type="file"] { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
+  input[type="text"]:focus, input[type="email"]:focus, select:focus, input[type="file"]:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
+  small { display: block; font-size: 0.85em; color: #607d8b; margin-top: 6px; }
+  button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
+  button:hover { background: #d32f2f; }
+  .spinner { display: none; margin: 16px 0; text-align: center; color: #b71c1c; font-weight: 700; }
+  .success, .error { display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700; }
+  .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+  .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+
+  /* Progress bar */
+  .progress-container { display: none; margin-top: 16px; background: #eee; border-radius: 8px; height: 18px; overflow: hidden; }
+  .progress-bar { height: 100%; width: 0%; background: #2e7d32; transition: width 0.2s ease; }
   </style>
 </head>
 <body>
@@ -31,6 +38,10 @@
 
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
+
+  <label for="email">Officer Email:</label>
+  <input type="email" id="email" placeholder="Enter your official email" required />
+  <small>📩 You will receive an email confirmation once your files are saved.</small>
 
   <label for="evidenceName">Evidence Name:</label>
   <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
@@ -77,6 +88,7 @@
 <script>
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
+const emailInput = document.getElementById("email");
 const evidenceNameInput = document.getElementById("evidenceName");
 const categorySelect = document.getElementById("category");
 const indicatorSelect = document.getElementById("indicator");
@@ -89,35 +101,31 @@ const uploadBtn = document.getElementById("uploadBtn");
 const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 
-// ✅ Load categories + indicators from external JSON
-let indicatorsMap = {};
+// ✅ Load categories & indicators dynamically
 fetch("indicators.json")
   .then(res => res.json())
   .then(data => {
-    indicatorsMap = data;
     Object.keys(data).forEach(cat => {
       const opt = document.createElement("option");
       opt.value = cat;
       opt.textContent = cat;
       categorySelect.appendChild(opt);
     });
-  });
 
-// ✅ Populate indicators when category changes
-categorySelect.addEventListener("change", () => {
-  const category = categorySelect.value;
-  indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-  if (indicatorsMap[category]) {
-    indicatorsMap[category].forEach(ind => {
-      const opt = document.createElement("option");
-      opt.value = ind;
-      opt.textContent = ind;
-      indicatorSelect.appendChild(opt);
+    categorySelect.addEventListener("change", () => {
+      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+      if (data[categorySelect.value]) {
+        data[categorySelect.value].forEach(ind => {
+          const opt = document.createElement("option");
+          opt.value = ind;
+          opt.textContent = ind;
+          indicatorSelect.appendChild(opt);
+        });
+      }
     });
-  }
-});
+  })
+  .catch(err => console.error("Error loading indicators.json:", err));
 
-// ✅ Upload Handler
 function showError(msg) {
   errorMsg.style.display = msg ? "block" : "none";
   errorMsg.textContent = msg;
@@ -128,10 +136,11 @@ function showSuccess(msg) {
   successMsg.style.display = "block";
   successMsg.textContent = msg;
   errorMsg.style.display = "none";
-  setTimeout(() => { successMsg.style.display = "none"; }, 4000);
+  setTimeout(() => { successMsg.style.display = "none"; }, 5000);
 }
 
 function resetForm() {
+  emailInput.value = "";
   evidenceNameInput.value = "";
   categorySelect.value = "";
   indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
@@ -142,13 +151,14 @@ function resetForm() {
 }
 
 uploadBtn.addEventListener("click", () => {
+  const email = emailInput.value.trim();
   const evidenceName = evidenceNameInput.value.trim();
   const category = categorySelect.value;
   const indicator = indicatorSelect.value;
   const subCounty = subCountySelect.value;
   const files = filesInput.files;
 
-  if (!evidenceName || !category || !indicator || !subCounty || !files.length) {
+  if (!email || !evidenceName || !category || !indicator || !subCounty || !files.length) {
     return showError("Please fill all fields and select at least one PDF file.");
   }
 
@@ -158,6 +168,7 @@ uploadBtn.addEventListener("click", () => {
   showError("");
 
   const formData = new FormData();
+  formData.append("email", email);
   formData.append("evidenceName", evidenceName);
   formData.append("category", category);
   formData.append("indicator", indicator);
@@ -179,7 +190,8 @@ uploadBtn.addEventListener("click", () => {
   xhr.onload = () => {
     spinner.style.display = "none";
     if (xhr.status >= 200 && xhr.status < 300) {
-      showSuccess(`${evidenceName}_${subCounty}.pdf submitted successfully`);
+      // ✅ Success ASAP, backend continues saving
+      showSuccess("Evidence submitted successfully! 📩 You’ll get an email once files are saved.");
       resetForm();
     } else {
       showError("Upload failed. Try again.");
