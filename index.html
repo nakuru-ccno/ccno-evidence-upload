@@ -3,57 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CCNO Evidence Upload</title>
+  <title>Nakuru County CCNO PC Evidence Upload</title>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
 
   <style>
-    body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; color:#333; overflow-x:hidden; }
-    header { display:flex; justify-content:space-between; align-items:center; background:#0277bd; padding:12px 18px; color:#fff; font-weight:700; font-size:1.05rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
-    header img { height:52px; width:52px; object-fit:contain; background:#fff; border-radius:50%; padding:4px; }
-    .menu-toggle { margin-left:auto; background:transparent; color:#fff; border:none; font-size:1.2rem; cursor:pointer; }
-    .menu-toggle:hover { color:#ffeb3b; }
-
-    /* Sidebar */
-    .sidebar { position:fixed; top:0; right:0; width:220px; height:100%; background:#e0f2f1; padding:16px; display:flex; flex-direction:column; justify-content:flex-start; box-shadow:-2px 0 8px rgba(0,0,0,0.1); transform:translateX(100%); transition:transform 0.3s ease-in-out; z-index:1001; }
-    .sidebar.active { transform:translateX(0); }
-    .user-info { color:#1b5e20; font-size:0.95rem; }
-    .user-info div { margin-bottom:12px; }
-    .user-info div span { font-weight:700; }
-    .logout-btn { background:#b71c1c; color:#fff; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:700; margin-top:20px; }
-    .logout-btn:hover { background:#d32f2f; }
-
-    /* Overlay */
-    .overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); z-index:1000; display:none; }
-    .overlay.active { display:block; }
-
-    /* Upload form */
-    .container { max-width:720px; background:#fff; margin:24px auto; padding:28px 32px; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top:6px solid #2e7d32; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin:0; padding:0; color:#333; }
+    .container { max-width: 720px; margin: 40px auto; background: #fff; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top:6px solid #2e7d32; }
     h2 { text-align:center; font-weight:800; color:#b71c1c; margin-bottom:20px; }
     label { display:block; margin-top:16px; font-weight:700; color:#2e7d32; }
     input, select { width:100%; padding:12px 14px; margin-top:8px; border:1px solid #cfd8dc; border-radius:8px; font-size:1rem; background:#fff; box-sizing:border-box; }
     input:focus, select:focus { outline:none; border-color:#0277bd; box-shadow:0 0 0 3px rgba(2,119,189,0.15); }
-    button { margin-top:22px; width:100%; padding:14px 16px; font-size:1.05rem; background:#b71c1c; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:800; }
+    button { margin-top:22px; width:100%; padding:14px 16px; font-size:1.05rem; background:#b71c1c; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:800; transition: background 0.2s; }
     button:hover { background:#d32f2f; }
     .spinner { display:none; margin:16px 0; text-align:center; color:#b71c1c; font-weight:700; }
     .success, .error { display:none; margin:18px 0; padding:14px 16px; border-radius:8px; font-weight:700; }
     .success { background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; }
     .error { background:#ffebee; color:#b71c1c; border:1px solid #ef9a9a; }
     .progress-container { display:none; margin-top:16px; background:#eee; border-radius:8px; height:18px; overflow:hidden; }
-    .progress-bar { height:100%; width:0%; background:#2e7d32; transition:width 0.2s ease; }
+    .progress-bar { height:100%; width:0%; background:#2e7d32; transition: width 0.2s ease; }
     #progressText { text-align:right; font-size:0.9rem; color:#2e7d32; display:none; margin-top:4px; }
   </style>
 </head>
 <body>
-<header>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <img src="images/LOGO.png" alt="Nakuru County Logo" />
-    Performance Contract For FY 2025/26
-  </div>
-  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-</header>
 
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
+
+  <label for="email">Email (for notification CC):</label>
+  <input type="email" id="email" placeholder="Enter email to CC notification" />
 
   <label for="evidenceName">Evidence Name:</label>
   <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
@@ -61,19 +38,19 @@
   <label for="category">Evidence Category:</label>
   <select id="category">
     <option value="">Select Evidence Category</option>
-    <option value="D3 - Immunization Coverage Increased">D3 - Immunization Coverage Increased</option>
-    <option value="D11 - Mental health services improved">D11 - Mental health services improved</option>
-    <option value="D12 - Referral system improved">D12 - Referral system improved</option>
-    <option value="D14 - Operationalization of health facilities">D14 - Operationalization of health facilities</option>
-    <option value="D19 - Theatre Services improved">D19 - Theatre Services improved</option>
-    <option value="D20 - In-patient Services Improved">D20 - In-patient Services Improved</option>
-    <option value="D23 - Antenatal Care Services improved">D23 - Antenatal Care Services improved</option>
-    <option value="D24 - Postnatal Care Improved">D24 - Postnatal Care Improved</option>
-    <option value="D25 - Maternal Perinatal Deaths Audited">D25 - Maternal Perinatal Deaths Audited</option>
-    <option value="D26 - Family Planning Uptake improved">D26 - Family Planning Uptake improved</option>
-    <option value="D27 - Burden of Cancer Reduced">D27 - Burden of Cancer Reduced</option>
-    <option value="D29 - Health Services Supervision">D29 - Health Services Supervision</option>
-    <option value="D35 - Youth Empowerment Initiatives">D35 - Youth Empowerment Initiatives</option>
+    <option value="D3 Immunisation Coverage Increased">D3 Immunisation Coverage Increased</option>
+    <option value="D11 Mental health services improved">D11 Mental health services improved</option>
+    <option value="D12 Referral system improved">D12 Referral system improved</option>
+    <option value="D14 Operationalization of health facilities to offer better services">D14 Operationalization of health facilities to offer better services</option>
+    <option value="D19 Theatre Services improved">D19 Theatre Services improved</option>
+    <option value="D20 In-patient Services Improved">D20 In-patient Services Improved</option>
+    <option value="D23 Antenatal Care Services improved">D23 Antenatal Care Services improved</option>
+    <option value="D24 Postnatal Care Improved">D24 Postnatal Care Improved</option>
+    <option value="D25 Maternal Perinatal Deaths Audited">D25 Maternal Perinatal Deaths Audited</option>
+    <option value="D26 Family Planning Uptake improved">D26 Family Planning Uptake improved</option>
+    <option value="D27 Burden of Cancer Reduced">D27 Burden of Cancer Reduced</option>
+    <option value="D29 Health Services Supervision">D29 Health Services Supervision</option>
+    <option value="Youth Empowerment Initiatives">Youth Empowerment Initiatives</option>
   </select>
 
   <label for="indicator">Indicator:</label>
@@ -111,55 +88,103 @@
   <button id="uploadBtn">Upload Performance Evidence</button>
 </div>
 
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-  <div class="user-info">
-    <div>Full Name: <span id="userName">Loading...</span></div>
-    <div>Sub County: <span id="userSubCounty">Loading...</span></div>
-    <div>Status: <span id="userStatus">Active</span></div>
-  </div>
-  <button class="logout-btn" onclick="logout()">Logout</button>
-</div>
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
 <script>
-  const PROXY_URL = "YOUR_BACKEND_UPLOAD_URL"; // replace with your backend
+  const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
-  // Sidebar toggle
-  function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("active");
-    document.getElementById("overlay").classList.toggle("active");
-  }
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("active");
-    document.getElementById("overlay").classList.remove("active");
-  }
-  function logout() {
-    localStorage.removeItem("ccno_user");
-    window.location.href = "login.html";
-  }
-
-  // Load user info from localStorage
-  const user = JSON.parse(localStorage.getItem("ccno_user")) || {};
-  document.getElementById("userName").textContent = user["Full Name"] || "Not Set";
-  document.getElementById("userSubCounty").textContent = user["Sub County"] || "Not Set";
-  document.getElementById("userStatus").textContent = user["Status"] || "Active";
-
-  // Indicators mapping (add all remaining indicators here)
-  const indicatorsMap = {
-    "D3 - Immunization Coverage Increased": ["Avail immunization services on daily basis 8am-5pm","Conduct continuous Immunization defaulter tracing","Conduct quarterly CCE assessment in all the immunizing facilities","Conduct monthly integrated outreaches"],
-    "D11 - Mental health services improved": ["Training of skilled HCWs on mental health and common mental health disorders (mhGAP)","Conduct quarterly debrief/self care sessions for HCWs","Train 3000 CHPs on mental health and psychological first aid","Identification and referral on mental health disorders by CHPs to health facilities"],
-    "D12 - Referral system improved": ["Strengthen referral system-Revise and disseminate SOPs","Formulate ambulance checklist to ensure consistent availability of emergency response commodities","Procure 2 ACLS ambulances for Naivasha and Molo","Relocate the call Centre to NCRTH and strengthen the call Centre by acquiring a dedicated toll free number"]
-    // ... add rest of indicators here
-  };
-
+  const evidenceNameInput = document.getElementById("evidenceName");
   const categorySelect = document.getElementById("category");
   const indicatorSelect = document.getElementById("indicator");
+  const subCountySelect = document.getElementById("subCounty");
+  const filesInput = document.getElementById("files");
+  const emailInput = document.getElementById("email");
+  const spinner = document.getElementById("spinner");
+  const successMsg = document.getElementById("success");
+  const errorMsg = document.getElementById("error");
+  const uploadBtn = document.getElementById("uploadBtn");
+  const progressContainer = document.getElementById("progressContainer");
+  const progressBar = document.getElementById("progressBar");
+  const progressText = document.getElementById("progressText");
+
+  const indicatorsMap = {
+    "D3 Immunisation Coverage Increased": [
+      "Avail immunisation services in all the county facilities",
+      "Conduct monthly integrated outreaches (Big Catch-Up Strategy)",
+      "Conduct continuous Immunisation defaulter tracing",
+      "Conduct quarterly CCE assessment in all the immunising facilities"
+    ],
+    "D11 Mental health services improved": [
+      "Train HCWs on common mental health disorders (mhGAP) to identify and manage mental health cases",
+      "Establish and operationalize subcounty mental health services",
+      "Conduct quarterly debrief/self-care sessions for HCWs",
+      "Train 3000 CHPs on common mental health disorders"
+    ],
+    "D12 Referral system improved": [
+      "Develop a checklist for maintenance of ambulances Equipment and commodities",
+      "Formulate referral system SOPs",
+      "Procure 2 ACLS ambulances for Naivasha and Molo",
+      "Relocate the call centre to NCRTH and strengthen the call centre by acquiring a dedicated toll-free number"
+    ],
+    "D14 Operationalization of health facilities to offer better services": [
+      "Upgrade 6 new level II health facilities to health centres across the County",
+      "Operationalize Level 4 new Maternity units in Elburgon, Molo, Gilgil and Githioro L3",
+      "Equip 6 new health facilities – Ol-Rongai laboratory, Ngondi laboratory, Karandit, Kapket"
+    ],
+    "D19 Theatre Services improved": [
+      "Operationalise the theatre at Bondeni SCH",
+      "Procurement of Theater equipment for Subukia",
+      "Deployment of HRH to operationalize Subukia, Elburgon and Gilgil Theatres",
+      "Improved access to safe caesarean sections and anaesthesia care in the 5 targeted facilities, reducing delays and complications during obstetric emergencies. (OSS)"
+    ],
+    "D20 In-patient Services Improved": [
+      "Conduct quarterly Supportive Supervision in all the 16 Level IV & V Hospitals",
+      "Re invigorate audit committees in all hospitals – with clear terms of reference",
+      "Hold Hospital Quarterly clinical audit team meetings in level IV / V hospitals"
+    ],
+    "D23 Antenatal Care Services improved": [
+      "Scale up the number of facilities Enrolling ANC mothers to SMS PROMPTS from 57 to 90",
+      "Procure and distribute post-partum hemorrhage bundles for Gilgil, Molo, Naivasha, NCRTH, Olenguruone, Keringet, and Elburgon",
+      "Implementation of group ANC in MCH clinics"
+    ],
+    "D24 Postnatal Care Improved": [
+      "Provision of PNC within the first 48 hours in all the maternity units",
+      "Integrate cervical cancer screening in postnatal clinic"
+    ],
+    "D25 Maternal Perinatal Deaths Audited": [
+      "Establish and operationalise MPDSR committees in all relevant facilities",
+      "Conduct MPDSR reviews meetings at all levels of care",
+      "Implement recommendations pf MPDSR",
+      "Conduct weekly virtual MPDSR reviews",
+      "Track and Implement recommendations of the action points from the MPDSR meetings as per the tracker"
+    ],
+    "D26 Family Planning Uptake improved": [
+      "Requisition of family planning commodities",
+      "Mentorship / OJT on long acting and reversible contraceptive methods, including Hormonal IUD",
+      "Roll out the self-care initiative in reproductive health and DMPA-SC injection at all levels (40 facilities)",
+      "Operationalization of the 4 AYSRH centers at Kabazi SCH, Maai Mahiu HC, Rhonda HC and Mau Narok HC"
+    ],
+    "D27 Burden of Cancer Reduced": [
+      "Undertake cervical cancer Screening",
+      "Treatment of 90% of cervical cancer lesions identified",
+      "Administration of the HPV 1 vaccine to girls 10 years–14 years",
+      "Conduct quarterly psychosocial support counselling session for cancer survivors and their families at oncology/palliative center"
+    ],
+    "D29 Health Services Supervision": [
+      "Undertake 3 integrated supervisions per quarter",
+      "Report on implementation of recommendations of CHMT supervision",
+      "SCHMT undertakes 33 supervisions in all sub counties per quarter – in all the PHC Facilities",
+      "Report on implementation of recommendations of SCHMT supervision"
+    ],
+    "Youth Empowerment Initiatives": [
+      "Establishment of Youth Friendly Centers in Facilities – Ronda HC, Mau Narok HC",
+      "Sensitize the youth on YFS, lifesaving skills and Alcohol & Substance Abuse – 120 youths per sub county and integrate into school health programme",
+      "Provision of psychological counselling services in youth friendly centers"
+    ]
+  };
 
   categorySelect.addEventListener("change", () => {
     const category = categorySelect.value;
     indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-    if(indicatorsMap[category]){
+    if (indicatorsMap[category]) {
       indicatorsMap[category].forEach(ind => {
         const opt = document.createElement("option");
         opt.value = ind;
@@ -169,71 +194,81 @@
     }
   });
 
-  // Upload logic
-  const evidenceNameInput = document.getElementById("evidenceName");
-  const subCountySelect = document.getElementById("subCounty");
-  const filesInput = document.getElementById("files");
-  const spinner = document.getElementById("spinner");
-  const successMsg = document.getElementById("success");
-  const errorMsg = document.getElementById("error");
-  const uploadBtn = document.getElementById("uploadBtn");
-  const progressContainer = document.getElementById("progressContainer");
-  const progressBar = document.getElementById("progressBar");
-  const progressText = document.getElementById("progressText");
+  function showError(msg) {
+    errorMsg.style.display = msg ? "block" : "none";
+    errorMsg.textContent = msg;
+    successMsg.style.display = "none";
+  }
 
-  function showError(msg){ errorMsg.style.display = msg?"block":"none"; errorMsg.textContent=msg; successMsg.style.display="none"; }
-  function showSuccess(msg){ successMsg.style.display="block"; successMsg.textContent=msg; errorMsg.style.display="none"; }
+  function showSuccess(msg) {
+    successMsg.style.display = "block";
+    successMsg.textContent = msg;
+    errorMsg.style.display = "none";
+    setTimeout(() => { successMsg.style.display = "none"; }, 4000);
+  }
 
-  uploadBtn.addEventListener("click", async () => {
-    showError(""); showSuccess("");
+  function resetForm() {
+    evidenceNameInput.value = "";
+    emailInput.value = "";
+    categorySelect.value = "";
+    indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+    subCountySelect.value = "";
+    filesInput.value = "";
+    progressBar.style.width = "0%";
+    progressContainer.style.display = "none";
+    progressText.style.display = "none";
+  }
+
+  uploadBtn.addEventListener("click", () => {
     const evidenceName = evidenceNameInput.value.trim();
+    const email = emailInput.value.trim();
     const category = categorySelect.value;
     const indicator = indicatorSelect.value;
     const subCounty = subCountySelect.value;
     const files = filesInput.files;
 
-    if(!evidenceName || !category || !indicator || !subCounty || !files.length){
-      return showError("Please fill all fields and select file(s).");
+    if (!evidenceName || !category || !indicator || !subCounty || !files.length || !email) {
+      return showError("Please fill all fields including Email and select at least one PDF file.");
     }
 
-    spinner.style.display="block";
-    progressContainer.style.display="block";
-    progressBar.style.width="0%";
-    progressText.style.display="block";
-    progressText.textContent="0%";
+    spinner.style.display = "block";
+    progressContainer.style.display = "block";
+    progressText.style.display = "block";
+    progressBar.style.width = "0%";
+    showError("");
 
-    try{
-      for(let i=0;i<files.length;i++){
-        const file = files[i];
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("evidenceName", evidenceName);
-        formData.append("category", category);
-        formData.append("indicator", indicator);
-        formData.append("subCounty", subCounty);
-        formData.append("uploadedBy", user["Full Name"]);
-        // replace below with actual fetch to your backend
-        await fakeUpload(formData,i+1,files.length);
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("evidenceName", evidenceName);
+    formData.append("category", category);
+    formData.append("indicator", indicator);
+    formData.append("subCounty", subCounty);
+    for (let file of files) formData.append("files", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", PROXY_URL, true);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        progressBar.style.width = percent + "%";
+        progressText.textContent = percent + "%";
       }
-      showSuccess("✅ All files uploaded successfully!");
-    }catch(e){ showError("Error uploading files."); console.error(e); }
-    spinner.style.display="none"; progressContainer.style.display="none"; progressText.style.display="none";
+    };
+    xhr.onload = () => {
+      spinner.style.display = "none";
+      if (xhr.status === 200) {
+        showSuccess("✅ Evidence uploaded successfully!");
+        resetForm();
+      } else {
+        showError("❌ Upload failed. Please try again.");
+      }
+    };
+    xhr.onerror = () => {
+      spinner.style.display = "none";
+      showError("❌ An error occurred during upload.");
+    };
+    xhr.send(formData);
   });
-
-  // Fake upload function for demo (replace with actual fetch)
-  function fakeUpload(formData,index,total){
-    return new Promise(res=>{
-      let progress=0;
-      const interval = setInterval(()=>{
-        progress+=10;
-        if(progress>100) progress=100;
-        progressBar.style.width = progress+"%";
-        progressText.textContent = Math.round(progress)+"%";
-        if(progress>=100){ clearInterval(interval); res(); }
-      },100);
-    });
-  }
-
 </script>
 </body>
 </html>
