@@ -4,31 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CCNO Evidence Upload</title>
-
-  <!-- ✅ Favicon -->
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
   <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
-  header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-  header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
-  .container { max-width: 720px; background: #fff; margin: 36px auto; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
-  h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
-  label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
-  input[type="text"], select, input[type="file"] { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
-  input[type="text"]:focus, select:focus, input[type="file"]:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
-  small { display: block; font-size: 0.85em; color: #607d8b; margin-top: 6px; }
-  button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
-  button:hover { background: #d32f2f; }
-  .spinner { display: none; margin: 16px 0; text-align: center; color: #b71c1c; font-weight: 700; }
-  .success, .error { display: none; margin: 18px 0; padding: 14px 16px; border-radius: 8px; font-weight: 700; }
-  .success { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
-  .error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
-
-  /* Progress bar */
-  .progress-container { display: none; margin-top: 16px; background: #eee; border-radius: 8px; height: 18px; overflow: hidden; }
-  .progress-bar { height: 100%; width: 0%; background: #2e7d32; transition: width 0.2s ease; }
-  #progressText { text-align:right; font-size:0.9rem; color:#2e7d32; display:none; margin-top:4px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+    header { display: flex; align-items: center; gap: 12px; background: #0277bd; padding: 12px 18px; color: #fff; font-weight: 700; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    header img { height: 52px; width: 52px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; }
+    .container { max-width: 720px; background: #fff; margin: 36px auto; padding: 28px 32px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-top: 6px solid #2e7d32; }
+    h2 { text-align: center; font-weight: 800; color: #b71c1c; margin: 0 0 20px; }
+    label { display: block; margin-top: 16px; font-weight: 700; color: #2e7d32; }
+    input[type="email"], select, input[type="file"] { width: 100%; padding: 12px 14px; margin-top: 8px; border: 1px solid #cfd8dc; border-radius: 8px; font-size: 1rem; background: #fff; box-sizing: border-box; }
+    input[type="email"]:focus, select:focus, input[type="file"]:focus { outline: none; border-color: #0277bd; box-shadow: 0 0 0 3px rgba(2,119,189,0.15); }
+    button { margin-top: 22px; width: 100%; padding: 14px 16px; font-size: 1.05rem; background: #b71c1c; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
+    button:hover { background: #d32f2f; }
+    .preview { display: none; margin-top: 20px; background: #f9f9f9; padding: 14px; border-radius: 8px; border: 1px solid #ddd; }
   </style>
 </head>
 <body>
@@ -40,95 +29,148 @@
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
-    <form id="uploadForm">
-      <label for="email">Officer Email:</label>
-      <input type="email" id="email" name="email" placeholder="Enter your official email" required>
+  <form id="uploadForm">
+    <label for="email">Officer Email:</label>
+    <input type="email" id="email" name="email" placeholder="Enter your official email" required>
 
-      <label for="category">Evidence Category:</label>
-      <select id="category" name="category" required>
-        <option value="">Select Evidence Category</option>
-      </select>
+    <label for="category">Evidence Category:</label>
+    <select id="category" name="category" required>
+      <option value="">Select Evidence Category</option>
+    </select>
 
-      <label for="indicator">Indicator:</label>
-      <select id="indicator" name="indicator" required>
-        <option value="">Select Indicator</option>
-      </select>
+    <label for="indicator">Indicator:</label>
+    <select id="indicator" name="indicator" required>
+      <option value="">Select Indicator</option>
+    </select>
 
-      <label for="file">Upload Evidence (PDF, Word, Excel, Image):</label>
-      <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" required>
+    <label for="file">Upload Evidence (PDF only, up to 10 files, max 30MB each):</label>
+    <input type="file" id="file" name="file" accept=".pdf" multiple required>
 
-      <button type="submit">Upload Evidence</button>
-    </form>
+    <button type="submit">Upload Evidence</button>
+  </form>
 
-    <div class="preview" id="preview" style="display: none;">
-      <h3>Submission Preview</h3>
-      <p><strong>Email:</strong> <span id="previewEmail"></span></p>
-      <p><strong>Category:</strong> <span id="previewCategory"></span></p>
-      <p><strong>Indicator:</strong> <span id="previewIndicator"></span></p>
-      <p><strong>File:</strong> <span id="previewFile"></span></p>
-    </div>
+  <div class="preview" id="preview">
+    <h3>Submission Preview</h3>
+    <p><strong>Email:</strong> <span id="previewEmail"></span></p>
+    <p><strong>Category:</strong> <span id="previewCategory"></span></p>
+    <p><strong>Indicator:</strong> <span id="previewIndicator"></span></p>
+    <p><strong>Files:</strong> <ul id="previewFiles"></ul></p>
   </div>
+</div>
 
-  <script>
-    const categorySelect = document.getElementById("category");
-    const indicatorSelect = document.getElementById("indicator");
-    const uploadForm = document.getElementById("uploadForm");
-    const preview = document.getElementById("preview");
-    const previewEmail = document.getElementById("previewEmail");
-    const previewCategory = document.getElementById("previewCategory");
-    const previewIndicator = document.getElementById("previewIndicator");
-    const previewFile = document.getElementById("previewFile");
+<script>
+  const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
+  const categorySelect = document.getElementById("category");
+  const indicatorSelect = document.getElementById("indicator");
+  const uploadForm = document.getElementById("uploadForm");
+  const preview = document.getElementById("preview");
+  const previewEmail = document.getElementById("previewEmail");
+  const previewCategory = document.getElementById("previewCategory");
+  const previewIndicator = document.getElementById("previewIndicator");
+  const previewFiles = document.getElementById("previewFiles");
 
-    // Load categories & indicators from external JSON
-    fetch("indicators.json")
-      .then(res => res.json())
-      .then(data => {
-        // Populate category dropdown
-        Object.keys(data).forEach(cat => {
-          const opt = document.createElement("option");
-          opt.value = cat;
-          opt.textContent = cat;
-          categorySelect.appendChild(opt);
-        });
+  let indicatorsData = {};
 
-        // Populate indicators when category changes
-        categorySelect.addEventListener("change", () => {
-          indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-          if (data[categorySelect.value]) {
-            data[categorySelect.value].forEach(ind => {
-              const opt = document.createElement("option");
-              opt.value = ind;
-              opt.textContent = ind;
-              indicatorSelect.appendChild(opt);
-            });
-          }
-        });
-      })
-      .catch(err => console.error("Error loading indicators.json:", err));
+  // Load categories & indicators from external JSON
+  fetch("indicators.json")
+    .then(res => res.json())
+    .then(data => {
+      indicatorsData = data;
+      Object.keys(data).forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
 
-    // Handle form submission
-    uploadForm.addEventListener("submit", function(event) {
-      event.preventDefault();
+      categorySelect.addEventListener("change", () => {
+        indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+        if (data[categorySelect.value]) {
+          data[categorySelect.value].forEach(ind => {
+            const opt = document.createElement("option");
+            opt.value = ind;
+            opt.textContent = ind;
+            indicatorSelect.appendChild(opt);
+          });
+        }
+      });
+    })
+    .catch(err => console.error("Error loading indicators.json:", err));
 
-      const email = document.getElementById("email").value;
-      const category = categorySelect.value;
-      const indicator = indicatorSelect.value;
-      const file = document.getElementById("file").files[0];
+  // Handle form submission
+  uploadForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-      if (!email || !category || !indicator || !file) {
-        alert("Please fill in all fields and select a file.");
+    const email = document.getElementById("email").value;
+    const category = categorySelect.value;
+    const indicator = indicatorSelect.value;
+    const files = document.getElementById("file").files;
+
+    // ✅ Validation
+    if (!indicatorsData[category] || !indicatorsData[category].includes(indicator)) {
+      alert("Invalid category/indicator selection!");
+      return;
+    }
+
+    if (!email || files.length === 0) {
+      alert("Please fill in all fields and select at least one file.");
+      return;
+    }
+
+    if (files.length > 10) {
+      alert("❌ You can only upload up to 10 files.");
+      return;
+    }
+
+    for (let file of files) {
+      if (file.type !== "application/pdf") {
+        alert("❌ Only PDF files are allowed.");
         return;
       }
+      if (file.size > 30 * 1024 * 1024) {
+        alert(`❌ ${file.name} exceeds the 30MB limit.`);
+        return;
+      }
+    }
 
-      // Show preview
-      previewEmail.textContent = email;
-      previewCategory.textContent = category;
-      previewIndicator.textContent = indicator;
-      previewFile.textContent = file.name;
-      preview.style.display = "block";
-
-      alert("Evidence ready for upload! (Backend handling not yet connected)");
+    // Show preview
+    previewEmail.textContent = email;
+    previewCategory.textContent = category;
+    previewIndicator.textContent = indicator;
+    previewFiles.innerHTML = "";
+    Array.from(files).forEach(f => {
+      const li = document.createElement("li");
+      li.textContent = f.name + ` (${(f.size/1024/1024).toFixed(2)} MB)`;
+      previewFiles.appendChild(li);
     });
-  </script>
+    preview.style.display = "block";
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("category", category);
+    formData.append("indicator", indicator);
+    Array.from(files).forEach(f => formData.append("files", f));
+
+    try {
+      const response = await fetch(PROXY_URL, {
+        method: "POST",
+        body: formData
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert("✅ Evidence uploaded successfully!");
+        uploadForm.reset();
+        preview.style.display = "none";
+      } else {
+        alert("❌ Upload failed: " + (result.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("❌ An error occurred while uploading evidence.");
+    }
+  });
+</script>
 </body>
 </html>
+
