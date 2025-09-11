@@ -1,0 +1,130 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f6f9;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0277bd;
+  padding: 12px 18px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+header img {
+  height: 52px;
+  width: 52px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 50%;
+  padding: 4px;
+}
+
+.container {
+  max-width: 720px;
+  background: #fff;
+  margin: 36px auto;
+  padding: 28px 32px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-top: 6px solid #2e7d32;
+}
+
+h2 {
+  text-align: center;
+  font-weight: 800;
+  color: #b71c1c;
+  margin: 0 0 20px;
+}
+
+label {
+  display: block;
+  margin-top: 16px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+input[type="text"], input[type="email"], select, input[type="file"] {
+  width: 100%;
+  padding: 12px 14px;
+  margin-top: 8px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #0277bd;
+  box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
+}
+
+button {
+  margin-top: 22px;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  background: #b71c1c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+button:hover {
+  background: #d32f2f;
+}
+
+.spinner {
+  display: none;
+  margin: 16px 0;
+  text-align: center;
+  color: #b71c1c;
+  font-weight: 700;
+}
+
+.success, .error {
+  display: none;
+  margin: 18px 0;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.success {
+  background: #e3f2fd;
+  color: #0d47a1;
+  border: 1px solid #90caf9;
+}
+
+.error {
+  background: #ffebee;
+  color: #b71c1c;
+  border: 1px solid #ef9a9a;
+}
+
+.progress-container {
+  display: none;
+  margin-top: 16px;
+  background: #eee;
+  border-radius: 8px;
+  height: 18px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #2e7d32;
+  transition: width 0.2s ease;
+}
