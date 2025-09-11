@@ -211,55 +211,84 @@ progressText.style.display = "none";
 }
 
 uploadBtn.addEventListener("click", () => {
-const evidenceName = evidenceNameInput.value.trim();
-const email = emailInput.value.trim();
-const category = categorySelect.value;
-const indicator = indicatorSelect.value;
-const subCounty = subCountySelect.value;
-const files = filesInput.files;
+  const evidenceName = evidenceNameInput.value.trim();
+  const email = emailInput.value.trim(); // uploader email / CC
+  const category = categorySelect.value;
+  const indicator = indicatorSelect.value;
+  const subCounty = subCountySelect.value;
+  const files = filesInput.files;
 
-if (!evidenceName || !category || !indicator || !subCounty || !files.length || !email) {
-return showError("Please fill all fields including Email and select at least one PDF file.");
-}
+  if (!evidenceName || !category || !indicator || !subCounty || !files.length || !email) {
+    return showError("Please fill all fields including Email and select at least one PDF file.");
+  }
 
-spinner.style.display = "block";
-progressContainer.style.display = "block";
-progressText.style.display = "block";
-progressBar.style.width = "0%";
-showError("");
+  spinner.style.display = "block";
+  progressContainer.style.display = "block";
+  progressText.style.display = "block";
+  progressBar.style.width = "0%";
+  showError("");
 
-const formData = new FormData();
-formData.append("email", email);
-formData.append("evidenceName", evidenceName);
-formData.append("category", category);
-formData.append("indicator", indicator);
-formData.append("subCounty", subCounty);
-for (let file of files) formData.append("files", file);
+  const filesData = [];
+  let loadedFiles = 0;
 
-const xhr = new XMLHttpRequest();
-xhr.open("POST", PROXY_URL, true);
-xhr.upload.onprogress = (e) => {
-if (e.lengthComputable) {
-const percent = Math.round((e.loaded / e.total) * 100);
-progressBar.style.width = percent + "%";
-progressText.textContent = percent + "%";
-}
-};
-xhr.onload = () => {
-spinner.style.display = "none";
-if (xhr.status === 200) {
-showSuccess("✅ Evidence uploaded successfully!");
-resetForm();
-} else {
-showError("❌ Upload failed. Please try again.");
-}
-};
-xhr.onerror = () => {
-spinner.style.display = "none";
-showError("❌ An error occurred during upload.");
-};
-xhr.send(formData);
+  for (let i = 0; i < files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = (function(file, index) {
+      return function(e) {
+        filesData.push({
+          name: file.name,
+          content: e.target.result.split(',')[1] // Base64 content
+        });
+        loadedFiles++;
+
+        // Only send once all files are read
+        if (loadedFiles === files.length) {
+          const payload = {
+            evidenceName,
+            category,
+            indicator,
+            subCounty,
+            uploaderEmail: email,
+            ccEmails: [email], // send uploader as CC
+            files: filesData
+          };
+
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", PROXY_URL, true);
+          xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+              const percent = Math.round((e.loaded / e.total) * 100);
+              progressBar.style.width = percent + "%";
+              progressText.textContent = percent + "%";
+            }
+          };
+
+          xhr.onload = () => {
+            spinner.style.display = "none";
+            if (xhr.status === 200) {
+              const resp = JSON.parse(xhr.responseText);
+              if (resp.success) {
+                showSuccess("✅ Evidence uploaded successfully!");
+                resetForm();
+              } else {
+                showError("❌ " + resp.message);
+              }
+            } else {
+              showError("❌ Upload failed. Please try again.");
+            }
+          };
+
+          xhr.onerror = () => {
+            spinner.style.display = "none";
+            showError("❌ An error occurred during upload.");
+          };
+
+          xhr.send(JSON.stringify(payload));
+        }
+      };
+    })(files[i], i);
+    reader.readAsDataURL(files[i]);
+  }
 });
-</script>
-</body>
-</html>
