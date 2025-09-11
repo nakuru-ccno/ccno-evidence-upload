@@ -1,3 +1,4 @@
+<script>
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 const officerEmailInput = document.getElementById("officerEmail");
@@ -13,32 +14,6 @@ const uploadBtn = document.getElementById("uploadBtn");
 const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 
-// Load categories + indicators from JSON
-fetch("indicators.json")
-  .then(res => res.json())
-  .then(data => {
-    Object.keys(data).forEach(category => {
-      const opt = document.createElement("option");
-      opt.value = category;
-      opt.textContent = category;
-      categorySelect.appendChild(opt);
-    });
-
-    categorySelect.addEventListener("change", () => {
-      const selected = categorySelect.value;
-      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-      if (data[selected]) {
-        data[selected].forEach(ind => {
-          const opt = document.createElement("option");
-          opt.value = ind;
-          opt.textContent = ind;
-          indicatorSelect.appendChild(opt);
-        });
-      }
-    });
-  });
-
-// Helper functions
 function showError(msg) {
   errorMsg.style.display = msg ? "block" : "none";
   errorMsg.textContent = msg;
@@ -49,7 +24,7 @@ function showSuccess(msg) {
   successMsg.style.display = "block";
   successMsg.textContent = msg;
   errorMsg.style.display = "none";
-  setTimeout(() => (successMsg.style.display = "none"), 5000);
+  setTimeout(() => { successMsg.style.display = "none"; }, 4000);
 }
 
 function resetForm() {
@@ -63,7 +38,6 @@ function resetForm() {
   progressContainer.style.display = "none";
 }
 
-// Upload
 uploadBtn.addEventListener("click", () => {
   const officerEmail = officerEmailInput.value.trim();
   const evidenceName = evidenceNameInput.value.trim();
@@ -73,21 +47,7 @@ uploadBtn.addEventListener("click", () => {
   const files = filesInput.files;
 
   if (!officerEmail || !evidenceName || !category || !indicator || !subCounty || !files.length) {
-    return showError("⚠️ Please fill all fields and select at least one PDF file.");
-  }
-
-  // Validate files
-  if (files.length > 10) {
-    return showError("⚠️ You can only upload up to 10 PDF files at once.");
-  }
-
-  for (let file of files) {
-    if (file.type !== "application/pdf") {
-      return showError(`⚠️ ${file.name} is not a PDF.`);
-    }
-    if (file.size > 30 * 1024 * 1024) {
-      return showError(`⚠️ ${file.name} exceeds the 30MB limit.`);
-    }
+    return showError("Please fill all fields and select at least one PDF file.");
   }
 
   spinner.style.display = "block";
@@ -96,14 +56,14 @@ uploadBtn.addEventListener("click", () => {
   showError("");
 
   const formData = new FormData();
-  formData.append("officerEmail", officerEmail);
+  formData.append("officerEmail", officerEmail); // <--- added email
   formData.append("evidenceName", evidenceName);
   formData.append("category", category);
   formData.append("indicator", indicator);
   formData.append("subCounty", subCounty);
+
   for (let file of files) {
-    // Use files[] so proxy can handle multiple
-    formData.append("files[]", file, file.name);
+    formData.append("files", file, file.name);
   }
 
   const xhr = new XMLHttpRequest();
@@ -119,17 +79,18 @@ uploadBtn.addEventListener("click", () => {
   xhr.onload = () => {
     spinner.style.display = "none";
     if (xhr.status >= 200 && xhr.status < 300) {
-      showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
+      showSuccess(`${evidenceName}_${subCounty}.pdf submitted successfully. 📩 You will receive an email confirmation.`);
       resetForm();
     } else {
-      showError("❌ Upload failed. Please try again.");
+      showError("Upload failed. Try again.");
     }
   };
 
   xhr.onerror = () => {
     spinner.style.display = "none";
-    showError("❌ Network error. Please try again.");
+    showError("Network error. Try again.");
   };
 
   xhr.send(formData);
 });
+</script>
