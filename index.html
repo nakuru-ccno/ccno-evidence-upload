@@ -334,7 +334,7 @@ uploadBtn.addEventListener("click", () => {
   formData.append("indicator", indicator);
   formData.append("subCounty", subCounty);
   for (let file of files) {
-    formData.append("files[]", file, file.name);
+    formData.append("files", file, file.name);
   }
 
   const xhr = new XMLHttpRequest();
