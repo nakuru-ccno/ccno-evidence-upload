@@ -6,19 +6,24 @@ body {
   color: #333;
 }
 
+/* Header: logo left, text centered, big and prominent */
 header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center; /* Center text horizontally */
+  position: relative;      /* Allows absolute positioning for logo */
   background: #0277bd;
-  padding: 12px 18px;
+  padding: 16px 18px;
   color: #fff;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.5rem;       /* Bigger, prominent text */
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  text-align: center;
 }
 
 header img {
+  position: absolute;       /* Keep logo on left without affecting text */
+  left: 18px;
   height: 52px;
   width: 52px;
   object-fit: contain;
@@ -127,4 +132,16 @@ button:hover {
   width: 0%;
   background: #2e7d32;
   transition: width 0.2s ease;
+}
+
+/* Mobile adjustments: keep text centered and logo responsive */
+@media (max-width: 480px) {
+  header {
+    font-size: 1.2rem;
+    padding: 12px 14px;
+  }
+  header img {
+    height: 46px;
+    width: 46px;
+  }
 }
