@@ -10,7 +10,7 @@ body {
 
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* ensures footer stays at bottom */
+  min-height: 100vh; /* keeps footer at bottom */
 }
 
 /* ==============================
@@ -20,12 +20,12 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  gap: 12px;
   background: linear-gradient(90deg, #0277bd, #03a9f4);
-  padding: 20px 18px;
+  padding: 16px;
   color: #fff;
   font-weight: 800;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2vw, 1.25rem); /* keeps text smaller + responsive */
   text-align: center;
   letter-spacing: 1px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
@@ -34,16 +34,14 @@ header {
 }
 
 header img {
-  position: absolute;
-  left: 18px;
-  height: 50px;
-  width: 50px;
+  height: 44px;
+  width: 44px;
   object-fit: contain;
   background: #fff;
   border-radius: 50%;
   padding: 4px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: transform 0.3s ease, height 0.3s ease, width 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 header img:hover {
@@ -118,11 +116,6 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
-input:nth-of-type(1) { animation-delay: 0.1s; }
-input:nth-of-type(2) { animation-delay: 0.2s; }
-input:nth-of-type(3) { animation-delay: 0.3s; }
-input:nth-of-type(4) { animation-delay: 0.4s; }
-
 /* ==============================
    BUTTON
 ============================== */
@@ -166,7 +159,7 @@ button:disabled {
 }
 
 /* ==============================
-   SUCCESS MESSAGE WITH CHECKMARK
+   SUCCESS MESSAGE
 ============================== */
 .success {
   display: none;
@@ -270,7 +263,6 @@ button:disabled {
   font-size: 0.95rem;
   font-weight: 700;
   color: #2e7d32;
-  transition: opacity 0.3s ease, color 0.3s ease;
 }
 
 .upload-progress-text.show {
@@ -303,12 +295,13 @@ button:disabled {
    FOOTER
 ============================== */
 .site-footer {
-  background: #ffffff;   /* clean white */
+  background: #ffffff;
   text-align: center;
   padding: 16px 10px;
   font-size: 0.95rem;
   color: #333;
   margin-top: auto;
+  border-top: 1px solid #e0e0e0;
 }
 
 .site-footer p {
@@ -322,14 +315,13 @@ button:disabled {
 @media (max-width: 480px) {
   header {
     flex-direction: column;
-    font-size: 1.25rem;
-    padding: 14px 14px;
+    font-size: 1rem;
+    padding: 12px;
   }
   header img {
-    position: static;
-    height: 40px;
-    width: 40px;
     margin-bottom: 6px;
+    height: 36px;
+    width: 36px;
   }
   h2 {
     font-size: 1rem;
