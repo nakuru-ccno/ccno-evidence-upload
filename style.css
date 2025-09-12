@@ -1,3 +1,6 @@
+/* ==============================
+   BODY & GLOBAL
+============================== */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f4f6f9;
@@ -6,32 +9,52 @@ body {
   color: #333;
 }
 
-/* Header: logo left, text centered, big and prominent */
+/* ==============================
+   Header: Premium Style
+============================== */
 header {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center text horizontally */
-  position: relative;      /* Allows absolute positioning for logo */
-  background: #0277bd;
-  padding: 16px 18px;
+  justify-content: center;       /* Center text horizontally */
+  position: relative;            /* Allows absolute positioning for logo */
+  background: linear-gradient(90deg, #0277bd, #03a9f4);
+  padding: 32px 18px;            /* Taller header */
   color: #fff;
-  font-weight: 700;
-  font-size: 1.5rem;       /* Bigger, prominent text */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-weight: 800;
+  font-size: 2rem;
   text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  animation: fadeInHeader 1.2s ease-in-out;
 }
 
 header img {
-  position: absolute;       /* Keep logo on left without affecting text */
+  position: absolute;
   left: 18px;
-  height: 52px;
-  width: 52px;
+  height: 64px;
+  width: 64px;
   object-fit: contain;
   background: #fff;
   border-radius: 50%;
   padding: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transform: translateY(0);
+  transition: transform 0.3s ease;
 }
 
+header img:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes fadeInHeader {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ==============================
+   CONTAINER & FORM
+============================== */
 .container {
   max-width: 720px;
   background: #fff;
@@ -134,14 +157,22 @@ button:hover {
   transition: width 0.2s ease;
 }
 
-/* Mobile adjustments: keep text centered and logo responsive */
+.email-note {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 6px;
+}
+
+/* ==============================
+   RESPONSIVE MOBILE
+============================== */
 @media (max-width: 480px) {
   header {
-    font-size: 1.2rem;
-    padding: 12px 14px;
+    font-size: 1.5rem;
+    padding: 24px 14px;
   }
   header img {
-    height: 46px;
-    width: 46px;
+    height: 52px;
+    width: 52px;
   }
 }
