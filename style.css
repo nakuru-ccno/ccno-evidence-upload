@@ -21,7 +21,7 @@ header {
   padding: 32px 18px;
   color: #fff;
   font-weight: 800;
-  font-size: 1.5rem; /* reduced desktop size */
+  font-size: 1.5rem;
   text-align: center;
   letter-spacing: 1px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
@@ -98,7 +98,6 @@ input[type="text"], input[type="email"], select, input[type="file"] {
   animation: floatIn 0.8s forwards;
 }
 
-/* Input hover/focus highlight */
 input[type="text"]:hover,
 input[type="email"]:hover,
 select:hover,
@@ -114,7 +113,6 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
-/* Staggered animation delays for inputs */
 input:nth-of-type(1) { animation-delay: 0.1s; }
 input:nth-of-type(2) { animation-delay: 0.2s; }
 input:nth-of-type(3) { animation-delay: 0.3s; }
@@ -128,7 +126,7 @@ button {
   width: 100%;
   padding: 14px 16px;
   font-size: 1.05rem;
-  background: #b71c1c; /* normal color */
+  background: #b71c1c;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -163,7 +161,7 @@ button:disabled {
 }
 
 .success, .error {
-  display: none;
+  display: block;
   margin: 18px 0;
   padding: 14px 16px;
   border-radius: 8px;
@@ -172,24 +170,22 @@ button:disabled {
   transition: opacity 0.5s ease;
 }
 
-.success.show, .error.show {
-  opacity: 1;
-}
-
-.success {
+.success.show {
   background: #e3f2fd;
   color: #0d47a1;
   border: 1px solid #90caf9;
+  opacity: 1;
 }
 
-.error {
+.error.show {
   background: #ffebee;
   color: #b71c1c;
   border: 1px solid #ef9a9a;
+  opacity: 1;
 }
 
 /* ==============================
-   PROGRESS BAR (Animated Gradient)
+   PROGRESS BAR
 ============================== */
 .progress-container {
   display: none;
@@ -206,7 +202,7 @@ button:disabled {
   background: linear-gradient(270deg, #2e7d32, #81c784, #2e7d32);
   background-size: 600% 100%;
   border-radius: 8px;
-  transition: width 0.3s ease;
+  transition: width 0.15s linear;
   animation: gradientMove 3s linear infinite;
 }
 
