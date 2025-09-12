@@ -62,6 +62,11 @@ header img:hover {
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   border-top: 6px solid #2e7d32;
+  transition: box-shadow 0.3s ease;
+}
+
+.container:hover {
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
 
 h2 {
@@ -93,12 +98,14 @@ input[type="text"], input[type="email"], select, input[type="file"] {
   animation: floatIn 0.8s forwards;
 }
 
-/* Optional subtle lift on input hover */
+/* Input hover/focus highlight */
 input[type="text"]:hover,
 input[type="email"]:hover,
 select:hover,
 input[type="file"]:hover {
   transform: translateY(-1px);
+  border-color: #b71c1c;
+  box-shadow: 0 2px 6px rgba(183,28,28,0.2);
 }
 
 input:focus, select:focus {
@@ -130,14 +137,18 @@ button {
   transition: background 0.3s ease;
   opacity: 0;
   transform: translateY(20px);
-  animation: floatIn 0.8s forwards 0.5s; /* float in on page load */
-  background-size: 200% 200%; /* for gradient hover */
+  animation: floatIn 0.8s forwards 0.5s;
+  background-size: 200% 200%;
 }
 
-/* Hover: premium red gradient */
 button:hover {
   background: linear-gradient(90deg, #e53935, #d32f2f);
   background-position: right center;
+}
+
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
 }
 
 /* ==============================
@@ -157,6 +168,12 @@ button:hover {
   padding: 14px 16px;
   border-radius: 8px;
   font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.success.show, .error.show {
+  opacity: 1;
 }
 
 .success {
@@ -171,6 +188,9 @@ button:hover {
   border: 1px solid #ef9a9a;
 }
 
+/* ==============================
+   PROGRESS BAR (Animated Gradient)
+============================== */
 .progress-container {
   display: none;
   margin-top: 16px;
@@ -183,10 +203,43 @@ button:hover {
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: #2e7d32;
-  transition: width 0.2s ease;
+  background: linear-gradient(270deg, #2e7d32, #81c784, #2e7d32);
+  background-size: 600% 100%;
+  border-radius: 8px;
+  transition: width 0.3s ease;
+  animation: gradientMove 3s linear infinite;
 }
 
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==============================
+   INLINE UPLOAD PROGRESS TEXT
+============================== */
+.upload-progress-text {
+  display: none;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2e7d32;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.upload-progress-text.show {
+  display: block;
+  opacity: 1;
+}
+
+.upload-progress-text.complete {
+  color: #0277bd;
+}
+
+/* ==============================
+   EMAIL NOTE
+============================== */
 .email-note {
   font-size: 0.9rem;
   color: #555;
@@ -207,7 +260,7 @@ button:hover {
 @media (max-width: 480px) {
   header {
     flex-direction: column;
-    font-size: 1.25rem; /* mobile size smaller */
+    font-size: 1.25rem;
     padding: 16px 14px;
   }
   header img {
@@ -217,6 +270,6 @@ button:hover {
     margin-bottom: 8px;
   }
   h2 {
-    font-size: 1.1rem; /* smaller heading on mobile */
+    font-size: 1.1rem;
   }
 }
