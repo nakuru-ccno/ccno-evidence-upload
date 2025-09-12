@@ -21,7 +21,7 @@ header {
   padding: 32px 18px;
   color: #fff;
   font-weight: 800;
-  font-size: 1.5rem; /* desktop size */
+  font-size: 2rem; /* desktop size */
   text-align: center;
   letter-spacing: 1px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
@@ -94,11 +94,12 @@ input[type="text"], input[type="email"], select, input[type="file"] {
   animation: floatIn 0.8s forwards;
 }
 
+/* Floating hover bounce animation */
 input[type="text"]:hover,
 input[type="email"]:hover,
 select:hover,
 input[type="file"]:hover {
-  transform: translateY(-2px);
+  animation: bounceHover 0.4s ease forwards;
 }
 
 input:focus, select:focus {
@@ -107,7 +108,7 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
-/* Add staggered animation delays */
+/* Staggered animation delays */
 input:nth-of-type(1) { animation-delay: 0.1s; }
 input:nth-of-type(2) { animation-delay: 0.2s; }
 input:nth-of-type(3) { animation-delay: 0.3s; }
@@ -134,8 +135,8 @@ button {
 }
 
 button:hover {
+  animation: bounceHover 0.4s ease forwards;
   background: #d32f2f;
-  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
@@ -198,6 +199,13 @@ button:hover {
 @keyframes floatIn {
   0% { opacity: 0; transform: translateY(15px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounceHover {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-4px) scale(1.02); }
+  60% { transform: translateY(2px) scale(0.99); }
+  100% { transform: translateY(0) scale(1); }
 }
 
 /* ==============================
