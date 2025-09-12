@@ -6,14 +6,13 @@
 <title>CCNO Evidence Upload</title>
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
-<!-- Link to your full CSS -->
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <img src="images/LOGO.png" alt="Nakuru County Logo" />
-  <span class="header-text">Q1 FY 25/26 Performance Contract</span>
+  <span class="header-text">Performance Contract For FY 25/26 </span>
 </header>
 
 <div class="container">
@@ -91,9 +90,7 @@ const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 const uploadText = document.getElementById("uploadText");
 
-// -------------------------
-// Load categories + indicators from JSON
-// -------------------------
+// Load categories + indicators
 fetch("indicators.json")
   .then(res => res.json())
   .then(data => {
@@ -103,7 +100,6 @@ fetch("indicators.json")
       opt.textContent = category;
       categorySelect.appendChild(opt);
     });
-
     categorySelect.addEventListener("change", () => {
       const selected = categorySelect.value;
       indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
@@ -118,9 +114,7 @@ fetch("indicators.json")
     });
   });
 
-// -------------------------
 // LocalStorage for previous emails
-// -------------------------
 function saveOfficerEmail(email) {
   if (!email) return;
   let emails = JSON.parse(localStorage.getItem("officerEmails") || "[]");
@@ -141,9 +135,7 @@ officerEmailInput.addEventListener("focus", () => {
   });
 });
 
-// -------------------------
 // Helper functions
-// -------------------------
 function showError(msg) {
   errorMsg.style.display = msg ? "block" : "none";
   errorMsg.textContent = msg;
@@ -154,7 +146,6 @@ function showSuccess(msg) {
   successMsg.style.display = "block";
   successMsg.textContent = msg;
   errorMsg.style.display = "none";
-  setTimeout(() => (successMsg.style.display = "none"), 4000);
 }
 
 function resetForm() {
@@ -168,9 +159,7 @@ function resetForm() {
   uploadText.style.display = "none";
 }
 
-// -------------------------
 // Upload logic
-// -------------------------
 uploadBtn.addEventListener("click", () => {
   const officerEmail = officerEmailInput.value.trim();
   const evidenceName = evidenceNameInput.value.trim();
@@ -212,7 +201,6 @@ uploadBtn.addEventListener("click", () => {
       const percent = Math.round((event.loaded / event.total) * 100);
       progressBar.style.width = percent + "%";
       uploadText.textContent = `Uploading... ${percent}%`;
-      if (percent >= 100) uploadText.classList.add("complete");
     }
   };
 
@@ -220,8 +208,14 @@ uploadBtn.addEventListener("click", () => {
     spinner.style.display = "none";
     if (xhr.status >= 200 && xhr.status < 300) {
       showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
+
+      // Keep message for 4 seconds, then reset form and hide success
+      setTimeout(() => {
+        resetForm();
+        successMsg.style.display = "none";
+      }, 4000);
+
       saveOfficerEmail(officerEmail);
-      resetForm();
     } else {
       showError("❌ Upload failed. Please try again.");
     }
