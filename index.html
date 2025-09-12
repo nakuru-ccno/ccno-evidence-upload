@@ -66,7 +66,6 @@
 </div>
 
 <script>
-// ---------- CONFIG ----------
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 const officerEmailInput = document.getElementById("officerEmail");
@@ -83,14 +82,14 @@ const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 const uploadText = document.getElementById("uploadText");
 
-// ---------- Load Categories & Indicators ----------
+// Load categories + indicators
 fetch("indicators.json")
   .then(res => res.json())
   .then(data => {
-    Object.keys(data).forEach(cat => {
+    Object.keys(data).forEach(category => {
       const opt = document.createElement("option");
-      opt.value = cat;
-      opt.textContent = cat;
+      opt.value = category;
+      opt.textContent = category;
       categorySelect.appendChild(opt);
     });
     categorySelect.addEventListener("change", () => {
@@ -107,7 +106,7 @@ fetch("indicators.json")
     });
   });
 
-// ---------- LocalStorage for previous emails ----------
+// LocalStorage for previous emails
 function saveOfficerEmail(email) {
   if (!email) return;
   let emails = JSON.parse(localStorage.getItem("officerEmails") || "[]");
@@ -128,7 +127,7 @@ officerEmailInput.addEventListener("focus", () => {
   });
 });
 
-// ---------- Helpers ----------
+// Helper functions
 function showError(msg) {
   errorMsg.textContent = msg;
   errorMsg.style.display = msg ? "block" : "none";
@@ -156,27 +155,39 @@ function resetForm() {
   uploadText.style.display = "none";
 }
 
-// ---------- Offline Queue ----------
-function queueSubmission(data) {
-  let queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
-  queue.push(data);
-  localStorage.setItem("offlineQueue", JSON.stringify(queue));
-  showSuccess("✅ Saved offline. Will submit automatically when back online.");
-}
+// Upload logic
+uploadBtn.addEventListener("click", () => {
+  const officerEmail = officerEmailInput.value.trim();
+  const evidenceName = evidenceNameInput.value.trim();
+  const category = categorySelect.value;
+  const indicator = indicatorSelect.value;
+  const subCounty = subCountySelect.value;
+  const files = filesInput.files;
 
-// ---------- Attempt Upload ----------
-function attemptUpload(formData, callback) {
-  if (!navigator.onLine) {
-    queueSubmission(Object.fromEntries(formData.entries()));
-    return;
+  if (!officerEmail || !evidenceName || !category || !indicator || !subCounty || !files.length) {
+    return showError("⚠ Please fill all fields and select at least one PDF file.");
+  }
+
+  if (files.length > 10) return showError("⚠ You can only upload up to 10 PDF files at once.");
+  for (let file of files) {
+    if (file.type !== "application/pdf") return showError(⚠ ${file.name} is not a PDF.);
+    if (file.size > 30 * 1024 * 1024) return showError(⚠ ${file.name} exceeds the 30MB limit.);
   }
 
   spinner.style.display = "block";
   progressContainer.style.display = "block";
   uploadText.style.display = "block";
-  progressBar.style.width = "0%";
   uploadText.textContent = "Uploading... 0%";
+  progressBar.style.width = "0%";
   showError("");
+
+  const formData = new FormData();
+  formData.append("officerEmail", officerEmail);
+  formData.append("evidenceName", evidenceName);
+  formData.append("category", category);
+  formData.append("indicator", indicator);
+  formData.append("subCounty", subCounty);
+  for (let file of files) formData.append("files", file, file.name);
 
   const xhr = new XMLHttpRequest();
   xhr.open("POST", PROXY_URL, true);
@@ -185,7 +196,7 @@ function attemptUpload(formData, callback) {
     if (event.lengthComputable) {
       const percent = Math.round((event.loaded / event.total) * 100);
       progressBar.style.width = percent + "%";
-      uploadText.textContent = `Uploading... ${percent}%`;
+      uploadText.textContent = Uploading... ${percent}%;
     }
   };
 
@@ -199,66 +210,26 @@ function attemptUpload(formData, callback) {
       uploadText.style.display = "none";
 
       if (xhr.status >= 200 && xhr.status < 300) {
-        showSuccess(`✅ File(s) submitted successfully. 📩 You will receive an email confirmation.`);
-        setTimeout(resetForm, 4000);
-        callback && callback(true);
+        showSuccess(✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.);
+        setTimeout(() => {
+          resetForm();
+          successMsg.style.display = "none";
+          successMsg.classList.remove("show");
+        }, 4000);
+
+        saveOfficerEmail(officerEmail);
       } else {
-        showError("❌ Upload failed. Saved offline and will retry.");
-        queueSubmission(Object.fromEntries(formData.entries()));
+        showError("❌ Upload failed. Please try again.");
       }
     }, 500);
   };
 
   xhr.onerror = () => {
     spinner.style.display = "none";
-    showError("❌ Network error. Saved offline and will retry.");
-    queueSubmission(Object.fromEntries(formData.entries()));
+    showError("❌ Network error. Please try again.");
   };
 
   xhr.send(formData);
-}
-
-// ---------- Upload Button ----------
-uploadBtn.addEventListener("click", () => {
-  const officerEmail = officerEmailInput.value.trim();
-  const evidenceName = evidenceNameInput.value.trim();
-  const category = categorySelect.value;
-  const indicator = indicatorSelect.value;
-  const subCounty = subCountySelect.value;
-  const files = filesInput.files;
-
-  if (!officerEmail || !evidenceName || !category || !indicator || !subCounty || !files.length) {
-    return showError("⚠️ Please fill all fields and select at least one PDF file.");
-  }
-
-  const formData = new FormData();
-  formData.append("officerEmail", officerEmail);
-  formData.append("evidenceName", evidenceName);
-  formData.append("category", category);
-  formData.append("indicator", indicator);
-  formData.append("subCounty", subCounty);
-  for (let file of files) formData.append("files", file, file.name);
-
-  saveOfficerEmail(officerEmail);
-  attemptUpload(formData);
-});
-
-// ---------- Retry Offline Queue When Back Online ----------
-window.addEventListener("online", () => {
-  let queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
-  if (!queue.length) return;
-  queue.forEach(item => {
-    const formData = new FormData();
-    Object.keys(item).forEach(key => {
-      if (key === "files") {
-        for (let file of item[key]) formData.append(key, file);
-      } else {
-        formData.append(key, item[key]);
-      }
-    });
-    attemptUpload(formData);
-  });
-  localStorage.removeItem("offlineQueue");
 });
 </script>
 
