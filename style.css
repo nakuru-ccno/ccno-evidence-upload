@@ -18,7 +18,7 @@ header {
   justify-content: center;
   position: relative;
   background: linear-gradient(90deg, #0277bd, #03a9f4);
-  padding: 28px 18px;
+  padding: 20px 18px;
   color: #fff;
   font-weight: 800;
   font-size: 1.5rem;
@@ -26,14 +26,14 @@ header {
   letter-spacing: 1px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
   box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  animation: fadeInHeader 1s ease-in-out;
+  animation: fadeInHeader 1.2s ease-in-out;
 }
 
 header img {
   position: absolute;
   left: 18px;
-  height: 64px;
-  width: 64px;
+  height: 50px;
+  width: 50px;
   object-fit: contain;
   background: #fff;
   border-radius: 50%;
@@ -57,8 +57,8 @@ header img:hover {
 .container {
   max-width: 720px;
   background: #fff;
-  margin: 28px auto;
-  padding: 24px 28px;
+  margin: 20px auto;
+  padding: 20px 28px;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   border-top: 6px solid #2e7d32;
@@ -73,17 +73,17 @@ h2 {
   text-align: center;
   font-weight: 800;
   color: #b71c1c;
-  margin-bottom: 18px;
+  margin: 0 0 18px;
 }
 
 label {
   display: block;
-  margin-top: 14px;
+  margin-top: 12px;
   font-weight: 700;
   color: #2e7d32;
 }
 
-input[type="text"], input[list], select, input[type="file"] {
+input[type="text"], input[type="email"], select, input[type="file"] {
   width: 100%;
   padding: 10px 12px;
   margin-top: 6px;
@@ -94,11 +94,14 @@ input[type="text"], input[list], select, input[type="file"] {
   box-sizing: border-box;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
   opacity: 0;
-  transform: translateY(10px);
-  animation: floatIn 0.7s forwards;
+  transform: translateY(15px);
+  animation: floatIn 0.8s forwards;
 }
 
-input:hover, select:hover, input[type="file"]:hover {
+input[type="text"]:hover,
+input[type="email"]:hover,
+select:hover,
+input[type="file"]:hover {
   transform: translateY(-1px);
   border-color: #b71c1c;
   box-shadow: 0 2px 6px rgba(183,28,28,0.2);
@@ -110,13 +113,18 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
+input:nth-of-type(1) { animation-delay: 0.1s; }
+input:nth-of-type(2) { animation-delay: 0.2s; }
+input:nth-of-type(3) { animation-delay: 0.3s; }
+input:nth-of-type(4) { animation-delay: 0.4s; }
+
 /* ==============================
    BUTTON
 ============================== */
 button {
-  margin-top: 12px;
+  margin-top: 8px;
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px 16px;
   font-size: 1.05rem;
   background: #b71c1c;
   color: #fff;
@@ -126,8 +134,8 @@ button {
   font-weight: 800;
   transition: background 0.3s ease;
   opacity: 0;
-  transform: translateY(15px);
-  animation: floatIn 0.7s forwards 0.4s;
+  transform: translateY(20px);
+  animation: floatIn 0.8s forwards 0.5s;
   background-size: 200% 200%;
 }
 
@@ -142,40 +150,82 @@ button:disabled {
 }
 
 /* ==============================
-   SPINNER & MESSAGES
+   SPINNER
 ============================== */
 .spinner {
   display: none;
-  margin: 12px 0;
+  margin: 8px 0;
   text-align: center;
   color: #b71c1c;
   font-weight: 700;
 }
 
-.success, .error {
+/* ==============================
+   SUCCESS MESSAGE WITH CHECKMARK
+============================== */
+.success {
   display: none;
-  margin: 12px 0;
+  margin: 6px 0 0 0;
+  padding: 12px 14px 12px 42px;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #0d47a1;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+.success.show {
+  opacity: 1;
+  transform: translateY(-5px);
+}
+
+.success::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg);
+  width: 18px;
+  height: 10px;
+  border-left: 3px solid #0d47a1;
+  border-bottom: 3px solid #0d47a1;
+  border-radius: 2px;
+  transform-origin: bottom left;
+  opacity: 0;
+}
+
+.success.show::before {
+  animation: checkmark 0.5s forwards;
+}
+
+@keyframes checkmark {
+  0% { width: 0; height: 0; opacity: 0; transform: translateY(-50%) rotate(0deg); }
+  50% { width: 9px; height: 0; opacity: 1; transform: translateY(-50%) rotate(45deg); }
+  100% { width: 18px; height: 10px; opacity: 1; transform: translateY(-50%) rotate(45deg); }
+}
+
+/* ==============================
+   ERROR MESSAGE
+============================== */
+.error {
+  display: none;
+  margin: 6px 0 0 0;
   padding: 12px 14px;
   border-radius: 8px;
   font-weight: 700;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.success.show, .error.show {
-  opacity: 1;
-}
-
-.success {
-  background: #e3f2fd;
-  color: #0d47a1;
-  border: 1px solid #90caf9;
-}
-
-.error {
-  background: #ffebee;
   color: #b71c1c;
+  background: #ffebee;
   border: 1px solid #ef9a9a;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+.error.show {
+  opacity: 1;
+  transform: translateY(-5px);
 }
 
 /* ==============================
@@ -183,7 +233,7 @@ button:disabled {
 ============================== */
 .progress-container {
   display: none;
-  margin-top: 10px;
+  margin-top: 6px;
   background: #eee;
   border-radius: 8px;
   height: 16px;
@@ -207,7 +257,7 @@ button:disabled {
 }
 
 /* ==============================
-   INLINE UPLOAD TEXT
+   UPLOAD PROGRESS TEXT
 ============================== */
 .upload-progress-text {
   display: none;
@@ -215,41 +265,51 @@ button:disabled {
   font-size: 0.95rem;
   font-weight: 700;
   color: #2e7d32;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.upload-progress-text.show {
+  display: block;
+  opacity: 1;
+}
+
+.upload-progress-text.complete {
+  color: #0277bd;
 }
 
 /* ==============================
    EMAIL NOTE
 ============================== */
 .email-note {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #555;
   margin-top: 4px;
 }
 
 /* ==============================
-   FLOAT ANIMATION
+   FLOATING ANIMATION
 ============================== */
 @keyframes floatIn {
-  0% { opacity: 0; transform: translateY(10px); }
+  0% { opacity: 0; transform: translateY(15px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 /* ==============================
-   RESPONSIVE
+   RESPONSIVE MOBILE
 ============================== */
 @media (max-width: 480px) {
   header {
     flex-direction: column;
     font-size: 1.25rem;
-    padding: 14px;
+    padding: 14px 14px;
   }
   header img {
     position: static;
-    height: 45px;
-    width: 45px;
+    height: 40px;
+    width: 40px;
     margin-bottom: 6px;
   }
   h2 {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 }
