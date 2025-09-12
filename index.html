@@ -129,15 +129,19 @@ officerEmailInput.addEventListener("focus", () => {
 
 // Helper functions
 function showError(msg) {
-  errorMsg.style.display = msg ? "block" : "none";
   errorMsg.textContent = msg;
+  errorMsg.style.display = msg ? "block" : "none";
+  errorMsg.classList.add("show");
   successMsg.style.display = "none";
+  successMsg.classList.remove("show");
 }
 
 function showSuccess(msg) {
-  successMsg.style.display = "block";
   successMsg.textContent = msg;
+  successMsg.style.display = "block";
+  successMsg.classList.add("show");
   errorMsg.style.display = "none";
+  errorMsg.classList.remove("show");
 }
 
 function resetForm() {
@@ -202,14 +206,22 @@ uploadBtn.addEventListener("click", () => {
     uploadText.textContent = "Uploading... 100%";
 
     setTimeout(() => {
+      progressContainer.style.display = "none";
+      uploadText.style.display = "none";
+
       if (xhr.status >= 200 && xhr.status < 300) {
         showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
-        setTimeout(() => { resetForm(); successMsg.style.display = "none"; }, 4000);
+        setTimeout(() => {
+          resetForm();
+          successMsg.style.display = "none";
+          successMsg.classList.remove("show");
+        }, 4000);
+
         saveOfficerEmail(officerEmail);
       } else {
         showError("❌ Upload failed. Please try again.");
       }
-    }, 300);
+    }, 500);
   };
 
   xhr.onerror = () => {
