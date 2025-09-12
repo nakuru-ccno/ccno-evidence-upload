@@ -82,7 +82,7 @@ const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 const uploadText = document.getElementById("uploadText");
 
-// Load categories + indicators
+// Load categories + indicators from JSON
 fetch("indicators.json")
   .then(res => res.json())
   .then(data => {
@@ -92,6 +92,7 @@ fetch("indicators.json")
       opt.textContent = category;
       categorySelect.appendChild(opt);
     });
+
     categorySelect.addEventListener("change", () => {
       const selected = categorySelect.value;
       indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
@@ -104,7 +105,8 @@ fetch("indicators.json")
         });
       }
     });
-  });
+  })
+  .catch(err => console.error("Error loading indicators.json:", err));
 
 // LocalStorage for previous emails
 function saveOfficerEmail(email) {
@@ -170,8 +172,8 @@ uploadBtn.addEventListener("click", () => {
 
   if (files.length > 10) return showError("⚠ You can only upload up to 10 PDF files at once.");
   for (let file of files) {
-    if (file.type !== "application/pdf") return showError(⚠ ${file.name} is not a PDF.);
-    if (file.size > 30 * 1024 * 1024) return showError(⚠ ${file.name} exceeds the 30MB limit.);
+    if (file.type !== "application/pdf") return showError(`⚠️ ${file.name} is not a PDF.`);
+    if (file.size > 30 * 1024 * 1024) return showError(`⚠️ ${file.name} exceeds the 30MB limit.`);
   }
 
   spinner.style.display = "block";
@@ -196,7 +198,7 @@ uploadBtn.addEventListener("click", () => {
     if (event.lengthComputable) {
       const percent = Math.round((event.loaded / event.total) * 100);
       progressBar.style.width = percent + "%";
-      uploadText.textContent = Uploading... ${percent}%;
+      uploadText.textContent = `Uploading... ${percent}%`;
     }
   };
 
@@ -210,7 +212,7 @@ uploadBtn.addEventListener("click", () => {
       uploadText.style.display = "none";
 
       if (xhr.status >= 200 && xhr.status < 300) {
-        showSuccess(✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.);
+        showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
         setTimeout(() => {
           resetForm();
           successMsg.style.display = "none";
