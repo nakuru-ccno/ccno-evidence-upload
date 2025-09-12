@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload</title>
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,29 +17,24 @@
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
 
-  <!-- Officer Email -->
   <label for="officerEmail">Officer Email:</label>
   <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" required />
   <datalist id="officerEmails"></datalist>
   <div class="email-note">📩 You will receive an email confirmation once your files are received.</div>
 
-  <!-- Evidence Name -->
   <label for="evidenceName">Evidence Name:</label>
   <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
 
-  <!-- Category -->
   <label for="category">Evidence Category:</label>
   <select id="category">
     <option value="">Select Evidence Category</option>
   </select>
 
-  <!-- Indicator -->
   <label for="indicator">Indicator:</label>
   <select id="indicator">
     <option value="">Select Indicator</option>
   </select>
 
-  <!-- Sub County -->
   <label for="subCounty">Sub County:</label>
   <select id="subCounty">
     <option value="">Select Sub County</option>
@@ -57,11 +51,9 @@
     <option value="Gilgil Sub County">Gilgil Sub County</option>
   </select>
 
-  <!-- Files -->
   <label for="files">Choose PDF file(s):</label>
   <input type="file" id="files" accept="application/pdf" multiple />
 
-  <!-- Spinner, progress, messages -->
   <div class="spinner" id="spinner">⏳ Uploading...</div>
   <div class="progress-container" id="progressContainer">
     <div class="progress-bar" id="progressBar"></div>
@@ -137,15 +129,20 @@ officerEmailInput.addEventListener("focus", () => {
 
 // Helper functions
 function showError(msg) {
-  errorMsg.style.display = msg ? "block" : "none";
   errorMsg.textContent = msg;
-  successMsg.style.display = "none";
+  errorMsg.classList.add("show");
+  successMsg.classList.remove("show");
+  if (msg) setTimeout(() => errorMsg.classList.remove("show"), 4000);
 }
 
 function showSuccess(msg) {
-  successMsg.style.display = "block";
   successMsg.textContent = msg;
-  errorMsg.style.display = "none";
+  successMsg.classList.add("show");
+  errorMsg.classList.remove("show");
+  setTimeout(() => {
+    successMsg.classList.remove("show");
+    resetForm();
+  }, 4000);
 }
 
 function resetForm() {
@@ -157,6 +154,20 @@ function resetForm() {
   progressBar.style.width = "0%";
   progressContainer.style.display = "none";
   uploadText.style.display = "none";
+}
+
+// Smooth progress animation
+function animateProgress(targetPercent) {
+  let width = parseFloat(progressBar.style.width) || 0;
+  const interval = setInterval(() => {
+    if (width >= targetPercent) {
+      clearInterval(interval);
+    } else {
+      width += 1; // increment 1% per step
+      progressBar.style.width = width + "%";
+      uploadText.textContent = `Uploading... ${width}%`;
+    }
+  }, 15); // 15ms per step → smooth animation
 }
 
 // Upload logic
@@ -181,8 +192,8 @@ uploadBtn.addEventListener("click", () => {
   spinner.style.display = "block";
   progressContainer.style.display = "block";
   uploadText.style.display = "block";
-  uploadText.textContent = "Uploading... 0%";
   progressBar.style.width = "0%";
+  uploadText.textContent = "Uploading... 0%";
   showError("");
 
   const formData = new FormData();
@@ -199,22 +210,15 @@ uploadBtn.addEventListener("click", () => {
   xhr.upload.onprogress = (event) => {
     if (event.lengthComputable) {
       const percent = Math.round((event.loaded / event.total) * 100);
-      progressBar.style.width = percent + "%";
-      uploadText.textContent = `Uploading... ${percent}%`;
+      animateProgress(percent); // smooth
     }
   };
 
   xhr.onload = () => {
     spinner.style.display = "none";
+    animateProgress(100); // ensure fully filled
     if (xhr.status >= 200 && xhr.status < 300) {
       showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
-
-      // Keep message for 4 seconds, then reset form and hide success
-      setTimeout(() => {
-        resetForm();
-        successMsg.style.display = "none";
-      }, 4000);
-
       saveOfficerEmail(officerEmail);
     } else {
       showError("❌ Upload failed. Please try again.");
