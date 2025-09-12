@@ -3,14 +3,14 @@
 ============================== */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #e0f7fa, #f4f6f9);
+  background: #f4f6f9;
   margin: 0;
   padding: 0;
   color: #333;
 }
 
 /* ==============================
-   HEADER
+   Header: Premium Style
 ============================== */
 header {
   display: flex;
@@ -18,28 +18,28 @@ header {
   justify-content: center;
   position: relative;
   background: linear-gradient(90deg, #0277bd, #03a9f4);
-  padding: 20px 16px;
+  padding: 28px 18px;
   color: #fff;
   font-weight: 800;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   text-align: center;
   letter-spacing: 1px;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
   box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  animation: fadeInHeader 1s ease-in-out;
+  animation: fadeInHeader 1.2s ease-in-out;
 }
 
 header img {
   position: absolute;
-  left: 16px;
-  height: 50px;
-  width: 50px;
+  left: 18px;
+  height: 60px;
+  width: 60px;
   object-fit: contain;
   background: #fff;
   border-radius: 50%;
   padding: 4px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, height 0.3s ease, width 0.3s ease;
 }
 
 header img:hover {
@@ -52,32 +52,30 @@ header img:hover {
 }
 
 /* ==============================
-   CONTAINER
+   CONTAINER & FORM
 ============================== */
 .container {
-  max-width: 700px;
+  max-width: 720px;
+  background: #fff;
   margin: 24px auto;
   padding: 24px 28px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.3);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-top: 6px solid #2e7d32;
+  transition: box-shadow 0.3s ease;
 }
 
-/* ==============================
-   HEADINGS
-============================== */
+.container:hover {
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
 h2 {
   text-align: center;
   font-weight: 800;
   color: #b71c1c;
-  margin-bottom: 16px;
+  margin: 0 0 18px;
 }
 
-/* ==============================
-   LABELS & INPUTS
-============================== */
 label {
   display: block;
   margin-top: 14px;
@@ -85,38 +83,34 @@ label {
   color: #2e7d32;
 }
 
-input[type="text"],
-input[type="email"],
-select,
-input[type="file"] {
+input[type="text"], input[type="email"], select, input[type="file"] {
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 12px;
   margin-top: 6px;
   border: 1px solid #cfd8dc;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 1rem;
   background: #fff;
   box-sizing: border-box;
-  transition: all 0.3s ease;
-  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  transform: translateY(15px);
+  animation: floatIn 0.8s forwards;
 }
 
-input:hover,
+input[type="text"]:hover,
+input[type="email"]:hover,
 select:hover,
-input:focus,
-select:focus,
 input[type="file"]:hover {
   transform: translateY(-1px);
-  border-color: #0277bd;
-  box-shadow: 0 4px 12px rgba(2,119,189,0.15);
+  border-color: #b71c1c;
+  box-shadow: 0 2px 6px rgba(183,28,28,0.2);
 }
 
-/* Floating placeholder labels (requires HTML adjustment) */
-input:focus + label,
-input:not(:placeholder-shown) + label {
-  transform: translateY(-24px);
-  font-size: 0.85rem;
-  color: #0277bd;
+input:focus, select:focus {
+  outline: none;
+  border-color: #0277bd;
+  box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
 /* ==============================
@@ -127,141 +121,169 @@ button {
   width: 100%;
   padding: 14px 16px;
   font-size: 1.05rem;
-  font-weight: 800;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
+  background: #b71c1c;
   color: #fff;
-  background: linear-gradient(90deg, #b71c1c, #e53935);
-  transition: all 0.3s ease;
-  box-shadow: 4px 4px 12px rgba(0,0,0,0.1), -4px -4px 12px rgba(255,255,255,0.6);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  transition: background 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: floatIn 0.8s forwards 0.5s;
+  background-size: 200% 200%;
 }
 
 button:hover {
-  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.1), inset -4px -4px 10px rgba(255,255,255,0.6);
+  background: linear-gradient(90deg, #e53935, #d32f2f);
+  background-position: right center;
+}
+
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
 }
 
 /* ==============================
-   SPINNER & MESSAGES
+   SPINNER
 ============================== */
 .spinner {
   display: none;
-  margin: 12px 0;
+  margin: 10px 0;
   text-align: center;
-  font-weight: 700;
   color: #b71c1c;
-}
-
-.success, .error {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 14px 20px;
-  border-radius: 10px;
   font-weight: 700;
-  opacity: 0;
-  z-index: 999;
-  transition: all 0.5s ease;
-}
-
-.success.show {
-  background: #e3f2fd;
-  color: #0d47a1;
-  border: 1px solid #90caf9;
-  opacity: 1;
-  animation: slideDown 0.5s ease forwards;
-}
-
-.error.show {
-  background: #ffebee;
-  color: #b71c1c;
-  border: 1px solid #ef9a9a;
-  opacity: 1;
-  animation: slideDown 0.5s ease forwards;
-}
-
-@keyframes slideDown {
-  0% { opacity: 0; transform: translate(-50%, -20px); }
-  100% { opacity: 1; transform: translate(-50%, 0); }
 }
 
 /* ==============================
-   PROGRESS BAR
+   SUCCESS & ERROR MESSAGES
+============================== */
+.success, .error {
+  display: none;
+  margin: 10px 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.success.show {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+  color: #0d47a1;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  box-shadow: 0 8px 20px rgba(2, 119, 189, 0.3);
+}
+
+.error.show {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+  color: #b71c1c;
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+  box-shadow: 0 8px 20px rgba(183,28,28,0.3);
+}
+
+/* ==============================
+   PROGRESS BAR (Animated Gradient + Flash)
 ============================== */
 .progress-container {
   display: none;
-  margin-top: 8px;
-  height: 16px;
-  border-radius: 8px;
+  margin-top: 12px;
   background: #eee;
+  border-radius: 8px;
+  height: 18px;
   overflow: hidden;
+  position: relative;
 }
 
 .progress-bar {
   height: 100%;
   width: 0%;
+  background: linear-gradient(270deg, #2e7d32, #81c784, #2e7d32);
+  background-size: 600% 100%;
   border-radius: 8px;
-  background: repeating-linear-gradient(
-    45deg,
-    #2e7d32,
-    #2e7d32 10px,
-    #81c784 10px,
-    #81c784 20px
-  );
-  animation: moveStripes 1s linear infinite;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, box-shadow 0.3s ease;
+  animation: gradientMove 3s linear infinite;
 }
 
-@keyframes moveStripes {
-  0% { background-position: 0 0; }
-  100% { background-position: 40px 0; }
+.progress-bar.complete {
+  animation: flashGlow 0.6s ease-in-out 2;
+  box-shadow: 0 0 12px #2e7d32;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes flashGlow {
+  0% { box-shadow: 0 0 0px #2e7d32; }
+  50% { box-shadow: 0 0 12px #2e7d32; }
+  100% { box-shadow: 0 0 0px #2e7d32; }
 }
 
 /* ==============================
-   UPLOAD TEXT
+   INLINE UPLOAD PROGRESS TEXT
 ============================== */
 .upload-progress-text {
   display: none;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 0.95rem;
   font-weight: 700;
   color: #2e7d32;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.upload-progress-text.show {
+  display: block;
+  opacity: 1;
+}
+
+.upload-progress-text.complete {
+  color: #0277bd;
 }
 
 /* ==============================
    EMAIL NOTE
 ============================== */
 .email-note {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #555;
   margin-top: 4px;
 }
 
 /* ==============================
-   ANIMATIONS
+   FLOATING ANIMATION
 ============================== */
-@keyframes fadeInHeader {
-  0% { opacity: 0; transform: translateY(-20px); }
+@keyframes floatIn {
+  0% { opacity: 0; transform: translateY(15px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 /* ==============================
-   RESPONSIVE
+   RESPONSIVE MOBILE
 ============================== */
 @media (max-width: 480px) {
   header {
     flex-direction: column;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     padding: 14px 12px;
   }
   header img {
     position: static;
-    height: 40px;
-    width: 40px;
+    height: 45px;
+    width: 45px;
     margin-bottom: 6px;
   }
   h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
