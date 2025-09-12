@@ -11,7 +11,7 @@
 
 <header>
   <img src="images/LOGO.png" alt="Nakuru County Logo" />
-  <span class="header-text">Performance Contract For FY 25/26 </span>
+  <span class="header-text">Performance Contract For FY 25/26</span>
 </header>
 
 <div class="container">
@@ -129,20 +129,15 @@ officerEmailInput.addEventListener("focus", () => {
 
 // Helper functions
 function showError(msg) {
+  errorMsg.style.display = msg ? "block" : "none";
   errorMsg.textContent = msg;
-  errorMsg.classList.add("show");
-  successMsg.classList.remove("show");
-  if (msg) setTimeout(() => errorMsg.classList.remove("show"), 4000);
+  successMsg.style.display = "none";
 }
 
 function showSuccess(msg) {
+  successMsg.style.display = "block";
   successMsg.textContent = msg;
-  successMsg.classList.add("show");
-  errorMsg.classList.remove("show");
-  setTimeout(() => {
-    successMsg.classList.remove("show");
-    resetForm();
-  }, 4000);
+  errorMsg.style.display = "none";
 }
 
 function resetForm() {
@@ -154,20 +149,6 @@ function resetForm() {
   progressBar.style.width = "0%";
   progressContainer.style.display = "none";
   uploadText.style.display = "none";
-}
-
-// Smooth progress animation
-function animateProgress(targetPercent) {
-  let width = parseFloat(progressBar.style.width) || 0;
-  const interval = setInterval(() => {
-    if (width >= targetPercent) {
-      clearInterval(interval);
-    } else {
-      width += 1; // increment 1% per step
-      progressBar.style.width = width + "%";
-      uploadText.textContent = `Uploading... ${width}%`;
-    }
-  }, 15); // 15ms per step → smooth animation
 }
 
 // Upload logic
@@ -192,8 +173,8 @@ uploadBtn.addEventListener("click", () => {
   spinner.style.display = "block";
   progressContainer.style.display = "block";
   uploadText.style.display = "block";
-  progressBar.style.width = "0%";
   uploadText.textContent = "Uploading... 0%";
+  progressBar.style.width = "0%";
   showError("");
 
   const formData = new FormData();
@@ -210,19 +191,25 @@ uploadBtn.addEventListener("click", () => {
   xhr.upload.onprogress = (event) => {
     if (event.lengthComputable) {
       const percent = Math.round((event.loaded / event.total) * 100);
-      animateProgress(percent); // smooth
+      progressBar.style.width = percent + "%";
+      uploadText.textContent = `Uploading... ${percent}%`;
     }
   };
 
   xhr.onload = () => {
     spinner.style.display = "none";
-    animateProgress(100); // ensure fully filled
-    if (xhr.status >= 200 && xhr.status < 300) {
-      showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
-      saveOfficerEmail(officerEmail);
-    } else {
-      showError("❌ Upload failed. Please try again.");
-    }
+    progressBar.style.width = "100%";
+    uploadText.textContent = "Uploading... 100%";
+
+    setTimeout(() => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
+        setTimeout(() => { resetForm(); successMsg.style.display = "none"; }, 4000);
+        saveOfficerEmail(officerEmail);
+      } else {
+        showError("❌ Upload failed. Please try again.");
+      }
+    }, 300);
   };
 
   xhr.onerror = () => {
