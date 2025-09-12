@@ -6,16 +6,15 @@
 <title>CCNO Evidence Upload</title>
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
-<link rel="stylesheet" href="style.css"> <!-- your external CSS -->
-
+<!-- Link to your full CSS -->
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <img src="images/LOGO.png" alt="Nakuru County Logo" />
-  <span class="header-text">Performance Contract For FY 25/26</span>
+  <span class="header-text">Q1 FY 25/26 Performance Contract</span>
 </header>
-
 
 <div class="container">
   <h2>Nakuru County CCNO PC Evidence Upload</h2>
@@ -24,7 +23,7 @@
   <label for="officerEmail">Officer Email:</label>
   <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" required />
   <datalist id="officerEmails"></datalist>
-  <div class="email-note">📩 You will receive an email confirmation once your files are recieved.</div>
+  <div class="email-note">📩 You will receive an email confirmation once your files are received.</div>
 
   <!-- Evidence Name -->
   <label for="evidenceName">Evidence Name:</label>
@@ -68,6 +67,7 @@
   <div class="progress-container" id="progressContainer">
     <div class="progress-bar" id="progressBar"></div>
   </div>
+  <div class="upload-progress-text" id="uploadText"></div>
   <div class="success" id="success"></div>
   <div class="error" id="error"></div>
 
@@ -89,6 +89,7 @@ const errorMsg = document.getElementById("error");
 const uploadBtn = document.getElementById("uploadBtn");
 const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
+const uploadText = document.getElementById("uploadText");
 
 // -------------------------
 // Load categories + indicators from JSON
@@ -129,7 +130,6 @@ function saveOfficerEmail(email) {
   }
 }
 
-// Populate datalist on focus
 officerEmailInput.addEventListener("focus", () => {
   const datalist = document.getElementById("officerEmails");
   datalist.innerHTML = "";
@@ -165,6 +165,7 @@ function resetForm() {
   filesInput.value = "";
   progressBar.style.width = "0%";
   progressContainer.style.display = "none";
+  uploadText.style.display = "none";
 }
 
 // -------------------------
@@ -190,6 +191,8 @@ uploadBtn.addEventListener("click", () => {
 
   spinner.style.display = "block";
   progressContainer.style.display = "block";
+  uploadText.style.display = "block";
+  uploadText.textContent = "Uploading... 0%";
   progressBar.style.width = "0%";
   showError("");
 
@@ -206,8 +209,10 @@ uploadBtn.addEventListener("click", () => {
 
   xhr.upload.onprogress = (event) => {
     if (event.lengthComputable) {
-      const percent = (event.loaded / event.total) * 100;
+      const percent = Math.round((event.loaded / event.total) * 100);
       progressBar.style.width = percent + "%";
+      uploadText.textContent = `Uploading... ${percent}%`;
+      if (percent >= 100) uploadText.classList.add("complete");
     }
   };
 
@@ -215,7 +220,7 @@ uploadBtn.addEventListener("click", () => {
     spinner.style.display = "none";
     if (xhr.status >= 200 && xhr.status < 300) {
       showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
-      saveOfficerEmail(officerEmail); // <-- Save for next time
+      saveOfficerEmail(officerEmail);
       resetForm();
     } else {
       showError("❌ Upload failed. Please try again.");
