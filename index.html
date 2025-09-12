@@ -9,9 +9,13 @@
 </head>
 <body>
 
-<header>
-  <img src="images/LOGO.png" alt="Nakuru County Logo" />
-  <span class="header-text">Performance Contract For FY 25/26</span>
+<!-- HEADER -->
+<header class="site-header">
+  <img src="images/LOGO.png" alt="Nakuru County Logo" class="logo" />
+  <div class="header-texts">
+    <h1>Nakuru County CCNO Performance Contract Evidence Upload System</h1>
+    <p class="subtitle">For Submission of PC Evidence — FY 2025/2026</p>
+  </div>
 </header>
 
 <div class="container">
@@ -64,6 +68,15 @@
 
   <button id="uploadBtn">Upload Evidence</button>
 </div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-line"></div>
+  <div class="footer-content">
+    <img src="images/LOGO.png" alt="Nakuru County Logo" class="footer-logo" />
+    <p>© 2025 Nakuru County Chief Nursing Officer. All Rights Reserved.</p>
+  </div>
+</footer>
 
 <script>
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
@@ -172,8 +185,8 @@ uploadBtn.addEventListener("click", () => {
 
   if (files.length > 10) return showError("⚠ You can only upload up to 10 PDF files at once.");
   for (let file of files) {
-    if (file.type !== "application/pdf") return showError(`⚠️ ${file.name} is not a PDF.`);
-    if (file.size > 30 * 1024 * 1024) return showError(`⚠️ ${file.name} exceeds the 30MB limit.`);
+    if (file.type !== "application/pdf") return showError(`⚠ ${file.name} is not a PDF.`);
+    if (file.size > 30 * 1024 * 1024) return showError(`⚠ ${file.name} exceeds the 30MB limit.`);
   }
 
   spinner.style.display = "block";
