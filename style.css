@@ -39,7 +39,6 @@ header img {
   border-radius: 50%;
   padding: 4px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transform: translateY(0);
   transition: transform 0.3s ease, height 0.3s ease, width 0.3s ease;
 }
 
@@ -94,12 +93,12 @@ input[type="text"], input[type="email"], select, input[type="file"] {
   animation: floatIn 0.8s forwards;
 }
 
-/* Floating hover bounce animation */
+/* Optional subtle lift on input hover */
 input[type="text"]:hover,
 input[type="email"]:hover,
 select:hover,
 input[type="file"]:hover {
-  animation: bounceHover 0.4s ease forwards;
+  transform: translateY(-1px);
 }
 
 input:focus, select:focus {
@@ -108,7 +107,7 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
-/* Staggered animation delays */
+/* Staggered animation delays for inputs */
 input:nth-of-type(1) { animation-delay: 0.1s; }
 input:nth-of-type(2) { animation-delay: 0.2s; }
 input:nth-of-type(3) { animation-delay: 0.3s; }
@@ -122,22 +121,20 @@ button {
   width: 100%;
   padding: 14px 16px;
   font-size: 1.05rem;
-  background: #b71c1c;
+  background: #b71c1c; /* normal color */
   color: #fff;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 800;
-  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.3s ease; /* only color change */
   opacity: 0;
   transform: translateY(20px);
-  animation: floatIn 0.8s forwards 0.5s;
+  animation: floatIn 0.8s forwards 0.5s; /* float in on page load */
 }
 
 button:hover {
-  animation: bounceHover 0.4s ease forwards;
-  background: #d32f2f;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background: #d32f2f; /* only color changes on hover */
 }
 
 /* ==============================
@@ -199,13 +196,6 @@ button:hover {
 @keyframes floatIn {
   0% { opacity: 0; transform: translateY(15px); }
   100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes bounceHover {
-  0% { transform: translateY(0) scale(1); }
-  30% { transform: translateY(-4px) scale(1.02); }
-  60% { transform: translateY(2px) scale(0.99); }
-  100% { transform: translateY(0) scale(1); }
 }
 
 /* ==============================
