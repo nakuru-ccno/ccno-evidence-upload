@@ -335,4 +335,11 @@ button:disabled {
   h2 {
     font-size: 1rem;
   }
+   .container {
+  margin: 20px auto 0 auto; /* only top margin, no bottom */
+}
+
+.site-footer {
+  margin-top: 0; /* no extra space above footer */
+}
 }
