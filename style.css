@@ -1,309 +1,202 @@
-/* ==============================
-   BODY & GLOBAL
-============================== */
+/* ===== General Reset ===== */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f6f9;
   margin: 0;
-  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
   color: #333;
+  line-height: 1.6;
 }
 
-/* ==============================
-   HEADER
-============================== */
+/* ===== Header ===== */
 .site-header {
-  background: linear-gradient(90deg, #0288d1, #03a9f4);
-  color: #fff;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  padding: 16px 28px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  padding: 10px 20px;
+  background: #004080; /* County navy */
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.site-header .logo {
-  height: 60px;
-  width: 60px;
-  object-fit: contain;
-  background: #e1f5fe;
-  border-radius: 50%;
-  padding: 5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  flex-shrink: 0;
+.site-header img {
+  height: 50px;
+  margin-right: 15px;
 }
 
-.site-header .header-texts h1 {
-  font-size: 1.8rem;
-  font-weight: 800;
-  line-height: 1.3;
+.header-texts h1 {
+  font-size: 1.6rem;
   margin: 0;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.25);
 }
 
-.site-header .header-texts h1 small {
+.header-texts h1 small {
   display: block;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 400;
-  margin-top: 4px;
-  color: #e0f7fa;
+  color: #d0e4ff;
 }
 
-@media (max-width: 768px) {
-  .site-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
-    padding: 12px 16px;
-  }
-  .site-header .logo {
-    height: 45px;
-    width: 45px;
-  }
-  .site-header .header-texts h1 {
-    font-size: 1.3rem;
-  }
-}
-
-/* ==============================
-   CONTAINER & FORM
-============================== */
+/* ===== Container ===== */
 .container {
-  max-width: 720px;
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 25px;
   background: #fff;
-  margin: 20px auto;
-  padding: 20px 28px;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  border-top: 6px solid #2e7d32;
-  transition: box-shadow 0.3s ease;
-}
-.container:hover {
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Friendly form intro */
+/* ===== Form Intro Highlight ===== */
 .form-intro {
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #444;
-  margin: 0 0 18px;
+  display: inline-block;
+  background: #e6f2ff;   /* soft blue */
+  color: #004080;        /* county navy */
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-label {
+/* ===== Form Elements ===== */
+.container label {
   display: block;
-  margin-top: 12px;
-  font-weight: 700;
-  color: #2e7d32;
+  font-weight: 600;
+  margin: 12px 0 6px;
 }
 
 .container input[type="text"],
 .container input[type="email"],
-.container select,
-.container input[type="file"] {
+.container input[type="file"],
+.container select {
   width: 100%;
-  padding: 12px 14px;
-  margin-top: 6px;
-  border: 1px solid #cfd8dc;
+  padding: 10px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 1rem;
-  background: #fafafa;
-  box-sizing: border-box;
-  transition: all 0.25s ease;
-  opacity: 0;
-  transform: translateY(15px);
-  animation: floatIn 0.8s forwards;
-}
-
-.container input:hover,
-.container select:hover,
-.container input[type="file"]:hover {
-  background: #f0f7ff;
-  border-color: #0277bd;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .container input:focus,
 .container select:focus {
+  border-color: #0078d7;
+  box-shadow: 0 0 0 3px rgba(0,120,215,0.2);
   outline: none;
-  border-color: #0277bd;
-  box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
-/* Animate all form fields nicely */
-.container input,
-.container select {
-  animation-delay: 0.1s;
-}
-.container input:nth-of-type(2),
-.container select:nth-of-type(2) {
-  animation-delay: 0.2s;
-}
-.container input:nth-of-type(3),
-.container select:nth-of-type(3) {
-  animation-delay: 0.3s;
-}
-.container input:nth-of-type(4),
-.container select:nth-of-type(4) {
-  animation-delay: 0.4s;
-}
-
-/* ==============================
-   BUTTON
-============================== */
-button {
-  margin-top: 12px;
+/* ===== Button ===== */
+.container button {
+  margin-top: 18px;
   width: 100%;
-  padding: 14px 18px;
-  font-size: 1.05rem;
-  background: linear-gradient(90deg, #c62828, #e53935);
+  padding: 12px;
+  background: linear-gradient(90deg, #0078d7, #005bb5);
   color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
   border: none;
-  border-radius: 50px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 800;
   transition: transform 0.2s ease, background 0.3s ease;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: floatIn 0.8s forwards 0.5s;
-  background-size: 200% 200%;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-button:hover {
+
+.container button:hover {
+  background: linear-gradient(90deg, #005bb5, #004080);
   transform: translateY(-2px);
-  background: linear-gradient(90deg, #d32f2f, #f44336);
-}
-button:disabled {
-  background: #999;
-  cursor: not-allowed;
 }
 
-/* ==============================
-   SPINNER
-============================== */
-.spinner {
-  display: none;
-  margin: 8px 0;
-  text-align: center;
-  color: #b71c1c;
-  font-weight: 700;
-}
-
-/* ==============================
-   SUCCESS & ERROR MESSAGES
-============================== */
+/* ===== Success & Error Messages ===== */
 .success,
 .error {
   display: none;
-  margin: 6px 0 0 0;
-  padding: 12px 14px;
+  padding: 12px;
+  margin-top: 18px;
   border-radius: 8px;
-  font-weight: 700;
-  opacity: 0;
-  transition: opacity 0.5s ease, transform 0.3s ease;
+  font-weight: 500;
+  animation: fadeIn 0.4s ease;
 }
 
 .success {
-  color: #1b5e20;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
-}
-.success.show {
-  display: block;
-  opacity: 1;
-  transform: translateY(-5px);
+  background: #e6ffed;
+  color: #137333;
+  border-left: 5px solid #34a853;
 }
 
 .error {
-  color: #c62828;
-  background: #ffebee;
-  border: 1px solid #ef9a9a;
-}
-.error.show {
-  display: block;
-  opacity: 1;
-  transform: translateY(-5px);
+  background: #ffe6e6;
+  color: #b00020;
+  border-left: 5px solid #d93025;
 }
 
-/* ==============================
-   PROGRESS BAR
-============================== */
+/* ===== Progress Bar ===== */
 .progress-container {
   display: none;
-  margin-top: 6px;
-  background: #eee;
-  border-radius: 8px;
-  height: 18px;
+  margin-top: 18px;
+}
+
+.progress-bar {
+  height: 14px;
+  background: #e6f2ff;
+  border-radius: 7px;
   overflow: hidden;
 }
-.progress-bar {
+
+.progress-fill {
   height: 100%;
-  width: 0%;
-  background: linear-gradient(270deg, #2e7d32, #81c784, #2e7d32);
-  background-size: 600% 100%;
-  border-radius: 8px;
-  transition: width 0.3s ease;
-  animation: gradientMove 3s linear infinite;
-  font-size: 0.8rem;
-  text-align: center;
-  color: #fff;
-  line-height: 18px;
-}
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  width: 0;
+  background: linear-gradient(90deg, #0078d7, #00aaff);
+  transition: width 0.4s ease;
 }
 
-/* ==============================
-   UPLOAD PROGRESS TEXT
-============================== */
 .upload-progress-text {
-  display: none;
-  margin-top: 4px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #2e7d32;
-  transition: opacity 0.3s ease, color 0.3s ease;
-}
-.upload-progress-text.show {
-  display: block;
-  opacity: 1;
-}
-.upload-progress-text.complete {
-  color: #0277bd;
+  text-align: right;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  color: #555;
 }
 
-/* ==============================
-   EMAIL NOTE
-============================== */
-.email-note {
+/* ===== Spinner ===== */
+.spinner {
+  display: none;
+  margin: 15px auto;
+  border: 4px solid #e6f2ff;
+  border-top: 4px solid #0078d7;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Footer ===== */
+.site-footer {
+  text-align: center;
+  padding: 15px;
   font-size: 0.85rem;
   color: #555;
-  margin-top: 4px;
+  margin-top: 30px;
 }
 
-/* ==============================
-   FOOTER
-============================== */
-.site-footer {
-  background: #fff;
-  color: #555;
-  text-align: center;
-  padding: 16px 12px;
-  margin-top: 40px;
-  font-size: 0.9rem;
-  border-top: 1px solid #ddd;
-}
-.site-footer p {
-  margin: 0;
-  font-weight: 600;
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==============================
-   ANIMATIONS
-============================== */
-@keyframes floatIn {
-  0% { opacity: 0; transform: translateY(15px); }
-  100% { opacity: 1; transform: translateY(0); }
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .site-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .site-header img {
+    margin: 0 0 10px;
+  }
+
+  .container {
+    margin: 20px;
+    padding: 20px;
+  }
 }
