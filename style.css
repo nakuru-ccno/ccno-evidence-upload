@@ -24,8 +24,8 @@ header {
   background: linear-gradient(90deg, #0277bd, #03a9f4);
   padding: 16px;
   color: #fff;
-  font-weight: 800;
-  font-size: clamp(1rem, 2.2vw, 1.3rem); /* keeps text smaller + responsive */
+  font-weight: 600;
+  font-size: clamp(0.9rem, 1.2vw, 1.2rem); /* keeps text smaller + responsive */
   text-align: center;
   letter-spacing: 1px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
