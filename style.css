@@ -41,6 +41,14 @@ body {
   text-shadow: 1px 1px 4px rgba(0,0,0,0.25);
 }
 
+.site-header .header-texts h1 small {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin-top: 4px;
+  color: #e0f7fa;
+}
+
 @media (max-width: 768px) {
   .site-header {
     flex-direction: column;
@@ -74,7 +82,7 @@ body {
   box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
 
-/* Friendly form intro instead of heavy h2 */
+/* Friendly form intro */
 .form-intro {
   text-align: center;
   font-size: 1.1rem;
@@ -90,10 +98,10 @@ label {
   color: #2e7d32;
 }
 
-input[type="text"],
-input[type="email"],
-select,
-input[type="file"] {
+.container input[type="text"],
+.container input[type="email"],
+.container select,
+.container input[type="file"] {
   width: 100%;
   padding: 12px 14px;
   margin-top: 6px;
@@ -107,24 +115,38 @@ input[type="file"] {
   transform: translateY(15px);
   animation: floatIn 0.8s forwards;
 }
-input:hover,
-select:hover,
-input[type="file"]:hover {
+
+.container input:hover,
+.container select:hover,
+.container input[type="file"]:hover {
   background: #f0f7ff;
   border-color: #0277bd;
 }
-input:focus,
-select:focus {
+
+.container input:focus,
+.container select:focus {
   outline: none;
   border-color: #0277bd;
   box-shadow: 0 0 0 3px rgba(2,119,189,0.15);
 }
 
-/* stagger input animation */
-input:nth-of-type(1) { animation-delay: 0.1s; }
-input:nth-of-type(2) { animation-delay: 0.2s; }
-input:nth-of-type(3) { animation-delay: 0.3s; }
-input:nth-of-type(4) { animation-delay: 0.4s; }
+/* Animate all form fields nicely */
+.container input,
+.container select {
+  animation-delay: 0.1s;
+}
+.container input:nth-of-type(2),
+.container select:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+.container input:nth-of-type(3),
+.container select:nth-of-type(3) {
+  animation-delay: 0.3s;
+}
+.container input:nth-of-type(4),
+.container select:nth-of-type(4) {
+  animation-delay: 0.4s;
+}
 
 /* ==============================
    BUTTON
@@ -168,63 +190,37 @@ button:disabled {
 }
 
 /* ==============================
-   SUCCESS MESSAGE
+   SUCCESS & ERROR MESSAGES
 ============================== */
-.success {
-  display: none;
-  margin: 6px 0 0 0;
-  padding: 12px 14px 12px 42px;
-  border-radius: 8px;
-  font-weight: 700;
-  color: #1b5e20;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
-  position: relative;
-  opacity: 0;
-  transition: opacity 0.5s ease, transform 0.3s ease;
-}
-.success.show {
-  opacity: 1;
-  transform: translateY(-5px);
-}
-.success::before {
-  content: "";
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 10px;
-  border-left: 3px solid #1b5e20;
-  border-bottom: 3px solid #1b5e20;
-  border-radius: 2px;
-  opacity: 0;
-}
-.success.show::before {
-  animation: checkmark 0.5s forwards;
-}
-@keyframes checkmark {
-  0% { width: 0; height: 0; opacity: 0; }
-  50% { width: 9px; height: 0; opacity: 1; transform: rotate(45deg); }
-  100% { width: 18px; height: 10px; opacity: 1; transform: rotate(45deg); }
-}
-
-/* ==============================
-   ERROR MESSAGE
-============================== */
+.success,
 .error {
   display: none;
   margin: 6px 0 0 0;
   padding: 12px 14px;
   border-radius: 8px;
   font-weight: 700;
-  color: #c62828;
-  background: #ffebee;
-  border: 1px solid #ef9a9a;
   opacity: 0;
   transition: opacity 0.5s ease, transform 0.3s ease;
 }
+
+.success {
+  color: #1b5e20;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+}
+.success.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(-5px);
+}
+
+.error {
+  color: #c62828;
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+}
 .error.show {
+  display: block;
   opacity: 1;
   transform: translateY(-5px);
 }
@@ -305,22 +301,9 @@ button:disabled {
 }
 
 /* ==============================
-   FLOATING ANIMATION
+   ANIMATIONS
 ============================== */
 @keyframes floatIn {
   0% { opacity: 0; transform: translateY(15px); }
   100% { opacity: 1; transform: translateY(0); }
-}
-
-/* ==============================
-   RESPONSIVE MOBILE
-============================== */
-@media (max-width: 480px) {
-  .form-intro {
-    font-size: 1rem;
-  }
-  button {
-    font-size: 1rem;
-    padding: 12px;
-  }
 }
