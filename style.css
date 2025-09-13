@@ -1,28 +1,19 @@
 /* ==============================
-   BODY & GLOBAL
-============================== */
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f6f9;
-  color: #333;
-  line-height: 1.6;
-}
-
-/* ==============================
-   HEADER – ULTRA MODERN
+   HEADER – SLIM & MODERN
 ============================== */
 .site-header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 16px 28px;
+  padding: 8px 16px;          /* reduced padding for slimmer header */
   background: linear-gradient(135deg, #0288d1, #03a9f4);
   color: #fff;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-  border-bottom: 3px solid rgba(255,255,255,0.2);
-  gap: 20px;
-  transition: background 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+  gap: 12px;
+  transition: background 0.3s ease, padding 0.3s ease;
+  flex-wrap: wrap; /* allows wrapping on small screens */
+  height: 60px;     /* fixed slim height */
 }
 
 .site-header:hover {
@@ -30,47 +21,49 @@ body {
 }
 
 .site-header .logo {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
+  width: 45px;                  
+  height: 45px;
+  padding: 2px;
   border-radius: 50%;
   background: linear-gradient(135deg, #03a9f4, #0288d1);
-  padding: 5px;
   border: 2px solid #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   flex-shrink: 0;
 }
 
 .site-header .logo:hover {
-  transform: scale(1.1);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 .site-header .header-texts {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
+  min-width: 0; /* prevent text overflow */
+  flex: 1;      /* take remaining space */
 }
 
 .site-header .header-texts h1 {
-  font-size: 1.9rem;
+  font-size: 1.4rem;            
   font-weight: 900;
   margin: 0;
   line-height: 1.2;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.35);
-  letter-spacing: 0.5px;
-  transition: color 0.3s ease;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.25);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .site-header .header-texts h1 small {
   display: block;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: #e0f7fa;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
-  margin-top: 4px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  margin-top: 1px;
 }
 
 /* ==============================
@@ -80,18 +73,32 @@ body {
   .site-header {
     flex-direction: column;
     text-align: center;
-    padding: 12px 16px;
-    gap: 12px;
+    padding: 6px 12px;
+    gap: 6px;
+    height: auto; /* let height adjust */
   }
   .site-header .logo {
-    width: 55px;
-    height: 55px;
+    width: 40px;
+    height: 40px;
   }
   .site-header .header-texts h1 {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
   .site-header .header-texts h1 small {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header .logo {
+    width: 35px;
+    height: 35px;
+  }
+  .site-header .header-texts h1 {
+    font-size: 1rem;
+  }
+  .site-header .header-texts h1 small {
+    font-size: 0.7rem;
   }
 }
 
