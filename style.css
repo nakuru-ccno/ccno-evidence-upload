@@ -62,7 +62,7 @@
 }
 
 .site-header .header-texts h1:hover {
-  transform: translateX(2px);
+  transform-intro: translateX(2px);
 }
 
 .site-header .header-texts h1 small {
@@ -117,7 +117,7 @@
 }
 
 /* ==============================
-   CONTAINER & FORM
+   CONTAINER & form-intro
 ============================== */
 .container {
   max-width: 720px;
@@ -127,14 +127,14 @@
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   border-top: 6px solid #2e7d32;
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  transition: box-shadow 0.3s ease, transform-intro 0.2s ease;
   position: relative;
   overflow: hidden; /* For subtle background effects */
 }
 
 .container:hover {
   box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  transform: translateY(-2px);
+  transform-intro: translateY(-2px);
 }
 
 /* Subtle background pattern */
@@ -153,19 +153,19 @@
 }
 
 /* ==============================
-   FORM INTRO HIGHLIGHT
+   form-intro INTRO HIGHLIGHT
 ============================== */
 .form-intro {
   display: inline-block;
   background: linear-gradient(135deg, #e6f2ff, #f0f8ff);
-  color: #004080;
+  color: #c62828;  /* <-- changed to red */
   font-size: 1rem;
   font-weight: 500;
   padding: 12px 18px;
   border-radius: 10px;
   margin-bottom: 20px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-  border-left: 4px solid #0288d1;
+  border-left: 4px solid #c62828; /* optional: match red for left border */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
