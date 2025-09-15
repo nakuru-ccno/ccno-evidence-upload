@@ -168,6 +168,12 @@ function resetForm() {
   uploadText.style.display = "none";
 }
 
+// Remove red border instantly when user types/changes value
+[officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
+  el.addEventListener("input", () => el.style.border = "");
+  el.addEventListener("change", () => el.style.border = "");
+});
+
 // Upload logic
 uploadBtn.addEventListener("click", () => {
   const officerEmail = officerEmailInput.value.trim();
@@ -177,8 +183,22 @@ uploadBtn.addEventListener("click", () => {
   const subCounty = subCountySelect.value;
   const files = filesInput.files;
 
-  if (!officerEmail || !evidenceName || !category || !indicator || !subCounty || !files.length) {
-    return showError("⚠ Please fill all fields and select at least one PDF file.");
+  let missing = [];
+
+  // Reset borders
+  [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
+    el.style.border = "";
+  });
+
+  if (!officerEmail) { missing.push("Officer Email"); officerEmailInput.style.border = "2px solid red"; }
+  if (!evidenceName) { missing.push("Evidence Name"); evidenceNameInput.style.border = "2px solid red"; }
+  if (!category) { missing.push("Category"); categorySelect.style.border = "2px solid red"; }
+  if (!indicator) { missing.push("Indicator"); indicatorSelect.style.border = "2px solid red"; }
+  if (!subCounty) { missing.push("Sub-County"); subCountySelect.style.border = "2px solid red"; }
+  if (!files.length) { missing.push("PDF File(s)"); filesInput.style.border = "2px solid red"; }
+
+  if (missing.length > 0) {
+    return showError("⚠ Please fill the following required fields:\n\n- " + missing.join("\n- "));
   }
 
   if (files.length > 10) return showError("⚠ You can only upload up to 10 PDF files at once.");
