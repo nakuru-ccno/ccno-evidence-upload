@@ -31,6 +31,7 @@
       <label for="officerEmail"><i class="fas fa-envelope"></i> Officer Email</label>
       <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" type="email" required />
       <datalist id="officerEmails"></datalist>
+      <div class="validation-message" id="emailValidation"></div>
       <div class="email-note">
         <i class="fas fa-info-circle"></i> You will receive an email confirmation once your files are received.
       </div>
@@ -40,6 +41,7 @@
     <div class="form-group required">
       <label for="evidenceName"><i class="fas fa-file-signature"></i> Evidence Name</label>
       <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
+      <div class="validation-message" id="nameValidation"></div>
     </div>
 
     <!-- Category & Indicator -->
@@ -48,6 +50,7 @@
       <select id="category" required>
         <option value="">Select Evidence Category</option>
       </select>
+      <div class="validation-message" id="categoryValidation"></div>
     </div>
 
     <div class="form-group required">
@@ -55,6 +58,7 @@
       <select id="indicator" required>
         <option value="">Select Indicator</option>
       </select>
+      <div class="validation-message" id="indicatorValidation"></div>
     </div>
 
     <!-- Sub County -->
@@ -74,6 +78,7 @@
         <option value="Njoro Sub County">Njoro Sub County</option>
         <option value="Gilgil Sub County">Gilgil Sub County</option>
       </select>
+      <div class="validation-message" id="subCountyValidation"></div>
     </div>
 
     <!-- File Upload -->
@@ -81,6 +86,18 @@
       <label for="files"><i class="fas fa-file-pdf"></i> Choose PDF file(s)</label>
       <div class="file-upload-wrapper">
         <input type="file" id="files" accept="application/pdf" multiple required />
+      </div>
+      <div class="validation-message" id="filesValidation"></div>
+      
+      <!-- File Preview Container -->
+      <div class="file-preview-container" id="filePreview">
+        <div class="file-preview-header">
+          <span class="file-count" id="fileCount">0 files</span>
+          <span class="total-size" id="totalSize">0 MB</span>
+        </div>
+        <div id="fileList">
+          <!-- Files will be listed here -->
+        </div>
       </div>
     </div>
 
@@ -100,7 +117,31 @@
       <i class="fas fa-cloud-upload-alt"></i> Upload Evidence
     </button>
   </form>
+
+  <!-- Upload History Section -->
+  <div class="uploads-history" id="historySection" style="display: none;">
+    <div class="history-header">
+      <h3 class="history-title">
+        <i class="fas fa-history"></i> Recent Uploads
+      </h3>
+      <button class="refresh-btn" id="refreshHistory" title="Refresh">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+    
+    <div class="history-list" id="historyList">
+      <!-- History items will be loaded here -->
+    </div>
+    
+    <div class="empty-history" id="emptyHistory">
+      <i class="fas fa-inbox"></i>
+      <p>No uploads yet. Submit your first evidence to see history here.</p>
+    </div>
+  </div>
 </div>
+
+<!-- Save Status Indicator -->
+<div class="save-status" id="saveStatus"></div>
 
 <!-- FOOTER -->
 <footer class="site-footer">
@@ -111,15 +152,20 @@
 </footer>
 
 <script>
-// JavaScript remains exactly the same as before
+// Extended JavaScript with all 4 features
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
+// Get all DOM elements
 const officerEmailInput = document.getElementById("officerEmail");
 const evidenceNameInput = document.getElementById("evidenceName");
 const categorySelect = document.getElementById("category");
 const indicatorSelect = document.getElementById("indicator");
 const subCountySelect = document.getElementById("subCounty");
 const filesInput = document.getElementById("files");
+const filePreview = document.getElementById("filePreview");
+const fileList = document.getElementById("fileList");
+const fileCount = document.getElementById("fileCount");
+const totalSize = document.getElementById("totalSize");
 const spinner = document.getElementById("spinner");
 const successMsg = document.getElementById("success");
 const errorMsg = document.getElementById("error");
@@ -128,7 +174,333 @@ const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 const uploadText = document.getElementById("uploadText");
 const uploadForm = document.getElementById("uploadForm");
+const saveStatus = document.getElementById("saveStatus");
+const historySection = document.getElementById("historySection");
+const historyList = document.getElementById("historyList");
+const emptyHistory = document.getElementById("emptyHistory");
+const refreshHistory = document.getElementById("refreshHistory");
 
+// Validation message elements
+const emailValidation = document.getElementById("emailValidation");
+const nameValidation = document.getElementById("nameValidation");
+const categoryValidation = document.getElementById("categoryValidation");
+const indicatorValidation = document.getElementById("indicatorValidation");
+const subCountyValidation = document.getElementById("subCountyValidation");
+const filesValidation = document.getElementById("filesValidation");
+
+// ========== FEATURE 1: FILE VALIDATION PREVIEW ==========
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function validateFile(file) {
+    const errors = [];
+    
+    if (file.type !== 'application/pdf') {
+        errors.push('Not a PDF file');
+    }
+    
+    if (file.size > 30 * 1024 * 1024) {
+        errors.push('Exceeds 30MB limit');
+    }
+    
+    return errors;
+}
+
+function updateFilePreview() {
+    const files = Array.from(filesInput.files);
+    
+    if (files.length === 0) {
+        filePreview.style.display = 'none';
+        return;
+    }
+    
+    filePreview.style.display = 'block';
+    fileList.innerHTML = '';
+    
+    let totalBytes = 0;
+    let validCount = 0;
+    let errorCount = 0;
+    
+    files.forEach((file, index) => {
+        const errors = validateFile(file);
+        totalBytes += file.size;
+        
+        const fileItem = document.createElement('div');
+        fileItem.className = `file-item ${errors.length > 0 ? 'error' : 'valid'}`;
+        
+        let statusText = errors.length > 0 ? 'Invalid' : 'Ready';
+        let icon = errors.length > 0 ? 'fa-times-circle' : 'fa-check-circle';
+        
+        if (errors.length > 0) {
+            errorCount++;
+        } else {
+            validCount++;
+        }
+        
+        fileItem.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <div class="file-info">
+                <span class="file-name">${file.name}</span>
+                <span class="file-size">${formatBytes(file.size)}</span>
+            </div>
+            <span class="file-status ${errors.length > 0 ? 'error' : 'valid'}">
+                ${statusText}
+            </span>
+        `;
+        
+        fileList.appendChild(fileItem);
+    });
+    
+    fileCount.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} (${validCount} valid, ${errorCount} invalid)`;
+    totalSize.textContent = formatBytes(totalBytes);
+    
+    // Update validation message
+    if (errorCount > 0) {
+        filesValidation.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${errorCount} file${errorCount !== 1 ? 's' : ''} have issues`;
+        filesValidation.className = 'validation-message error';
+        filesValidation.style.display = 'flex';
+    } else if (files.length > 0) {
+        filesValidation.innerHTML = `<i class="fas fa-check-circle"></i> All files are valid`;
+        filesValidation.className = 'validation-message success';
+        filesValidation.style.display = 'flex';
+    } else {
+        filesValidation.style.display = 'none';
+    }
+}
+
+filesInput.addEventListener('change', updateFilePreview);
+
+// ========== FEATURE 2: REAL-TIME FORM VALIDATION ==========
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function showValidation(element, message, type = 'error') {
+    const validationElement = element.nextElementSibling;
+    if (validationElement && validationElement.classList.contains('validation-message')) {
+        validationElement.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${message}`;
+        validationElement.className = `validation-message ${type}`;
+        validationElement.style.display = 'flex';
+    }
+}
+
+function hideValidation(element) {
+    const validationElement = element.nextElementSibling;
+    if (validationElement && validationElement.classList.contains('validation-message')) {
+        validationElement.style.display = 'none';
+    }
+}
+
+// Email validation
+officerEmailInput.addEventListener('blur', function() {
+    const email = this.value.trim();
+    if (!email) {
+        showValidation(this, 'Email is required', 'error');
+    } else if (!validateEmail(email)) {
+        showValidation(this, 'Please enter a valid email address', 'error');
+    } else {
+        showValidation(this, 'Email looks good', 'success');
+    }
+});
+
+officerEmailInput.addEventListener('input', function() {
+    if (this.value.trim()) {
+        hideValidation(this);
+    }
+});
+
+// Other field validations
+evidenceNameInput.addEventListener('blur', function() {
+    if (!this.value.trim()) {
+        showValidation(this, 'Evidence name is required', 'error');
+    } else {
+        showValidation(this, 'Evidence name is valid', 'success');
+    }
+});
+
+evidenceNameInput.addEventListener('input', function() {
+    if (this.value.trim()) {
+        hideValidation(this);
+    }
+});
+
+categorySelect.addEventListener('change', function() {
+    if (this.value) {
+        showValidation(this, 'Category selected', 'success');
+    }
+});
+
+indicatorSelect.addEventListener('change', function() {
+    if (this.value) {
+        showValidation(this, 'Indicator selected', 'success');
+    }
+});
+
+subCountySelect.addEventListener('change', function() {
+    if (this.value) {
+        showValidation(this, 'Sub County selected', 'success');
+    }
+});
+
+// ========== FEATURE 3: AUTO-SAVE DRAFT ==========
+let autoSaveTimer;
+let hasUnsavedChanges = false;
+
+function saveDraft() {
+    const draft = {
+        officerEmail: officerEmailInput.value,
+        evidenceName: evidenceNameInput.value,
+        category: categorySelect.value,
+        indicator: indicatorSelect.value,
+        subCounty: subCountySelect.value,
+        timestamp: Date.now()
+    };
+    
+    localStorage.setItem('uploadDraft', JSON.stringify(draft));
+    showSaveStatus('Draft saved', 'saved');
+    hasUnsavedChanges = false;
+}
+
+function loadDraft() {
+    const draft = JSON.parse(localStorage.getItem('uploadDraft'));
+    if (draft) {
+        officerEmailInput.value = draft.officerEmail || '';
+        evidenceNameInput.value = draft.evidenceName || '';
+        categorySelect.value = draft.category || '';
+        indicatorSelect.value = draft.indicator || '';
+        subCountySelect.value = draft.subCounty || '';
+        
+        // Update indicators if category is selected
+        if (draft.category) {
+            updateIndicators(draft.category);
+        }
+        
+        // Show draft badge
+        showSaveStatus('Draft loaded', 'saved');
+    }
+}
+
+function showSaveStatus(message, type = 'saved') {
+    saveStatus.innerHTML = `
+        <i class="fas fa-${type === 'saving' ? 'spinner fa-spin' : type === 'saved' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    saveStatus.className = `save-status ${type}`;
+    saveStatus.style.display = 'flex';
+    
+    setTimeout(() => {
+        saveStatus.style.display = 'none';
+    }, 3000);
+}
+
+// Auto-save on input
+['input', 'change'].forEach(event => {
+    uploadForm.addEventListener(event, function() {
+        hasUnsavedChanges = true;
+        
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+            if (hasUnsavedChanges) {
+                showSaveStatus('Saving draft...', 'saving');
+                setTimeout(saveDraft, 500);
+            }
+        }, 1000);
+    });
+});
+
+// Save on page unload
+window.addEventListener('beforeunload', function(e) {
+    if (hasUnsavedChanges) {
+        saveDraft();
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+
+// Load draft on page load
+window.addEventListener('load', loadDraft);
+
+// Clear draft after successful upload
+function clearDraft() {
+    localStorage.removeItem('uploadDraft');
+    hasUnsavedChanges = false;
+}
+
+// ========== FEATURE 4: UPLOAD HISTORY ==========
+function saveToHistory(uploadData) {
+    const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
+    
+    const historyItem = {
+        id: Date.now(),
+        name: uploadData.evidenceName,
+        email: uploadData.officerEmail,
+        category: uploadData.category,
+        indicator: uploadData.indicator,
+        subCounty: uploadData.subCounty,
+        filesCount: uploadData.filesCount,
+        totalSize: uploadData.totalSize,
+        timestamp: new Date().toISOString(),
+        status: 'completed'
+    };
+    
+    history.unshift(historyItem);
+    localStorage.setItem('uploadHistory', JSON.stringify(history.slice(0, 10))); // Keep last 10
+    loadHistory();
+}
+
+function loadHistory() {
+    const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
+    
+    if (history.length > 0) {
+        historySection.style.display = 'block';
+        emptyHistory.style.display = 'none';
+        
+        historyList.innerHTML = '';
+        
+        history.forEach(item => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            const date = new Date(item.timestamp);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            historyItem.innerHTML = `
+                <div class="upload-info">
+                    <span class="upload-name">${item.name}</span>
+                    <span class="upload-meta">
+                        ${formattedDate} • ${item.filesCount} file${item.filesCount !== 1 ? 's' : ''} • ${formatBytes(item.totalSize)}
+                    </span>
+                </div>
+                <span class="upload-status ${item.status}">
+                    ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                </span>
+            `;
+            
+            historyList.appendChild(historyItem);
+        });
+    } else {
+        historySection.style.display = 'none';
+        emptyHistory.style.display = 'block';
+    }
+}
+
+refreshHistory.addEventListener('click', loadHistory);
+
+// Load history on page load
+window.addEventListener('load', loadHistory);
+
+// ========== ORIGINAL UPLOAD LOGIC (UPDATED) ==========
 // Load categories + indicators from JSON
 fetch("indicators.json")
   .then(res => res.json())
@@ -152,6 +524,19 @@ fetch("indicators.json")
         });
       }
     });
+    
+    // Function to update indicators (for draft loading)
+    window.updateIndicators = function(category) {
+      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+      if (data[category]) {
+        data[category].forEach(ind => {
+          const opt = document.createElement("option");
+          opt.value = ind;
+          opt.textContent = ind;
+          indicatorSelect.appendChild(opt);
+        });
+      }
+    };
   })
   .catch(err => console.error("Error loading indicators.json:", err));
 
@@ -198,6 +583,15 @@ function resetForm() {
   progressBar.style.width = "0%";
   progressContainer.style.display = "none";
   uploadText.style.display = "none";
+  filePreview.style.display = "none";
+  
+  // Clear draft after successful upload
+  clearDraft();
+  
+  // Clear validation messages
+  [emailValidation, nameValidation, categoryValidation, indicatorValidation, subCountyValidation, filesValidation].forEach(el => {
+    el.style.display = "none";
+  });
 }
 
 // Remove error styling instantly when user types/changes value
@@ -264,10 +658,15 @@ uploadBtn.addEventListener("click", () => {
     return showError("⚠ Please fill the following required fields:\n\n- " + missing.join("\n- "));
   }
 
-  if (files.length > 10) return showError("⚠ You can only upload up to 10 PDF files at once.");
-  for (let file of files) {
-    if (file.type !== "application/pdf") return showError(`⚠ ${file.name} is not a PDF.`);
-    if (file.size > 30 * 1024 * 1024) return showError(`⚠ ${file.name} exceeds the 30MB limit.`);
+  // Check for invalid files
+  const filesArray = Array.from(files);
+  const invalidFiles = filesArray.filter(file => {
+    const errors = validateFile(file);
+    return errors.length > 0;
+  });
+
+  if (invalidFiles.length > 0) {
+    return showError(`⚠ ${invalidFiles.length} file${invalidFiles.length !== 1 ? 's' : ''} have issues. Please check the file preview.`);
   }
 
   // Disable button and show loading
@@ -314,7 +713,21 @@ uploadBtn.addEventListener("click", () => {
       uploadBtn.disabled = false;
 
       if (xhr.status >= 200 && xhr.status < 300) {
-        showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
+        const successMessage = `✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`;
+        showSuccess(successMessage);
+        
+        // Save to history
+        const totalSize = Array.from(files).reduce((sum, file) => sum + file.size, 0);
+        saveToHistory({
+          evidenceName,
+          officerEmail,
+          category,
+          indicator,
+          subCounty,
+          filesCount: files.length,
+          totalSize
+        });
+        
         setTimeout(() => {
           resetForm();
           successMsg.style.display = "none";
@@ -340,15 +753,6 @@ uploadBtn.addEventListener("click", () => {
 // Add form submit prevention
 uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
-});
-
-// Add input validation for email
-officerEmailInput.addEventListener('blur', function() {
-  const email = this.value.trim();
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    this.style.border = "2px solid #ef4444";
-    this.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
 });
 </script>
 
