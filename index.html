@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload Portal</title>
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,65 +19,98 @@
 </header>
 
 <div class="container">
-  <!-- Friendlier intro line instead of duplicate heading -->
-  <p class="form-intro">
-    📂 Please fill in the details below to upload PC Evidence for FY 2025/2026
-  </p>
-
-  <label for="officerEmail">Officer Email:</label>
-  <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" required />
-  <datalist id="officerEmails"></datalist>
-  <div class="email-note">📩 You will receive an email confirmation once your files are received.</div>
-
-  <label for="evidenceName">Evidence Name:</label>
-  <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" />
-
-  <label for="category">Evidence Category:</label>
-  <select id="category">
-    <option value="">Select Evidence Category</option>
-  </select>
-
-  <label for="indicator">Indicator:</label>
-  <select id="indicator">
-    <option value="">Select Indicator</option>
-  </select>
-
-  <label for="subCounty">Sub County:</label>
-  <select id="subCounty">
-    <option value="">Select Sub County</option>
-    <option value="Nakuru West Sub County">Nakuru West Sub County</option>
-    <option value="Nakuru East Sub County">Nakuru East Sub County</option>
-    <option value="Nakuru North Sub County">Nakuru North Sub County</option>
-    <option value="Naivasha Sub County">Naivasha Sub County</option>
-    <option value="Rongai Sub County">Rongai Sub County</option>
-    <option value="Kuresoi South Sub County">Kuresoi South Sub County</option>
-    <option value="Kuresoi North Sub County">Kuresoi North Sub County</option>
-    <option value="Subukia Sub County">Subukia Sub County</option>
-    <option value="Molo Sub County">Molo Sub County</option>
-    <option value="Njoro Sub County">Njoro Sub County</option>
-    <option value="Gilgil Sub County">Gilgil Sub County</option>
-  </select>
-
-  <label for="files">Choose PDF file(s):</label>
-  <input type="file" id="files" accept="application/pdf" multiple />
-
-  <div class="spinner" id="spinner"></div>
-  <div class="progress-container" id="progressContainer">
-    <div class="progress-bar" id="progressBar"></div>
+  <!-- Form Container -->
+  <div class="form-intro">
+    <span>📂 Please fill in the details below to upload PC Evidence for FY 2025/2026</span>
   </div>
-  <div class="upload-progress-text" id="uploadText"></div>
-  <div class="success" id="success"></div>
-  <div class="error" id="error"></div>
 
-  <button id="uploadBtn">Upload Evidence</button>
+  <form id="uploadForm">
+    <!-- Officer Email -->
+    <div class="form-group">
+      <label for="officerEmail"><i class="fas fa-envelope"></i> Officer Email</label>
+      <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" required />
+      <datalist id="officerEmails"></datalist>
+      <div class="email-note">
+        <i class="fas fa-info-circle"></i> You will receive an email confirmation once your files are received.
+      </div>
+    </div>
+
+    <!-- Evidence Name -->
+    <div class="form-group">
+      <label for="evidenceName"><i class="fas fa-file-signature"></i> Evidence Name</label>
+      <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
+    </div>
+
+    <!-- Category & Indicator -->
+    <div class="form-group">
+      <label for="category"><i class="fas fa-folder"></i> Evidence Category</label>
+      <select id="category" required>
+        <option value="">Select Evidence Category</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="indicator"><i class="fas fa-chart-line"></i> Indicator</label>
+      <select id="indicator" required>
+        <option value="">Select Indicator</option>
+      </select>
+    </div>
+
+    <!-- Sub County -->
+    <div class="form-group">
+      <label for="subCounty"><i class="fas fa-map-marker-alt"></i> Sub County</label>
+      <select id="subCounty" required>
+        <option value="">Select Sub County</option>
+        <option value="Nakuru West Sub County">Nakuru West Sub County</option>
+        <option value="Nakuru East Sub County">Nakuru East Sub County</option>
+        <option value="Nakuru North Sub County">Nakuru North Sub County</option>
+        <option value="Naivasha Sub County">Naivasha Sub County</option>
+        <option value="Rongai Sub County">Rongai Sub County</option>
+        <option value="Kuresoi South Sub County">Kuresoi South Sub County</option>
+        <option value="Kuresoi North Sub County">Kuresoi North Sub County</option>
+        <option value="Subukia Sub County">Subukia Sub County</option>
+        <option value="Molo Sub County">Molo Sub County</option>
+        <option value="Njoro Sub County">Njoro Sub County</option>
+        <option value="Gilgil Sub County">Gilgil Sub County</option>
+      </select>
+    </div>
+
+    <!-- File Upload -->
+    <div class="form-group">
+      <label for="files"><i class="fas fa-file-pdf"></i> Choose PDF file(s)</label>
+      <div class="file-upload-wrapper">
+        <input type="file" id="files" accept="application/pdf" multiple required />
+      </div>
+    </div>
+
+    <!-- Progress Elements -->
+    <div class="spinner" id="spinner"></div>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="upload-progress-text" id="uploadText"></div>
+    
+    <!-- Messages -->
+    <div class="success" id="success"></div>
+    <div class="error" id="error"></div>
+
+    <!-- Upload Button -->
+    <button type="button" id="uploadBtn" class="upload-btn">
+      Upload Evidence
+    </button>
+  </form>
 </div>
 
 <!-- FOOTER -->
 <footer class="site-footer">
   <p>© 2025 Nakuru County Chief Nursing Officer. All Rights Reserved.</p>
+  <p style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">
+    <i class="fas fa-shield-alt"></i> Secure Evidence Upload System
+  </p>
 </footer>
 
 <script>
+// Your existing JavaScript remains exactly the same
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 const officerEmailInput = document.getElementById("officerEmail");
@@ -92,6 +126,7 @@ const uploadBtn = document.getElementById("uploadBtn");
 const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 const uploadText = document.getElementById("uploadText");
+const uploadForm = document.getElementById("uploadForm");
 
 // Load categories + indicators from JSON
 fetch("indicators.json")
@@ -143,18 +178,14 @@ officerEmailInput.addEventListener("focus", () => {
 // Helper functions
 function showError(msg) {
   errorMsg.textContent = msg;
-  errorMsg.style.display = msg ? "block" : "none";
-  errorMsg.classList.add("show");
+  errorMsg.style.display = msg ? "flex" : "none";
   successMsg.style.display = "none";
-  successMsg.classList.remove("show");
 }
 
 function showSuccess(msg) {
   successMsg.textContent = msg;
-  successMsg.style.display = "block";
-  successMsg.classList.add("show");
+  successMsg.style.display = "flex";
   errorMsg.style.display = "none";
-  errorMsg.classList.remove("show");
 }
 
 function resetForm() {
@@ -170,8 +201,14 @@ function resetForm() {
 
 // Remove red border instantly when user types/changes value
 [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
-  el.addEventListener("input", () => el.style.border = "");
-  el.addEventListener("change", () => el.style.border = "");
+  el.addEventListener("input", () => {
+    el.style.border = "";
+    el.style.boxShadow = "";
+  });
+  el.addEventListener("change", () => {
+    el.style.border = "";
+    el.style.boxShadow = "";
+  });
 });
 
 // Upload logic
@@ -188,14 +225,39 @@ uploadBtn.addEventListener("click", () => {
   // Reset borders
   [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
     el.style.border = "";
+    el.style.boxShadow = "";
   });
 
-  if (!officerEmail) { missing.push("Officer Email"); officerEmailInput.style.border = "2px solid red"; }
-  if (!evidenceName) { missing.push("Evidence Name"); evidenceNameInput.style.border = "2px solid red"; }
-  if (!category) { missing.push("Category"); categorySelect.style.border = "2px solid red"; }
-  if (!indicator) { missing.push("Indicator"); indicatorSelect.style.border = "2px solid red"; }
-  if (!subCounty) { missing.push("Sub-County"); subCountySelect.style.border = "2px solid red"; }
-  if (!files.length) { missing.push("PDF File(s)"); filesInput.style.border = "2px solid red"; }
+  if (!officerEmail) { 
+    missing.push("Officer Email"); 
+    officerEmailInput.style.border = "2px solid #ef4444";
+    officerEmailInput.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+  }
+  if (!evidenceName) { 
+    missing.push("Evidence Name"); 
+    evidenceNameInput.style.border = "2px solid #ef4444";
+    evidenceNameInput.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+  }
+  if (!category) { 
+    missing.push("Category"); 
+    categorySelect.style.border = "2px solid #ef4444";
+    categorySelect.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+  }
+  if (!indicator) { 
+    missing.push("Indicator"); 
+    indicatorSelect.style.border = "2px solid #ef4444";
+    indicatorSelect.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+  }
+  if (!subCounty) { 
+    missing.push("Sub-County"); 
+    subCountySelect.style.border = "2px solid #ef4444";
+    subCountySelect.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+  }
+  if (!files.length) { 
+    missing.push("PDF File(s)"); 
+    filesInput.style.border = "2px solid #ef4444";
+    filesInput.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+  }
 
   if (missing.length > 0) {
     return showError("⚠ Please fill the following required fields:\n\n- " + missing.join("\n- "));
@@ -247,7 +309,6 @@ uploadBtn.addEventListener("click", () => {
         setTimeout(() => {
           resetForm();
           successMsg.style.display = "none";
-          successMsg.classList.remove("show");
         }, 4000);
 
         saveOfficerEmail(officerEmail);
@@ -263,6 +324,11 @@ uploadBtn.addEventListener("click", () => {
   };
 
   xhr.send(formData);
+});
+
+// Add form submit prevention
+uploadForm.addEventListener("submit", (e) => {
+  e.preventDefault();
 });
 </script>
 
