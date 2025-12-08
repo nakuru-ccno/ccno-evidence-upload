@@ -21,14 +21,15 @@
 <div class="container">
   <!-- Form Container -->
   <div class="form-intro">
-    <span>📂 Please fill in the details below to upload PC Evidence for FY 2025/2026</span>
+    <i class="fas fa-cloud-upload-alt"></i>
+    <span>Upload PC Evidence for FY 2025/2026</span>
   </div>
 
   <form id="uploadForm">
     <!-- Officer Email -->
-    <div class="form-group">
+    <div class="form-group required">
       <label for="officerEmail"><i class="fas fa-envelope"></i> Officer Email</label>
-      <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" required />
+      <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" type="email" required />
       <datalist id="officerEmails"></datalist>
       <div class="email-note">
         <i class="fas fa-info-circle"></i> You will receive an email confirmation once your files are received.
@@ -36,20 +37,20 @@
     </div>
 
     <!-- Evidence Name -->
-    <div class="form-group">
+    <div class="form-group required">
       <label for="evidenceName"><i class="fas fa-file-signature"></i> Evidence Name</label>
       <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
     </div>
 
     <!-- Category & Indicator -->
-    <div class="form-group">
+    <div class="form-group required">
       <label for="category"><i class="fas fa-folder"></i> Evidence Category</label>
       <select id="category" required>
         <option value="">Select Evidence Category</option>
       </select>
     </div>
 
-    <div class="form-group">
+    <div class="form-group required">
       <label for="indicator"><i class="fas fa-chart-line"></i> Indicator</label>
       <select id="indicator" required>
         <option value="">Select Indicator</option>
@@ -57,7 +58,7 @@
     </div>
 
     <!-- Sub County -->
-    <div class="form-group">
+    <div class="form-group required">
       <label for="subCounty"><i class="fas fa-map-marker-alt"></i> Sub County</label>
       <select id="subCounty" required>
         <option value="">Select Sub County</option>
@@ -76,7 +77,7 @@
     </div>
 
     <!-- File Upload -->
-    <div class="form-group">
+    <div class="form-group required">
       <label for="files"><i class="fas fa-file-pdf"></i> Choose PDF file(s)</label>
       <div class="file-upload-wrapper">
         <input type="file" id="files" accept="application/pdf" multiple required />
@@ -96,7 +97,7 @@
 
     <!-- Upload Button -->
     <button type="button" id="uploadBtn" class="upload-btn">
-      Upload Evidence
+      <i class="fas fa-cloud-upload-alt"></i> Upload Evidence
     </button>
   </form>
 </div>
@@ -104,13 +105,13 @@
 <!-- FOOTER -->
 <footer class="site-footer">
   <p>© 2025 Nakuru County Chief Nursing Officer. All Rights Reserved.</p>
-  <p style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">
-    <i class="fas fa-shield-alt"></i> Secure Evidence Upload System
+  <p style="font-size: 0.85rem; color: #94a3b8;">
+    <i class="fas fa-shield-alt"></i> Secure Evidence Upload System v2.0
   </p>
 </footer>
 
 <script>
-// Your existing JavaScript remains exactly the same
+// JavaScript remains exactly the same as before
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 const officerEmailInput = document.getElementById("officerEmail");
@@ -199,15 +200,15 @@ function resetForm() {
   uploadText.style.display = "none";
 }
 
-// Remove red border instantly when user types/changes value
+// Remove error styling instantly when user types/changes value
 [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
   el.addEventListener("input", () => {
-    el.style.border = "";
-    el.style.boxShadow = "";
+    el.style.border = "2px solid #e2e8f0";
+    el.style.boxShadow = "none";
   });
   el.addEventListener("change", () => {
-    el.style.border = "";
-    el.style.boxShadow = "";
+    el.style.border = "2px solid #e2e8f0";
+    el.style.boxShadow = "none";
   });
 });
 
@@ -222,41 +223,41 @@ uploadBtn.addEventListener("click", () => {
 
   let missing = [];
 
-  // Reset borders
+  // Reset borders to normal
   [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
-    el.style.border = "";
-    el.style.boxShadow = "";
+    el.style.border = "2px solid #e2e8f0";
+    el.style.boxShadow = "none";
   });
 
   if (!officerEmail) { 
     missing.push("Officer Email"); 
     officerEmailInput.style.border = "2px solid #ef4444";
-    officerEmailInput.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+    officerEmailInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
   }
   if (!evidenceName) { 
     missing.push("Evidence Name"); 
     evidenceNameInput.style.border = "2px solid #ef4444";
-    evidenceNameInput.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+    evidenceNameInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
   }
   if (!category) { 
     missing.push("Category"); 
     categorySelect.style.border = "2px solid #ef4444";
-    categorySelect.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+    categorySelect.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
   }
   if (!indicator) { 
     missing.push("Indicator"); 
     indicatorSelect.style.border = "2px solid #ef4444";
-    indicatorSelect.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+    indicatorSelect.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
   }
   if (!subCounty) { 
     missing.push("Sub-County"); 
     subCountySelect.style.border = "2px solid #ef4444";
-    subCountySelect.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+    subCountySelect.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
   }
   if (!files.length) { 
     missing.push("PDF File(s)"); 
     filesInput.style.border = "2px solid #ef4444";
-    filesInput.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+    filesInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
   }
 
   if (missing.length > 0) {
@@ -269,6 +270,10 @@ uploadBtn.addEventListener("click", () => {
     if (file.size > 30 * 1024 * 1024) return showError(`⚠ ${file.name} exceeds the 30MB limit.`);
   }
 
+  // Disable button and show loading
+  uploadBtn.classList.add('loading');
+  uploadBtn.disabled = true;
+  
   spinner.style.display = "block";
   progressContainer.style.display = "block";
   uploadText.style.display = "block";
@@ -303,6 +308,10 @@ uploadBtn.addEventListener("click", () => {
     setTimeout(() => {
       progressContainer.style.display = "none";
       uploadText.style.display = "none";
+      
+      // Re-enable button
+      uploadBtn.classList.remove('loading');
+      uploadBtn.disabled = false;
 
       if (xhr.status >= 200 && xhr.status < 300) {
         showSuccess(`✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`);
@@ -320,6 +329,8 @@ uploadBtn.addEventListener("click", () => {
 
   xhr.onerror = () => {
     spinner.style.display = "none";
+    uploadBtn.classList.remove('loading');
+    uploadBtn.disabled = false;
     showError("❌ Network error. Please try again.");
   };
 
@@ -329,6 +340,15 @@ uploadBtn.addEventListener("click", () => {
 // Add form submit prevention
 uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
+});
+
+// Add input validation for email
+officerEmailInput.addEventListener('blur', function() {
+  const email = this.value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    this.style.border = "2px solid #ef4444";
+    this.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
+  }
 });
 </script>
 
