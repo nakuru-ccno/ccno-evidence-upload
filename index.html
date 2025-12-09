@@ -266,6 +266,7 @@ let hasUnsavedChanges = false;
 let uploadStartTime = 0;
 let deferredPrompt = null;
 let isOnline = navigator.onLine;
+let indicatorsData = null; // Store indicators JSON data globally
 
 // Disposable email domains for validation
 const disposableDomains = ['tempmail', 'mailinator', 'guerrillamail', '10minutemail', 'yopmail', 'sharklasers', 'maildrop'];
@@ -475,17 +476,20 @@ function updateFilePreview() {
 // ========== DRAG & DROP SUPPORT ==========
 fileDropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
+    fileDropZone.classList.add('drag-over');
     fileDropZone.style.backgroundColor = '#f0f9ff';
     fileDropZone.style.borderColor = '#3b82f6';
 });
 
 fileDropZone.addEventListener('dragleave', () => {
+    fileDropZone.classList.remove('drag-over');
     fileDropZone.style.backgroundColor = '';
     fileDropZone.style.borderColor = '';
 });
 
 fileDropZone.addEventListener('drop', (e) => {
     e.preventDefault();
+    fileDropZone.classList.remove('drag-over');
     fileDropZone.style.backgroundColor = '';
     fileDropZone.style.borderColor = '';
     
@@ -582,6 +586,8 @@ evidenceNameInput.addEventListener('input', function() {
 categorySelect.addEventListener('change', function() {
     if (this.value) {
         showValidation(this, 'Category selected', 'success');
+        // Update indicators immediately
+        updateIndicators(this.value);
     }
 });
 
@@ -597,7 +603,7 @@ subCountySelect.addEventListener('change', function() {
     }
 });
 
-// ========== FEATURE 3: AUTO-SAVE DRAFT WITH DEBOUNCE ==========
+// ========== FEATURE 3: FIXED AUTO-SAVE DRAFT ==========
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -629,31 +635,33 @@ function saveDraft() {
 function loadDraft() {
     const draft = JSON.parse(localStorage.getItem('uploadDraft'));
     if (draft && draft.csrfToken === csrfToken) {
+        // Load basic fields
         officerEmailInput.value = draft.officerEmail || '';
         evidenceNameInput.value = draft.evidenceName || '';
-        categorySelect.value = draft.category || '';
-        indicatorSelect.value = draft.indicator || '';
         subCountySelect.value = draft.subCounty || '';
         
-        // Update indicators if category is selected
-        if (draft.category) {
+        // Load category and indicator
+        if (draft.category && indicatorsData && indicatorsData[draft.category]) {
+            categorySelect.value = draft.category;
             updateIndicators(draft.category);
+            
+            // Set indicator after a short delay to ensure options are loaded
+            setTimeout(() => {
+                if (draft.indicator) {
+                    indicatorSelect.value = draft.indicator;
+                }
+                // Show success status
+                showSaveStatus('Draft loaded', 'saved');
+            }, 100);
+        } else {
+            categorySelect.value = draft.category || '';
+            indicatorSelect.value = draft.indicator || '';
+            showSaveStatus('Draft loaded', 'saved');
         }
         
-        // Show draft badge
-        showSaveStatus('Draft loaded', 'saved');
+        return true;
     }
-}
-
-function confirmDraftLoad() {
-    const draft = JSON.parse(localStorage.getItem('uploadDraft'));
-    if (draft && Object.values(draft).some(val => val && val !== csrfToken)) {
-        if (confirm('Found a saved draft. Would you like to restore it?')) {
-            loadDraft();
-        } else {
-            clearDraft();
-        }
-    }
+    return false;
 }
 
 function showSaveStatus(message, type = 'saved') {
@@ -677,9 +685,15 @@ const debouncedSave = debounce(() => {
     }
 }, 1500);
 
-// Auto-save on input
-['input', 'change'].forEach(event => {
-    uploadForm.addEventListener(event, function(e) {
+// Auto-save on input - FIXED to include ALL form elements
+const formElements = [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput];
+
+formElements.forEach(element => {
+    element.addEventListener('input', () => {
+        hasUnsavedChanges = true;
+        debouncedSave();
+    });
+    element.addEventListener('change', () => {
         hasUnsavedChanges = true;
         debouncedSave();
     });
@@ -689,7 +703,6 @@ const debouncedSave = debounce(() => {
 window.addEventListener('beforeunload', function(e) {
     if (hasUnsavedChanges) {
         saveDraft();
-        // Don't show confirmation for draft saves
     }
 });
 
@@ -858,6 +871,8 @@ function checkRateLimit() {
 fetch("indicators.json")
   .then(res => res.json())
   .then(data => {
+    indicatorsData = data; // Store globally for draft loading
+    
     Object.keys(data).forEach(category => {
       const opt = document.createElement("option");
       opt.value = category;
@@ -894,6 +909,13 @@ fetch("indicators.json")
         });
       }
     };
+    
+    // After loading categories, check for draft
+    const draft = JSON.parse(localStorage.getItem('uploadDraft'));
+    if (draft && draft.csrfToken === csrfToken) {
+        // Auto-load draft without popup
+        loadDraft();
+    }
   })
   .catch(err => {
     console.error("Error loading indicators.json:", err);
@@ -1185,7 +1207,7 @@ uploadForm.addEventListener("submit", (e) => {
 
 // Initialize on page load
 window.addEventListener('load', () => {
-  confirmDraftLoad();
+  // NO MORE ANNOYING POPUP - draft loads automatically if available
   loadHistory();
   checkOfflineQueue();
   
