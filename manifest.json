@@ -2,22 +2,26 @@
   "name": "Nakuru County CCNO Evidence Upload",
   "short_name": "CCNO Evidence",
   "description": "Secure evidence upload system for Nakuru County Chief Nursing Office",
-  "start_url": "/index.html",
+  
+  // CRITICAL: Add the repository path
+  "start_url": "/ccno-evidence-upload/index.html",
+  "scope": "/ccno-evidence-upload/",
+  
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
   "orientation": "portrait",
-  "scope": "/",
   
   "icons": [
     {
-      "src": "/icon-192.png",
+      // Remove leading slash for GitHub Pages
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
@@ -30,7 +34,8 @@
       "name": "Upload Evidence",
       "short_name": "Upload",
       "description": "Upload new evidence",
-      "url": "/index.html"
+      // Use full path with repository name
+      "url": "/ccno-evidence-upload/index.html"
     }
   ]
 }
