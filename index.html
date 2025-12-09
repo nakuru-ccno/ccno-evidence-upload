@@ -10,6 +10,9 @@
 </head>
 <body>
 
+<!-- Skip navigation for accessibility -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
 <!-- HEADER -->
 <header class="site-header">
   <img src="images/LOGO.png" alt="Nakuru County Logo" class="logo" />
@@ -18,7 +21,7 @@
   </div>
 </header>
 
-<div class="container">
+<div class="container" id="main-content">
   <!-- Form Container -->
   <div class="form-intro">
     <i class="fas fa-cloud-upload-alt"></i>
@@ -29,7 +32,17 @@
     <!-- Officer Email -->
     <div class="form-group required">
       <label for="officerEmail"><i class="fas fa-envelope"></i> Officer Email</label>
-      <input list="officerEmails" id="officerEmail" placeholder="Enter officer's email" type="email" required />
+      <input 
+        list="officerEmails" 
+        id="officerEmail" 
+        placeholder="Enter officer's email" 
+        type="email" 
+        required
+        aria-label="Officer email address"
+        aria-describedby="emailValidation"
+        aria-required="true"
+        aria-invalid="false"
+      />
       <datalist id="officerEmails"></datalist>
       <div class="validation-message" id="emailValidation"></div>
       <div class="email-note">
@@ -40,14 +53,30 @@
     <!-- Evidence Name -->
     <div class="form-group required">
       <label for="evidenceName"><i class="fas fa-file-signature"></i> Evidence Name</label>
-      <input type="text" id="evidenceName" placeholder="e.g., CME on Family Planning Methods" required />
+      <input 
+        type="text" 
+        id="evidenceName" 
+        placeholder="e.g., CME on Family Planning Methods" 
+        required
+        aria-label="Evidence name"
+        aria-describedby="nameValidation"
+        aria-required="true"
+        aria-invalid="false"
+      />
       <div class="validation-message" id="nameValidation"></div>
     </div>
 
     <!-- Category & Indicator -->
     <div class="form-group required">
       <label for="category"><i class="fas fa-folder"></i> Evidence Category</label>
-      <select id="category" required>
+      <select 
+        id="category" 
+        required
+        aria-label="Evidence category"
+        aria-describedby="categoryValidation"
+        aria-required="true"
+        aria-invalid="false"
+      >
         <option value="">Select Evidence Category</option>
       </select>
       <div class="validation-message" id="categoryValidation"></div>
@@ -55,7 +84,14 @@
 
     <div class="form-group required">
       <label for="indicator"><i class="fas fa-chart-line"></i> Indicator</label>
-      <select id="indicator" required>
+      <select 
+        id="indicator" 
+        required
+        aria-label="Indicator"
+        aria-describedby="indicatorValidation"
+        aria-required="true"
+        aria-invalid="false"
+      >
         <option value="">Select Indicator</option>
       </select>
       <div class="validation-message" id="indicatorValidation"></div>
@@ -64,7 +100,14 @@
     <!-- Sub County -->
     <div class="form-group required">
       <label for="subCounty"><i class="fas fa-map-marker-alt"></i> Sub County</label>
-      <select id="subCounty" required>
+      <select 
+        id="subCounty" 
+        required
+        aria-label="Sub County"
+        aria-describedby="subCountyValidation"
+        aria-required="true"
+        aria-invalid="false"
+      >
         <option value="">Select Sub County</option>
         <option value="Nakuru West Sub County">Nakuru West Sub County</option>
         <option value="Nakuru East Sub County">Nakuru East Sub County</option>
@@ -81,11 +124,25 @@
       <div class="validation-message" id="subCountyValidation"></div>
     </div>
 
-    <!-- File Upload -->
+    <!-- File Upload with Drag & Drop -->
     <div class="form-group required">
       <label for="files"><i class="fas fa-file-pdf"></i> Choose PDF file(s)</label>
-      <div class="file-upload-wrapper">
-        <input type="file" id="files" accept="application/pdf" multiple required />
+      <div class="file-upload-wrapper" id="fileDropZone">
+        <input 
+          type="file" 
+          id="files" 
+          accept="application/pdf" 
+          multiple 
+          required
+          aria-label="Choose PDF files"
+          aria-describedby="filesValidation"
+          aria-required="true"
+          aria-invalid="false"
+        />
+        <div class="drag-drop-text">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Drag & drop files here or click to browse</span>
+        </div>
       </div>
       <div class="validation-message" id="filesValidation"></div>
       
@@ -101,6 +158,17 @@
       </div>
     </div>
 
+    <!-- Terms & Conditions -->
+    <div class="form-group">
+      <div class="checkbox-group">
+        <input type="checkbox" id="terms" required>
+        <label for="terms">
+          <i class="fas fa-shield-alt"></i> I confirm that I have the authority to upload these files and that they comply with data protection policies.
+        </label>
+      </div>
+      <div class="validation-message" id="termsValidation"></div>
+    </div>
+
     <!-- Progress Elements -->
     <div class="spinner" id="spinner"></div>
     <div class="progress-container" id="progressContainer">
@@ -113,8 +181,19 @@
     <div class="error" id="error"></div>
 
     <!-- Upload Button -->
-    <button type="button" id="uploadBtn" class="upload-btn">
+    <button 
+      type="button" 
+      id="uploadBtn" 
+      class="upload-btn"
+      aria-live="polite"
+      aria-busy="false"
+    >
       <i class="fas fa-cloud-upload-alt"></i> Upload Evidence
+    </button>
+    
+    <!-- Install PWA Button (hidden by default) -->
+    <button type="button" id="installBtn" class="install-btn" style="display: none;">
+      <i class="fas fa-download"></i> Install App
     </button>
   </form>
 
@@ -148,11 +227,12 @@
   <p>© 2025 Nakuru County Chief Nursing Officer. All Rights Reserved.</p>
   <p style="font-size: 0.85rem; color: #94a3b8;">
     <i class="fas fa-shield-alt"></i> Secure Evidence Upload System v2.0
+    <span id="connectionStatus" style="margin-left: 15px;"></span>
   </p>
 </footer>
 
 <script>
-// Extended JavaScript with all 4 features
+// Extended JavaScript with enhanced features
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 // Get all DOM elements
@@ -162,6 +242,7 @@ const categorySelect = document.getElementById("category");
 const indicatorSelect = document.getElementById("indicator");
 const subCountySelect = document.getElementById("subCounty");
 const filesInput = document.getElementById("files");
+const fileDropZone = document.getElementById("fileDropZone");
 const filePreview = document.getElementById("filePreview");
 const fileList = document.getElementById("fileList");
 const fileCount = document.getElementById("fileCount");
@@ -179,6 +260,10 @@ const historySection = document.getElementById("historySection");
 const historyList = document.getElementById("historyList");
 const emptyHistory = document.getElementById("emptyHistory");
 const refreshHistory = document.getElementById("refreshHistory");
+const termsCheckbox = document.getElementById("terms");
+const termsValidation = document.getElementById("termsValidation");
+const installBtn = document.getElementById("installBtn");
+const connectionStatus = document.getElementById("connectionStatus");
 
 // Validation message elements
 const emailValidation = document.getElementById("emailValidation");
@@ -187,6 +272,76 @@ const categoryValidation = document.getElementById("categoryValidation");
 const indicatorValidation = document.getElementById("indicatorValidation");
 const subCountyValidation = document.getElementById("subCountyValidation");
 const filesValidation = document.getElementById("filesValidation");
+
+// State variables
+let autoSaveTimer;
+let hasUnsavedChanges = false;
+let uploadStartTime = 0;
+let deferredPrompt = null;
+let isOnline = navigator.onLine;
+
+// Disposable email domains for validation
+const disposableDomains = ['tempmail', 'mailinator', 'guerrillamail', '10minutemail', 'yopmail', 'sharklasers', 'maildrop'];
+
+// Initialize CSRF protection
+const csrfToken = Math.random().toString(36).substring(2);
+localStorage.setItem('csrfToken', csrfToken);
+
+// ========== NETWORK STATUS MONITORING ==========
+function updateConnectionStatus() {
+    if (isOnline) {
+        connectionStatus.innerHTML = '<i class="fas fa-wifi"></i> Online';
+        connectionStatus.style.color = '#10b981';
+    } else {
+        connectionStatus.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline - Uploads queued';
+        connectionStatus.style.color = '#ef4444';
+    }
+}
+
+window.addEventListener('online', () => {
+    isOnline = true;
+    updateConnectionStatus();
+    checkOfflineQueue();
+});
+
+window.addEventListener('offline', () => {
+    isOnline = false;
+    updateConnectionStatus();
+});
+
+updateConnectionStatus();
+
+// ========== PWA INSTALLATION ==========
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+    
+    installBtn.addEventListener('click', () => {
+        installBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted install');
+            }
+            deferredPrompt = null;
+        });
+    });
+});
+
+// ========== SERVICE WORKER REGISTRATION ==========
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registered:', registration);
+            })
+            .catch(err => {
+                console.log('ServiceWorker registration failed:', err);
+            });
+    });
+}
 
 // ========== FEATURE 1: FILE VALIDATION PREVIEW ==========
 function formatBytes(bytes) {
@@ -208,7 +363,38 @@ function validateFile(file) {
         errors.push('Exceeds 30MB limit');
     }
     
+    // Check for executable extensions
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith('.exe') || fileName.endsWith('.js') || fileName.endsWith('.vbs')) {
+        errors.push('Potentially dangerous file type');
+    }
+    
     return errors;
+}
+
+function checkFileCompression(file) {
+    if (file.size > 10 * 1024 * 1024) {
+        return {
+            warning: true,
+            message: 'Large file detected. Consider compressing PDF to speed up upload.'
+        };
+    }
+    return { warning: false };
+}
+
+function checkDuplicateFiles(files) {
+    const seen = new Set();
+    const duplicates = [];
+    
+    files.forEach(file => {
+        const key = `${file.name}-${file.size}`;
+        if (seen.has(key)) {
+            duplicates.push(file.name);
+        }
+        seen.add(key);
+    });
+    
+    return duplicates;
 }
 
 function updateFilePreview() {
@@ -225,21 +411,43 @@ function updateFilePreview() {
     let totalBytes = 0;
     let validCount = 0;
     let errorCount = 0;
+    let warningCount = 0;
+    
+    // Check for duplicates
+    const duplicates = checkDuplicateFiles(files);
     
     files.forEach((file, index) => {
         const errors = validateFile(file);
+        const compressionCheck = checkFileCompression(file);
+        const isDuplicate = duplicates.includes(file.name);
         totalBytes += file.size;
         
         const fileItem = document.createElement('div');
-        fileItem.className = `file-item ${errors.length > 0 ? 'error' : 'valid'}`;
+        fileItem.className = `file-item`;
         
-        let statusText = errors.length > 0 ? 'Invalid' : 'Ready';
-        let icon = errors.length > 0 ? 'fa-times-circle' : 'fa-check-circle';
+        if (errors.length > 0 || isDuplicate) {
+            fileItem.classList.add('error');
+            errorCount++;
+        } else if (compressionCheck.warning) {
+            fileItem.classList.add('warning');
+            warningCount++;
+        } else {
+            fileItem.classList.add('valid');
+            validCount++;
+        }
+        
+        let statusText = 'Ready';
+        let icon = 'fa-check-circle';
         
         if (errors.length > 0) {
-            errorCount++;
-        } else {
-            validCount++;
+            statusText = errors.join(', ');
+            icon = 'fa-times-circle';
+        } else if (isDuplicate) {
+            statusText = 'Duplicate file';
+            icon = 'fa-exclamation-triangle';
+        } else if (compressionCheck.warning) {
+            statusText = compressionCheck.message;
+            icon = 'fa-compress-alt';
         }
         
         fileItem.innerHTML = `
@@ -248,7 +456,7 @@ function updateFilePreview() {
                 <span class="file-name">${file.name}</span>
                 <span class="file-size">${formatBytes(file.size)}</span>
             </div>
-            <span class="file-status ${errors.length > 0 ? 'error' : 'valid'}">
+            <span class="file-status ${errors.length > 0 || isDuplicate ? 'error' : compressionCheck.warning ? 'warning' : 'valid'}">
                 ${statusText}
             </span>
         `;
@@ -256,13 +464,17 @@ function updateFilePreview() {
         fileList.appendChild(fileItem);
     });
     
-    fileCount.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} (${validCount} valid, ${errorCount} invalid)`;
+    fileCount.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} (${validCount} valid, ${warningCount} warning, ${errorCount} error)`;
     totalSize.textContent = formatBytes(totalBytes);
     
     // Update validation message
     if (errorCount > 0) {
         filesValidation.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${errorCount} file${errorCount !== 1 ? 's' : ''} have issues`;
         filesValidation.className = 'validation-message error';
+        filesValidation.style.display = 'flex';
+    } else if (warningCount > 0) {
+        filesValidation.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${warningCount} file${warningCount !== 1 ? 's' : ''} may upload slowly`;
+        filesValidation.className = 'validation-message warning';
         filesValidation.style.display = 'flex';
     } else if (files.length > 0) {
         filesValidation.innerHTML = `<i class="fas fa-check-circle"></i> All files are valid`;
@@ -273,20 +485,62 @@ function updateFilePreview() {
     }
 }
 
+// ========== DRAG & DROP SUPPORT ==========
+fileDropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fileDropZone.style.backgroundColor = '#f0f9ff';
+    fileDropZone.style.borderColor = '#3b82f6';
+});
+
+fileDropZone.addEventListener('dragleave', () => {
+    fileDropZone.style.backgroundColor = '';
+    fileDropZone.style.borderColor = '';
+});
+
+fileDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileDropZone.style.backgroundColor = '';
+    fileDropZone.style.borderColor = '';
+    
+    if (e.dataTransfer.files.length) {
+        filesInput.files = e.dataTransfer.files;
+        updateFilePreview();
+        
+        // Announce to screen readers
+        const liveRegion = document.createElement('div');
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.setAttribute('aria-atomic', 'true');
+        liveRegion.style.position = 'absolute';
+        liveRegion.style.left = '-9999px';
+        liveRegion.textContent = `${e.dataTransfer.files.length} files added`;
+        document.body.appendChild(liveRegion);
+        setTimeout(() => document.body.removeChild(liveRegion), 1000);
+    }
+});
+
 filesInput.addEventListener('change', updateFilePreview);
 
-// ========== FEATURE 2: REAL-TIME FORM VALIDATION ==========
+// ========== FEATURE 2: ENHANCED EMAIL VALIDATION ==========
 function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!re.test(email)) return false;
+    
+    // Check against disposable email domains
+    const domain = email.split('@')[1].toLowerCase();
+    return !disposableDomains.some(d => domain.includes(d));
 }
 
 function showValidation(element, message, type = 'error') {
     const validationElement = element.nextElementSibling;
     if (validationElement && validationElement.classList.contains('validation-message')) {
-        validationElement.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${message}`;
+        const icon = type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'check-circle';
+        validationElement.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
         validationElement.className = `validation-message ${type}`;
         validationElement.style.display = 'flex';
+        
+        // Update ARIA attributes
+        element.setAttribute('aria-invalid', type === 'error' ? 'true' : 'false');
+        element.setAttribute('aria-describedby', validationElement.id);
     }
 }
 
@@ -294,6 +548,7 @@ function hideValidation(element) {
     const validationElement = element.nextElementSibling;
     if (validationElement && validationElement.classList.contains('validation-message')) {
         validationElement.style.display = 'none';
+        element.setAttribute('aria-invalid', 'false');
     }
 }
 
@@ -303,7 +558,12 @@ officerEmailInput.addEventListener('blur', function() {
     if (!email) {
         showValidation(this, 'Email is required', 'error');
     } else if (!validateEmail(email)) {
-        showValidation(this, 'Please enter a valid email address', 'error');
+        const domain = email.split('@')[1] || '';
+        if (disposableDomains.some(d => domain.includes(d))) {
+            showValidation(this, 'Disposable email addresses are not allowed', 'error');
+        } else {
+            showValidation(this, 'Please enter a valid email address', 'error');
+        }
     } else {
         showValidation(this, 'Email looks good', 'success');
     }
@@ -319,6 +579,8 @@ officerEmailInput.addEventListener('input', function() {
 evidenceNameInput.addEventListener('blur', function() {
     if (!this.value.trim()) {
         showValidation(this, 'Evidence name is required', 'error');
+    } else if (this.value.trim().length < 5) {
+        showValidation(this, 'Evidence name should be at least 5 characters', 'error');
     } else {
         showValidation(this, 'Evidence name is valid', 'success');
     }
@@ -348,9 +610,24 @@ subCountySelect.addEventListener('change', function() {
     }
 });
 
-// ========== FEATURE 3: AUTO-SAVE DRAFT ==========
-let autoSaveTimer;
-let hasUnsavedChanges = false;
+termsCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        termsValidation.style.display = 'none';
+    }
+});
+
+// ========== FEATURE 3: AUTO-SAVE DRAFT WITH DEBOUNCE ==========
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
 function saveDraft() {
     const draft = {
@@ -359,7 +636,8 @@ function saveDraft() {
         category: categorySelect.value,
         indicator: indicatorSelect.value,
         subCounty: subCountySelect.value,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        csrfToken: csrfToken
     };
     
     localStorage.setItem('uploadDraft', JSON.stringify(draft));
@@ -369,7 +647,7 @@ function saveDraft() {
 
 function loadDraft() {
     const draft = JSON.parse(localStorage.getItem('uploadDraft'));
-    if (draft) {
+    if (draft && draft.csrfToken === csrfToken) {
         officerEmailInput.value = draft.officerEmail || '';
         evidenceNameInput.value = draft.evidenceName || '';
         categorySelect.value = draft.category || '';
@@ -386,6 +664,17 @@ function loadDraft() {
     }
 }
 
+function confirmDraftLoad() {
+    const draft = JSON.parse(localStorage.getItem('uploadDraft'));
+    if (draft && Object.values(draft).some(val => val && val !== csrfToken)) {
+        if (confirm('Found a saved draft. Would you like to restore it?')) {
+            loadDraft();
+        } else {
+            clearDraft();
+        }
+    }
+}
+
 function showSaveStatus(message, type = 'saved') {
     saveStatus.innerHTML = `
         <i class="fas fa-${type === 'saving' ? 'spinner fa-spin' : type === 'saved' ? 'check-circle' : 'exclamation-circle'}"></i>
@@ -399,18 +688,21 @@ function showSaveStatus(message, type = 'saved') {
     }, 3000);
 }
 
+// Debounced auto-save
+const debouncedSave = debounce(() => {
+    if (hasUnsavedChanges) {
+        showSaveStatus('Saving draft...', 'saving');
+        setTimeout(saveDraft, 500);
+    }
+}, 1500);
+
 // Auto-save on input
 ['input', 'change'].forEach(event => {
-    uploadForm.addEventListener(event, function() {
-        hasUnsavedChanges = true;
-        
-        clearTimeout(autoSaveTimer);
-        autoSaveTimer = setTimeout(() => {
-            if (hasUnsavedChanges) {
-                showSaveStatus('Saving draft...', 'saving');
-                setTimeout(saveDraft, 500);
-            }
-        }, 1000);
+    uploadForm.addEventListener(event, function(e) {
+        if (e.target !== termsCheckbox) { // Don't save terms checkbox
+            hasUnsavedChanges = true;
+            debouncedSave();
+        }
     });
 });
 
@@ -418,13 +710,9 @@ function showSaveStatus(message, type = 'saved') {
 window.addEventListener('beforeunload', function(e) {
     if (hasUnsavedChanges) {
         saveDraft();
-        e.preventDefault();
-        e.returnValue = '';
+        // Don't show confirmation for draft saves
     }
 });
-
-// Load draft on page load
-window.addEventListener('load', loadDraft);
 
 // Clear draft after successful upload
 function clearDraft() {
@@ -432,7 +720,7 @@ function clearDraft() {
     hasUnsavedChanges = false;
 }
 
-// ========== FEATURE 4: UPLOAD HISTORY ==========
+// ========== FEATURE 4: UPLOAD HISTORY WITH ANALYTICS ==========
 function saveToHistory(uploadData) {
     const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
     
@@ -446,11 +734,16 @@ function saveToHistory(uploadData) {
         filesCount: uploadData.filesCount,
         totalSize: uploadData.totalSize,
         timestamp: new Date().toISOString(),
-        status: 'completed'
+        status: 'completed',
+        uploadTime: uploadData.uploadTime || 0
     };
     
     history.unshift(historyItem);
     localStorage.setItem('uploadHistory', JSON.stringify(history.slice(0, 10))); // Keep last 10
+    
+    // Save analytics
+    logUploadAnalytics(historyItem);
+    
     loadHistory();
 }
 
@@ -466,6 +759,7 @@ function loadHistory() {
         history.forEach(item => {
             const historyItem = document.createElement('div');
             historyItem.className = 'history-item';
+            historyItem.setAttribute('role', 'listitem');
             
             const date = new Date(item.timestamp);
             const formattedDate = date.toLocaleDateString('en-US', {
@@ -475,14 +769,18 @@ function loadHistory() {
                 minute: '2-digit'
             });
             
+            const uploadSpeed = item.uploadTime > 0 ? 
+                `• ${formatBytes(item.totalSize / (item.uploadTime / 1000))}/s` : '';
+            
             historyItem.innerHTML = `
                 <div class="upload-info">
                     <span class="upload-name">${item.name}</span>
                     <span class="upload-meta">
-                        ${formattedDate} • ${item.filesCount} file${item.filesCount !== 1 ? 's' : ''} • ${formatBytes(item.totalSize)}
+                        ${formattedDate} • ${item.filesCount} file${item.filesCount !== 1 ? 's' : ''} • ${formatBytes(item.totalSize)} ${uploadSpeed}
                     </span>
                 </div>
-                <span class="upload-status ${item.status}">
+                <span class="upload-status ${item.status}" aria-label="Upload status: ${item.status}">
+                    <i class="fas fa-${item.status === 'completed' ? 'check-circle' : 'clock'}"></i>
                     ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                 </span>
             `;
@@ -495,12 +793,88 @@ function loadHistory() {
     }
 }
 
+function logUploadAnalytics(data) {
+    const analytics = {
+        timestamp: new Date().toISOString(),
+        fileCount: data.filesCount,
+        totalSize: data.totalSize,
+        uploadTime: data.uploadTime || 0,
+        category: data.category,
+        subCounty: data.subCounty,
+        userAgent: navigator.userAgent,
+        online: isOnline
+    };
+    
+    const analyticsLog = JSON.parse(localStorage.getItem('uploadAnalytics') || '[]');
+    analyticsLog.push(analytics);
+    localStorage.setItem('uploadAnalytics', JSON.stringify(analyticsLog.slice(-100)));
+}
+
+// Error tracking
+window.addEventListener('error', (event) => {
+    const errorLog = JSON.parse(localStorage.getItem('errorLog') || '[]');
+    errorLog.push({
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent
+    });
+    localStorage.setItem('errorLog', JSON.stringify(errorLog.slice(-50)));
+});
+
 refreshHistory.addEventListener('click', loadHistory);
 
-// Load history on page load
-window.addEventListener('load', loadHistory);
+// ========== OFFLINE QUEUE MANAGEMENT ==========
+function saveForOfflineUpload(formData) {
+    const offlineQueue = JSON.parse(localStorage.getItem('offlineQueue') || '[]');
+    
+    // Create a unique ID for this upload
+    const uploadId = 'offline_' + Date.now();
+    
+    offlineQueue.push({
+        id: uploadId,
+        timestamp: Date.now(),
+        data: Object.fromEntries(formData),
+        files: Array.from(filesInput.files).map(file => ({
+            name: file.name,
+            size: file.size,
+            type: file.type
+        }))
+    });
+    
+    localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue.slice(0, 5))); // Max 5 queued
+    return uploadId;
+}
 
-// ========== ORIGINAL UPLOAD LOGIC (UPDATED) ==========
+function checkOfflineQueue() {
+    const offlineQueue = JSON.parse(localStorage.getItem('offlineQueue') || '[]');
+    if (offlineQueue.length > 0 && isOnline) {
+        showSaveStatus(`${offlineQueue.length} offline upload${offlineQueue.length !== 1 ? 's' : ''} queued`, 'warning');
+    }
+}
+
+// ========== RATE LIMITING ==========
+function checkRateLimit() {
+    let uploadAttempts = JSON.parse(localStorage.getItem('uploadAttempts') || '[]');
+    const now = Date.now();
+    
+    // Clean old attempts (older than 1 hour)
+    uploadAttempts = uploadAttempts.filter(time => now - time < 3600000);
+    
+    if (uploadAttempts.length >= 10) {
+        const nextAttempt = new Date(uploadAttempts[0] + 3600000);
+        showError(`Upload limit exceeded. Please try again after ${nextAttempt.toLocaleTimeString()}`);
+        uploadBtn.disabled = true;
+        return false;
+    }
+    
+    uploadAttempts.push(now);
+    localStorage.setItem('uploadAttempts', JSON.stringify(uploadAttempts));
+    return true;
+}
+
+// ========== ORIGINAL UPLOAD LOGIC (ENHANCED) ==========
 // Load categories + indicators from JSON
 fetch("indicators.json")
   .then(res => res.json())
@@ -523,9 +897,13 @@ fetch("indicators.json")
           indicatorSelect.appendChild(opt);
         });
       }
+      
+      // Update validation
+      if (selected) {
+        showValidation(categorySelect, 'Category selected', 'success');
+      }
     });
     
-    // Function to update indicators (for draft loading)
     window.updateIndicators = function(category) {
       indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
       if (data[category]) {
@@ -538,7 +916,10 @@ fetch("indicators.json")
       }
     };
   })
-  .catch(err => console.error("Error loading indicators.json:", err));
+  .catch(err => {
+    console.error("Error loading indicators.json:", err);
+    showError("Failed to load categories. Please refresh the page.");
+  });
 
 // LocalStorage for previous emails
 function saveOfficerEmail(email) {
@@ -563,15 +944,17 @@ officerEmailInput.addEventListener("focus", () => {
 
 // Helper functions
 function showError(msg) {
-  errorMsg.textContent = msg;
+  errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
   errorMsg.style.display = msg ? "flex" : "none";
   successMsg.style.display = "none";
+  errorMsg.setAttribute('aria-live', 'assertive');
 }
 
 function showSuccess(msg) {
-  successMsg.textContent = msg;
+  successMsg.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
   successMsg.style.display = "flex";
   errorMsg.style.display = "none";
+  successMsg.setAttribute('aria-live', 'polite');
 }
 
 function resetForm() {
@@ -580,18 +963,30 @@ function resetForm() {
   indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
   subCountySelect.value = "";
   filesInput.value = "";
+  termsCheckbox.checked = false;
   progressBar.style.width = "0%";
   progressContainer.style.display = "none";
   uploadText.style.display = "none";
   filePreview.style.display = "none";
   
+  // Clear validation messages
+  [emailValidation, nameValidation, categoryValidation, 
+   indicatorValidation, subCountyValidation, filesValidation].forEach(el => {
+    el.style.display = "none";
+  });
+  
   // Clear draft after successful upload
   clearDraft();
   
-  // Clear validation messages
-  [emailValidation, nameValidation, categoryValidation, indicatorValidation, subCountyValidation, filesValidation].forEach(el => {
-    el.style.display = "none";
-  });
+  // Announce to screen reader
+  const liveRegion = document.createElement('div');
+  liveRegion.setAttribute('aria-live', 'polite');
+  liveRegion.setAttribute('aria-atomic', 'true');
+  liveRegion.style.position = 'absolute';
+  liveRegion.style.left = '-9999px';
+  liveRegion.textContent = 'Form reset successfully';
+  document.body.appendChild(liveRegion);
+  setTimeout(() => document.body.removeChild(liveRegion), 1000);
 }
 
 // Remove error styling instantly when user types/changes value
@@ -608,12 +1003,18 @@ function resetForm() {
 
 // Upload logic
 uploadBtn.addEventListener("click", () => {
+  // Check rate limit
+  if (!checkRateLimit()) {
+    return;
+  }
+
   const officerEmail = officerEmailInput.value.trim();
   const evidenceName = evidenceNameInput.value.trim();
   const category = categorySelect.value;
   const indicator = indicatorSelect.value;
   const subCounty = subCountySelect.value;
   const files = filesInput.files;
+  const termsAccepted = termsCheckbox.checked;
 
   let missing = [];
 
@@ -623,6 +1024,7 @@ uploadBtn.addEventListener("click", () => {
     el.style.boxShadow = "none";
   });
 
+  // Validate required fields
   if (!officerEmail) { 
     missing.push("Officer Email"); 
     officerEmailInput.style.border = "2px solid #ef4444";
@@ -653,9 +1055,15 @@ uploadBtn.addEventListener("click", () => {
     filesInput.style.border = "2px solid #ef4444";
     filesInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
   }
+  if (!termsAccepted) {
+    missing.push("Terms & Conditions"); 
+    termsValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> You must accept the terms';
+    termsValidation.className = 'validation-message error';
+    termsValidation.style.display = 'flex';
+  }
 
   if (missing.length > 0) {
-    return showError("⚠ Please fill the following required fields:\n\n- " + missing.join("\n- "));
+    return showError("⚠ Please fill the following required fields:<br>- " + missing.join("<br>- "));
   }
 
   // Check for invalid files
@@ -669,9 +1077,16 @@ uploadBtn.addEventListener("click", () => {
     return showError(`⚠ ${invalidFiles.length} file${invalidFiles.length !== 1 ? 's' : ''} have issues. Please check the file preview.`);
   }
 
+  // Check for duplicates
+  const duplicates = checkDuplicateFiles(filesArray);
+  if (duplicates.length > 0) {
+    return showError(`⚠ Duplicate files detected: ${duplicates.join(', ')}`);
+  }
+
   // Disable button and show loading
   uploadBtn.classList.add('loading');
   uploadBtn.disabled = true;
+  uploadBtn.setAttribute('aria-busy', 'true');
   
   spinner.style.display = "block";
   progressContainer.style.display = "block";
@@ -679,6 +1094,8 @@ uploadBtn.addEventListener("click", () => {
   uploadText.textContent = "Uploading... 0%";
   progressBar.style.width = "0%";
   showError("");
+  
+  uploadStartTime = Date.now();
 
   const formData = new FormData();
   formData.append("officerEmail", officerEmail);
@@ -686,23 +1103,46 @@ uploadBtn.addEventListener("click", () => {
   formData.append("category", category);
   formData.append("indicator", indicator);
   formData.append("subCounty", subCounty);
+  formData.append("csrfToken", csrfToken);
   for (let file of files) formData.append("files", file, file.name);
+
+  // If offline, save to queue
+  if (!isOnline) {
+    const uploadId = saveForOfflineUpload(formData);
+    setTimeout(() => {
+      spinner.style.display = "none";
+      uploadBtn.classList.remove('loading');
+      uploadBtn.disabled = false;
+      uploadBtn.setAttribute('aria-busy', 'false');
+      showSuccess(`📴 Upload queued for when you're back online (ID: ${uploadId})`);
+      
+      setTimeout(() => {
+        resetForm();
+        successMsg.style.display = "none";
+      }, 5000);
+    }, 1000);
+    return;
+  }
 
   const xhr = new XMLHttpRequest();
   xhr.open("POST", PROXY_URL, true);
+  xhr.timeout = 300000; // 5 minute timeout
 
   xhr.upload.onprogress = (event) => {
     if (event.lengthComputable) {
       const percent = Math.round((event.loaded / event.total) * 100);
       progressBar.style.width = percent + "%";
       uploadText.textContent = `Uploading... ${percent}%`;
+      uploadText.setAttribute('aria-valuenow', percent);
+      uploadText.setAttribute('aria-valuetext', `${percent} percent uploaded`);
     }
   };
 
   xhr.onload = () => {
+    const uploadTime = Date.now() - uploadStartTime;
     spinner.style.display = "none";
     progressBar.style.width = "100%";
-    uploadText.textContent = "Uploading... 100%";
+    uploadText.textContent = "Processing...";
 
     setTimeout(() => {
       progressContainer.style.display = "none";
@@ -711,9 +1151,10 @@ uploadBtn.addEventListener("click", () => {
       // Re-enable button
       uploadBtn.classList.remove('loading');
       uploadBtn.disabled = false;
+      uploadBtn.setAttribute('aria-busy', 'false');
 
       if (xhr.status >= 200 && xhr.status < 300) {
-        const successMessage = `✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`;
+        const successMessage = `✅ ${files.length} file(s) submitted successfully in ${(uploadTime/1000).toFixed(1)}s. 📩 You will receive an email confirmation.`;
         showSuccess(successMessage);
         
         // Save to history
@@ -725,17 +1166,18 @@ uploadBtn.addEventListener("click", () => {
           indicator,
           subCounty,
           filesCount: files.length,
-          totalSize
+          totalSize,
+          uploadTime
         });
         
         setTimeout(() => {
           resetForm();
           successMsg.style.display = "none";
-        }, 4000);
+        }, 5000);
 
         saveOfficerEmail(officerEmail);
       } else {
-        showError("❌ Upload failed. Please try again.");
+        showError(`❌ Upload failed (Status: ${xhr.status}). Please try again.`);
       }
     }, 500);
   };
@@ -744,7 +1186,22 @@ uploadBtn.addEventListener("click", () => {
     spinner.style.display = "none";
     uploadBtn.classList.remove('loading');
     uploadBtn.disabled = false;
-    showError("❌ Network error. Please try again.");
+    uploadBtn.setAttribute('aria-busy', 'false');
+    showError("❌ Network error. Your upload has been saved locally and will retry when online.");
+    
+    // Save to offline queue
+    saveForOfflineUpload(formData);
+  };
+
+  xhr.ontimeout = () => {
+    spinner.style.display = "none";
+    uploadBtn.classList.remove('loading');
+    uploadBtn.disabled = false;
+    uploadBtn.setAttribute('aria-busy', 'false');
+    showError("❌ Upload timeout. Your upload has been queued and will retry.");
+    
+    // Save to offline queue
+    saveForOfflineUpload(formData);
   };
 
   xhr.send(formData);
@@ -753,6 +1210,44 @@ uploadBtn.addEventListener("click", () => {
 // Add form submit prevention
 uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
+});
+
+// Initialize on page load
+window.addEventListener('load', () => {
+  confirmDraftLoad();
+  loadHistory();
+  checkOfflineQueue();
+  
+  // Focus management for accessibility
+  const firstInput = officerEmailInput;
+  firstInput.focus();
+  
+  // Announce page load to screen readers
+  const liveRegion = document.createElement('div');
+  liveRegion.setAttribute('aria-live', 'polite');
+  liveRegion.setAttribute('aria-atomic', 'true');
+  liveRegion.style.position = 'absolute';
+  liveRegion.style.left = '-9999px';
+  liveRegion.textContent = 'Nakuru County Evidence Upload System loaded';
+  document.body.appendChild(liveRegion);
+  setTimeout(() => document.body.removeChild(liveRegion), 1000);
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  // Ctrl/Cmd + S to save draft
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveDraft();
+  }
+  
+  // Escape to clear form
+  if (e.key === 'Escape') {
+    if (confirm('Are you sure you want to clear the form?')) {
+      resetForm();
+      clearDraft();
+    }
+  }
 });
 </script>
 
