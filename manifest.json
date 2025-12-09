@@ -34,7 +34,7 @@
       "name": "Upload Evidence",
       "short_name": "Upload",
       "description": "Upload new evidence",
-      // Use full path with repository name
+ 
       "url": "/ccno-evidence-upload/index.html"
     }
   ]
