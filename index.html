@@ -4,23 +4,25 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CCNO Evidence Upload Portal</title>
-<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+<!-- PWA Configuration with ABSOLUTE paths -->
+<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="style.css">
-  <!-- Add these lines to your head section -->
+<link rel="stylesheet" href="/style.css">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#4f46e5">
 
-<!-- For iOS -->
+<!-- iOS Support -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/images/LOGO.png">
 
-<!-- For Windows -->
+<!-- Windows Support -->
 <meta name="msapplication-TileColor" content="#4f46e5">
-<meta name="msapplication-TileImage" content="/icon-144.png">
-     <!-- Android PWA -->
-    <meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileImage" content="/images/LOGO.png">
+
+<!-- Android PWA -->
+<meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
 
@@ -29,7 +31,7 @@
 
 <!-- HEADER -->
 <header class="site-header">
-  <img src="images/LOGO.png" alt="Nakuru County Logo" class="logo" />
+  <img src="/images/LOGO.png" alt="Nakuru County Logo" class="logo" />
   <div class="header-texts">
     <h1>Nakuru County CCNO PC Evidence Upload System</h1>
   </div>
@@ -233,12 +235,37 @@
     <span id="connectionStatus" style="margin-left: 15px;"></span>
   </p>
 </footer>
+
 <script>
+// ===== BASE URL DETECTION =====
+const IS_PWA = window.matchMedia('(display-mode: standalone)').matches;
+const BASE_URL = window.location.origin; // Automatically gets https://pce.nakurucountychiefnursingofficer.site/
+
+console.log('Running as PWA:', IS_PWA);
+console.log('Base URL:', BASE_URL);
+
+// ===== FIX ALL PATHS FOR ANDROID PWA =====
+function fixPath(path) {
+  // If path is already absolute or starts with http, return as is
+  if (path.startsWith('http') || path.startsWith('//')) {
+    return path;
+  }
+  
+  // If path starts with slash, make it absolute
+  if (path.startsWith('/')) {
+    return BASE_URL + path;
+  }
+  
+  // Relative path, make it absolute
+  return BASE_URL + '/' + path;
+}
+
 // ===== SERVICE WORKER REGISTRATION =====
 if ('serviceWorker' in navigator) {
-  const swUrl = '/ccno-evidence-upload/sw.js';
-  
   window.addEventListener('load', () => {
+    // Use absolute path for service worker
+    const swUrl = fixPath('/sw.js');
+    
     navigator.serviceWorker.register(swUrl)
       .then(registration => {
         console.log('✅ Service Worker registered:', registration);
@@ -251,7 +278,9 @@ if ('serviceWorker' in navigator) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // New update available
-              showUpdateNotification();
+              if (confirm('A new version is available! Reload to update?')) {
+                window.location.reload();
+              }
             }
           });
         });
@@ -260,139 +289,9 @@ if ('serviceWorker' in navigator) {
         console.error('❌ Service Worker registration failed:', error);
       });
   });
-  
-  // Listen for controller change
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log('🔄 Service Worker controller changed');
-    window.location.reload();
-  });
 }
 
-// ===== OFFLINE DETECTION =====
-window.addEventListener('online', () => {
-  console.log('✅ Back online');
-  document.body.classList.remove('offline');
-  showToast('You are back online', 'success');
-});
-
-window.addEventListener('offline', () => {
-  console.log('⚠️ You are offline');
-  document.body.classList.add('offline');
-  showToast('You are offline. Some features may not work.', 'warning');
-});
-
-// ===== PWA INSTALLATION =====
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  
-  // Show install button if you have one
-  const installBtn = document.getElementById('installBtn');
-  if (installBtn) {
-    installBtn.style.display = 'flex';
-    installBtn.addEventListener('click', installApp);
-  }
-  
-  console.log('📱 PWA install prompt available');
-});
-
-function installApp() {
-  if (!deferredPrompt) return;
-  
-  deferredPrompt.prompt();
-  
-  deferredPrompt.userChoice.then((choiceResult) => {
-    if (choiceResult.outcome === 'accepted') {
-      console.log('✅ User accepted PWA install');
-      localStorage.setItem('pwaInstalled', 'true');
-    } else {
-      console.log('❌ User dismissed PWA install');
-    }
-    deferredPrompt = null;
-    
-    // Hide install button
-    const installBtn = document.getElementById('installBtn');
-    if (installBtn) installBtn.style.display = 'none';
-  });
-}
-
-// ===== CHECK IF RUNNING AS PWA =====
-function checkDisplayMode() {
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    console.log('📱 Running as installed PWA');
-    document.body.classList.add('pwa-installed');
-  }
-}
-
-// ===== HELPER FUNCTIONS =====
-function showUpdateNotification() {
-  if (confirm('A new version is available. Reload to update?')) {
-    window.location.reload();
-  }
-}
-
-function showToast(message, type = 'info') {
-  // Create toast element
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  toast.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 20px;
-    background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
-    color: white;
-    border-radius: 8px;
-    z-index: 1000;
-    animation: slideIn 0.3s ease;
-  `;
-  
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
-
-// ===== INITIALIZE =====
-document.addEventListener('DOMContentLoaded', () => {
-  checkDisplayMode();
-  
-  // Add CSS for offline mode
-  const style = document.createElement('style');
-  style.textContent = `
-    body.offline::before {
-      content: "⚠️ Offline";
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: #f59e0b;
-      color: white;
-      text-align: center;
-      padding: 5px;
-      z-index: 1000;
-      font-size: 12px;
-    }
-    
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  `;
-  document.head.appendChild(style);
-});
-
-// ===== CHECK INITIAL CONNECTION STATUS =====
-if (!navigator.onLine) {
-  document.body.classList.add('offline');
-  console.log('⚠️ Started offline');
-}
-</script>
-<script>
-// Extended JavaScript with enhanced features
+// ===== MAIN APPLICATION SCRIPT =====
 const PROXY_URL = "https://nccnoproxyy.onrender.com/upload-evidence";
 
 // Get all DOM elements
@@ -423,36 +322,19 @@ const refreshHistory = document.getElementById("refreshHistory");
 const installBtn = document.getElementById("installBtn");
 const connectionStatus = document.getElementById("connectionStatus");
 
-// Validation message elements
-const emailValidation = document.getElementById("emailValidation");
-const nameValidation = document.getElementById("nameValidation");
-const categoryValidation = document.getElementById("categoryValidation");
-const indicatorValidation = document.getElementById("indicatorValidation");
-const subCountyValidation = document.getElementById("subCountyValidation");
-const filesValidation = document.getElementById("filesValidation");
-
 // State variables
-let autoSaveTimer;
-let hasUnsavedChanges = false;
-let uploadStartTime = 0;
-let deferredPrompt = null;
+let indicatorsData = null;
 let isOnline = navigator.onLine;
-let indicatorsData = null; // Store indicators JSON data globally
-
-// Disposable email domains for validation
-const disposableDomains = ['tempmail', 'mailinator', 'guerrillamail', '10minutemail', 'yopmail', 'sharklasers', 'maildrop'];
-
-// Initialize CSRF protection
 const csrfToken = Math.random().toString(36).substring(2);
 localStorage.setItem('csrfToken', csrfToken);
 
-// ========== NETWORK STATUS MONITORING ==========
+// ===== NETWORK STATUS =====
 function updateConnectionStatus() {
     if (isOnline) {
         connectionStatus.innerHTML = '<i class="fas fa-wifi"></i> Online';
         connectionStatus.style.color = '#10b981';
     } else {
-        connectionStatus.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline - Uploads queued';
+        connectionStatus.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline';
         connectionStatus.style.color = '#ef4444';
     }
 }
@@ -468,92 +350,13 @@ window.addEventListener('offline', () => {
     updateConnectionStatus();
 });
 
-updateConnectionStatus();
-
-// ========== PWA INSTALLATION ==========
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'block';
-    
-    installBtn.addEventListener('click', () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-        
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted install');
-            }
-            deferredPrompt = null;
-        });
-    });
-});
-
-// ========== SERVICE WORKER REGISTRATION ==========
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('ServiceWorker registered:', registration);
-            })
-            .catch(err => {
-                console.log('ServiceWorker registration failed:', err);
-            });
-    });
-}
-
-// ========== FEATURE 1: FILE VALIDATION PREVIEW ==========
+// ===== FILE HANDLING =====
 function formatBytes(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-function validateFile(file) {
-    const errors = [];
-    
-    if (file.type !== 'application/pdf') {
-        errors.push('Not a PDF file');
-    }
-    
-    if (file.size > 30 * 1024 * 1024) {
-        errors.push('Exceeds 30MB limit');
-    }
-    
-    // Check for executable extensions
-    const fileName = file.name.toLowerCase();
-    if (fileName.endsWith('.exe') || fileName.endsWith('.js') || fileName.endsWith('.vbs')) {
-        errors.push('Potentially dangerous file type');
-    }
-    
-    return errors;
-}
-
-function checkFileCompression(file) {
-    if (file.size > 10 * 1024 * 1024) {
-        return {
-            warning: true,
-            message: 'Large file detected. Consider compressing PDF to speed up upload.'
-        };
-    }
-    return { warning: false };
-}
-
-function checkDuplicateFiles(files) {
-    const seen = new Set();
-    const duplicates = [];
-    
-    files.forEach(file => {
-        const key = `${file.name}-${file.size}`;
-        if (seen.has(key)) {
-            duplicates.push(file.name);
-        }
-        seen.add(key);
-    });
-    
-    return duplicates;
 }
 
 function updateFilePreview() {
@@ -568,532 +371,100 @@ function updateFilePreview() {
     fileList.innerHTML = '';
     
     let totalBytes = 0;
-    let validCount = 0;
-    let errorCount = 0;
-    let warningCount = 0;
-    
-    // Check for duplicates
-    const duplicates = checkDuplicateFiles(files);
     
     files.forEach((file, index) => {
-        const errors = validateFile(file);
-        const compressionCheck = checkFileCompression(file);
-        const isDuplicate = duplicates.includes(file.name);
         totalBytes += file.size;
         
         const fileItem = document.createElement('div');
-        fileItem.className = `file-item`;
-        
-        if (errors.length > 0 || isDuplicate) {
-            fileItem.classList.add('error');
-            errorCount++;
-        } else if (compressionCheck.warning) {
-            fileItem.classList.add('warning');
-            warningCount++;
-        } else {
-            fileItem.classList.add('valid');
-            validCount++;
-        }
-        
-        let statusText = 'Ready';
-        let icon = 'fa-check-circle';
-        
-        if (errors.length > 0) {
-            statusText = errors.join(', ');
-            icon = 'fa-times-circle';
-        } else if (isDuplicate) {
-            statusText = 'Duplicate file';
-            icon = 'fa-exclamation-triangle';
-        } else if (compressionCheck.warning) {
-            statusText = compressionCheck.message;
-            icon = 'fa-compress-alt';
-        }
+        fileItem.className = 'file-item valid';
         
         fileItem.innerHTML = `
-            <i class="fas ${icon}"></i>
+            <i class="fas fa-check-circle"></i>
             <div class="file-info">
                 <span class="file-name">${file.name}</span>
                 <span class="file-size">${formatBytes(file.size)}</span>
             </div>
-            <span class="file-status ${errors.length > 0 || isDuplicate ? 'error' : compressionCheck.warning ? 'warning' : 'valid'}">
-                ${statusText}
-            </span>
+            <span class="file-status valid">Ready</span>
         `;
         
         fileList.appendChild(fileItem);
     });
     
-    fileCount.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} (${validCount} valid, ${warningCount} warning, ${errorCount} error)`;
+    fileCount.textContent = `${files.length} file${files.length !== 1 ? 's' : ''}`;
     totalSize.textContent = formatBytes(totalBytes);
-    
-    // Update validation message
-    if (errorCount > 0) {
-        filesValidation.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${errorCount} file${errorCount !== 1 ? 's' : ''} have issues`;
-        filesValidation.className = 'validation-message error';
-        filesValidation.style.display = 'flex';
-    } else if (warningCount > 0) {
-        filesValidation.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${warningCount} file${warningCount !== 1 ? 's' : ''} may upload slowly`;
-        filesValidation.className = 'validation-message warning';
-        filesValidation.style.display = 'flex';
-    } else if (files.length > 0) {
-        filesValidation.innerHTML = `<i class="fas fa-check-circle"></i> All files are valid`;
-        filesValidation.className = 'validation-message success';
-        filesValidation.style.display = 'flex';
-    } else {
-        filesValidation.style.display = 'none';
-    }
 }
 
-// ========== DRAG & DROP SUPPORT ==========
+// Drag & drop
 fileDropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     fileDropZone.classList.add('drag-over');
-    fileDropZone.style.backgroundColor = '#f0f9ff';
-    fileDropZone.style.borderColor = '#3b82f6';
 });
 
 fileDropZone.addEventListener('dragleave', () => {
     fileDropZone.classList.remove('drag-over');
-    fileDropZone.style.backgroundColor = '';
-    fileDropZone.style.borderColor = '';
 });
 
 fileDropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     fileDropZone.classList.remove('drag-over');
-    fileDropZone.style.backgroundColor = '';
-    fileDropZone.style.borderColor = '';
     
     if (e.dataTransfer.files.length) {
         filesInput.files = e.dataTransfer.files;
         updateFilePreview();
-        
-        // Announce to screen readers
-        const liveRegion = document.createElement('div');
-        liveRegion.setAttribute('aria-live', 'polite');
-        liveRegion.setAttribute('aria-atomic', 'true');
-        liveRegion.style.position = 'absolute';
-        liveRegion.style.left = '-9999px';
-        liveRegion.textContent = `${e.dataTransfer.files.length} files added`;
-        document.body.appendChild(liveRegion);
-        setTimeout(() => document.body.removeChild(liveRegion), 1000);
     }
 });
 
 filesInput.addEventListener('change', updateFilePreview);
 
-// ========== FEATURE 2: ENHANCED EMAIL VALIDATION ==========
-function validateEmail(email) {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!re.test(email)) return false;
+// ===== LOAD INDICATORS (FIXED PATH) =====
+function loadIndicators() {
+    // Use absolute URL for indicators.json
+    const indicatorsUrl = fixPath('/indicators.json');
+    console.log('Loading indicators from:', indicatorsUrl);
     
-    // Check against disposable email domains
-    const domain = email.split('@')[1].toLowerCase();
-    return !disposableDomains.some(d => domain.includes(d));
-}
-
-function showValidation(element, message, type = 'error') {
-    const validationElement = element.nextElementSibling;
-    if (validationElement && validationElement.classList.contains('validation-message')) {
-        const icon = type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'check-circle';
-        validationElement.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
-        validationElement.className = `validation-message ${type}`;
-        validationElement.style.display = 'flex';
-        
-        // Update ARIA attributes
-        element.setAttribute('aria-invalid', type === 'error' ? 'true' : 'false');
-        element.setAttribute('aria-describedby', validationElement.id);
-    }
-}
-
-function hideValidation(element) {
-    const validationElement = element.nextElementSibling;
-    if (validationElement && validationElement.classList.contains('validation-message')) {
-        validationElement.style.display = 'none';
-        element.setAttribute('aria-invalid', 'false');
-    }
-}
-
-// Email validation
-officerEmailInput.addEventListener('blur', function() {
-    const email = this.value.trim();
-    if (!email) {
-        showValidation(this, 'Email is required', 'error');
-    } else if (!validateEmail(email)) {
-        const domain = email.split('@')[1] || '';
-        if (disposableDomains.some(d => domain.includes(d))) {
-            showValidation(this, 'Disposable email addresses are not allowed', 'error');
-        } else {
-            showValidation(this, 'Please enter a valid email address', 'error');
+    fetch(indicatorsUrl)
+      .then(res => {
+        console.log('Indicators response status:', res.status);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
-    } else {
-        showValidation(this, 'Email looks good', 'success');
-    }
-});
-
-officerEmailInput.addEventListener('input', function() {
-    if (this.value.trim()) {
-        hideValidation(this);
-    }
-});
-
-// Other field validations
-evidenceNameInput.addEventListener('blur', function() {
-    if (!this.value.trim()) {
-        showValidation(this, 'Evidence name is required', 'error');
-    } else if (this.value.trim().length < 5) {
-        showValidation(this, 'Evidence name should be at least 5 characters', 'error');
-    } else {
-        showValidation(this, 'Evidence name is valid', 'success');
-    }
-});
-
-evidenceNameInput.addEventListener('input', function() {
-    if (this.value.trim()) {
-        hideValidation(this);
-    }
-});
-
-categorySelect.addEventListener('change', function() {
-    if (this.value) {
-        showValidation(this, 'Category selected', 'success');
-        // Update indicators immediately
-        updateIndicators(this.value);
-    }
-});
-
-indicatorSelect.addEventListener('change', function() {
-    if (this.value) {
-        showValidation(this, 'Indicator selected', 'success');
-    }
-});
-
-subCountySelect.addEventListener('change', function() {
-    if (this.value) {
-        showValidation(this, 'Sub County selected', 'success');
-    }
-});
-
-// ========== FEATURE 3: FIXED AUTO-SAVE DRAFT ==========
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-function saveDraft() {
-    const draft = {
-        officerEmail: officerEmailInput.value,
-        evidenceName: evidenceNameInput.value,
-        category: categorySelect.value,
-        indicator: indicatorSelect.value,
-        subCounty: subCountySelect.value,
-        timestamp: Date.now(),
-        csrfToken: csrfToken
-    };
-    
-    localStorage.setItem('uploadDraft', JSON.stringify(draft));
-    showSaveStatus('Draft saved', 'saved');
-    hasUnsavedChanges = false;
-}
-
-function loadDraft() {
-    const draft = JSON.parse(localStorage.getItem('uploadDraft'));
-    if (draft && draft.csrfToken === csrfToken) {
-        // Load basic fields
-        officerEmailInput.value = draft.officerEmail || '';
-        evidenceNameInput.value = draft.evidenceName || '';
-        subCountySelect.value = draft.subCounty || '';
+        return res.json();
+      })
+      .then(data => {
+        console.log('Indicators loaded successfully:', Object.keys(data).length, 'categories');
+        indicatorsData = data;
         
-        // Load category and indicator
-        if (draft.category && indicatorsData && indicatorsData[draft.category]) {
-            categorySelect.value = draft.category;
-            updateIndicators(draft.category);
-            
-            // Set indicator after a short delay to ensure options are loaded
-            setTimeout(() => {
-                if (draft.indicator) {
-                    indicatorSelect.value = draft.indicator;
-                }
-                // Show success status
-                showSaveStatus('Draft loaded', 'saved');
-            }, 100);
-        } else {
-            categorySelect.value = draft.category || '';
-            indicatorSelect.value = draft.indicator || '';
-            showSaveStatus('Draft loaded', 'saved');
-        }
-        
-        return true;
-    }
-    return false;
-}
+        // Populate categories
+        Object.keys(data).forEach(category => {
+          const opt = document.createElement("option");
+          opt.value = category;
+          opt.textContent = category;
+          categorySelect.appendChild(opt);
+        });
 
-function showSaveStatus(message, type = 'saved') {
-    saveStatus.innerHTML = `
-        <i class="fas fa-${type === 'saving' ? 'spinner fa-spin' : type === 'saved' ? 'check-circle' : 'exclamation-circle'}"></i>
-        <span>${message}</span>
-    `;
-    saveStatus.className = `save-status ${type}`;
-    saveStatus.style.display = 'flex';
-    
-    setTimeout(() => {
-        saveStatus.style.display = 'none';
-    }, 3000);
-}
-
-// Debounced auto-save
-const debouncedSave = debounce(() => {
-    if (hasUnsavedChanges) {
-        showSaveStatus('Saving draft...', 'saving');
-        setTimeout(saveDraft, 500);
-    }
-}, 1500);
-
-// Auto-save on input - FIXED to include ALL form elements
-const formElements = [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput];
-
-formElements.forEach(element => {
-    element.addEventListener('input', () => {
-        hasUnsavedChanges = true;
-        debouncedSave();
-    });
-    element.addEventListener('change', () => {
-        hasUnsavedChanges = true;
-        debouncedSave();
-    });
-});
-
-// Save on page unload
-window.addEventListener('beforeunload', function(e) {
-    if (hasUnsavedChanges) {
-        saveDraft();
-    }
-});
-
-// Clear draft after successful upload
-function clearDraft() {
-    localStorage.removeItem('uploadDraft');
-    hasUnsavedChanges = false;
-}
-
-// ========== FEATURE 4: UPLOAD HISTORY WITH ANALYTICS ==========
-function saveToHistory(uploadData) {
-    const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
-    
-    const historyItem = {
-        id: Date.now(),
-        name: uploadData.evidenceName,
-        email: uploadData.officerEmail,
-        category: uploadData.category,
-        indicator: uploadData.indicator,
-        subCounty: uploadData.subCounty,
-        filesCount: uploadData.filesCount,
-        totalSize: uploadData.totalSize,
-        timestamp: new Date().toISOString(),
-        status: 'completed',
-        uploadTime: uploadData.uploadTime || 0
-    };
-    
-    history.unshift(historyItem);
-    localStorage.setItem('uploadHistory', JSON.stringify(history.slice(0, 10))); // Keep last 10
-    
-    // Save analytics
-    logUploadAnalytics(historyItem);
-    
-    loadHistory();
-}
-
-function loadHistory() {
-    const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
-    
-    if (history.length > 0) {
-        historySection.style.display = 'block';
-        emptyHistory.style.display = 'none';
-        
-        historyList.innerHTML = '';
-        
-        history.forEach(item => {
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.setAttribute('role', 'listitem');
-            
-            const date = new Date(item.timestamp);
-            const formattedDate = date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+        categorySelect.addEventListener("change", () => {
+          const selected = categorySelect.value;
+          indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
+          if (data[selected]) {
+            data[selected].forEach(ind => {
+              const opt = document.createElement("option");
+              opt.value = ind;
+              opt.textContent = ind;
+              indicatorSelect.appendChild(opt);
             });
-            
-            const uploadSpeed = item.uploadTime > 0 ? 
-                `• ${formatBytes(item.totalSize / (item.uploadTime / 1000))}/s` : '';
-            
-            historyItem.innerHTML = `
-                <div class="upload-info">
-                    <span class="upload-name">${item.name}</span>
-                    <span class="upload-meta">
-                        ${formattedDate} • ${item.filesCount} file${item.filesCount !== 1 ? 's' : ''} • ${formatBytes(item.totalSize)} ${uploadSpeed}
-                    </span>
-                </div>
-                <span class="upload-status ${item.status}" aria-label="Upload status: ${item.status}">
-                    <i class="fas fa-${item.status === 'completed' ? 'check-circle' : 'clock'}"></i>
-                    ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                </span>
-            `;
-            
-            historyList.appendChild(historyItem);
+          }
         });
-    } else {
-        historySection.style.display = 'none';
-        emptyHistory.style.display = 'block';
-    }
+      })
+      .catch(err => {
+        console.error("Error loading indicators.json:", err);
+        showError("Failed to load categories. Please check your internet connection.");
+        
+        // Try fallback after 3 seconds
+        setTimeout(loadIndicators, 3000);
+      });
 }
 
-function logUploadAnalytics(data) {
-    const analytics = {
-        timestamp: new Date().toISOString(),
-        fileCount: data.filesCount,
-        totalSize: data.totalSize,
-        uploadTime: data.uploadTime || 0,
-        category: data.category,
-        subCounty: data.subCounty,
-        userAgent: navigator.userAgent,
-        online: isOnline
-    };
-    
-    const analyticsLog = JSON.parse(localStorage.getItem('uploadAnalytics') || '[]');
-    analyticsLog.push(analytics);
-    localStorage.setItem('uploadAnalytics', JSON.stringify(analyticsLog.slice(-100)));
-}
-
-// Error tracking
-window.addEventListener('error', (event) => {
-    const errorLog = JSON.parse(localStorage.getItem('errorLog') || '[]');
-    errorLog.push({
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
-    });
-    localStorage.setItem('errorLog', JSON.stringify(errorLog.slice(-50)));
-});
-
-refreshHistory.addEventListener('click', loadHistory);
-
-// ========== OFFLINE QUEUE MANAGEMENT ==========
-function saveForOfflineUpload(formData) {
-    const offlineQueue = JSON.parse(localStorage.getItem('offlineQueue') || '[]');
-    
-    // Create a unique ID for this upload
-    const uploadId = 'offline_' + Date.now();
-    
-    offlineQueue.push({
-        id: uploadId,
-        timestamp: Date.now(),
-        data: Object.fromEntries(formData),
-        files: Array.from(filesInput.files).map(file => ({
-            name: file.name,
-            size: file.size,
-            type: file.type
-        }))
-    });
-    
-    localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue.slice(0, 5))); // Max 5 queued
-    return uploadId;
-}
-
-function checkOfflineQueue() {
-    const offlineQueue = JSON.parse(localStorage.getItem('offlineQueue') || '[]');
-    if (offlineQueue.length > 0 && isOnline) {
-        showSaveStatus(`${offlineQueue.length} offline upload${offlineQueue.length !== 1 ? 's' : ''} queued`, 'warning');
-    }
-}
-
-// ========== RATE LIMITING ==========
-function checkRateLimit() {
-    let uploadAttempts = JSON.parse(localStorage.getItem('uploadAttempts') || '[]');
-    const now = Date.now();
-    
-    // Clean old attempts (older than 1 hour)
-    uploadAttempts = uploadAttempts.filter(time => now - time < 3600000);
-    
-    if (uploadAttempts.length >= 10) {
-        const nextAttempt = new Date(uploadAttempts[0] + 3600000);
-        showError(`Upload limit exceeded. Please try again after ${nextAttempt.toLocaleTimeString()}`);
-        uploadBtn.disabled = true;
-        return false;
-    }
-    
-    uploadAttempts.push(now);
-    localStorage.setItem('uploadAttempts', JSON.stringify(uploadAttempts));
-    return true;
-}
-
-// ========== ORIGINAL UPLOAD LOGIC (ENHANCED) ==========
-// Load categories + indicators from JSON
-fetch("indicators.json")
-  .then(res => res.json())
-  .then(data => {
-    indicatorsData = data; // Store globally for draft loading
-    
-    Object.keys(data).forEach(category => {
-      const opt = document.createElement("option");
-      opt.value = category;
-      opt.textContent = category;
-      categorySelect.appendChild(opt);
-    });
-
-    categorySelect.addEventListener("change", () => {
-      const selected = categorySelect.value;
-      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-      if (data[selected]) {
-        data[selected].forEach(ind => {
-          const opt = document.createElement("option");
-          opt.value = ind;
-          opt.textContent = ind;
-          indicatorSelect.appendChild(opt);
-        });
-      }
-      
-      // Update validation
-      if (selected) {
-        showValidation(categorySelect, 'Category selected', 'success');
-      }
-    });
-    
-    window.updateIndicators = function(category) {
-      indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
-      if (data[category]) {
-        data[category].forEach(ind => {
-          const opt = document.createElement("option");
-          opt.value = ind;
-          opt.textContent = ind;
-          indicatorSelect.appendChild(opt);
-        });
-      }
-    };
-    
-    // After loading categories, check for draft
-    const draft = JSON.parse(localStorage.getItem('uploadDraft'));
-    if (draft && draft.csrfToken === csrfToken) {
-        // Auto-load draft without popup
-        loadDraft();
-    }
-  })
-  .catch(err => {
-    console.error("Error loading indicators.json:", err);
-    showError("Failed to load categories. Please refresh the page.");
-  });
-
-// LocalStorage for previous emails
+// ===== EMAIL SUGGESTIONS =====
 function saveOfficerEmail(email) {
   if (!email) return;
   let emails = JSON.parse(localStorage.getItem("officerEmails") || "[]");
@@ -1114,19 +485,103 @@ officerEmailInput.addEventListener("focus", () => {
   });
 });
 
-// Helper functions
+// ===== UPLOAD HISTORY =====
+function saveToHistory(uploadData) {
+    const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
+    
+    const historyItem = {
+        id: Date.now(),
+        name: uploadData.evidenceName,
+        email: uploadData.officerEmail,
+        category: uploadData.category,
+        indicator: uploadData.indicator,
+        subCounty: uploadData.subCounty,
+        filesCount: uploadData.filesCount,
+        totalSize: uploadData.totalSize,
+        timestamp: new Date().toISOString(),
+        status: 'completed'
+    };
+    
+    history.unshift(historyItem);
+    localStorage.setItem('uploadHistory', JSON.stringify(history.slice(0, 10)));
+    loadHistory();
+}
+
+function loadHistory() {
+    const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
+    
+    if (history.length > 0) {
+        historySection.style.display = 'block';
+        emptyHistory.style.display = 'none';
+        
+        historyList.innerHTML = '';
+        
+        history.forEach(item => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            const date = new Date(item.timestamp);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            historyItem.innerHTML = `
+                <div class="upload-info">
+                    <span class="upload-name">${item.name}</span>
+                    <span class="upload-meta">
+                        ${formattedDate} • ${item.filesCount} file${item.filesCount !== 1 ? 's' : ''} • ${formatBytes(item.totalSize)}
+                    </span>
+                </div>
+                <span class="upload-status completed">
+                    <i class="fas fa-check-circle"></i> Completed
+                </span>
+            `;
+            
+            historyList.appendChild(historyItem);
+        });
+    } else {
+        historySection.style.display = 'none';
+        emptyHistory.style.display = 'block';
+    }
+}
+
+refreshHistory.addEventListener('click', loadHistory);
+
+// ===== OFFLINE QUEUE =====
+function checkOfflineQueue() {
+    const offlineQueue = JSON.parse(localStorage.getItem('offlineQueue') || '[]');
+    if (offlineQueue.length > 0 && isOnline) {
+        showSaveStatus(`${offlineQueue.length} offline upload${offlineQueue.length !== 1 ? 's' : ''} queued`, 'warning');
+    }
+}
+
+// ===== HELPER FUNCTIONS =====
 function showError(msg) {
   errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
   errorMsg.style.display = msg ? "flex" : "none";
   successMsg.style.display = "none";
-  errorMsg.setAttribute('aria-live', 'assertive');
 }
 
 function showSuccess(msg) {
   successMsg.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
   successMsg.style.display = "flex";
   errorMsg.style.display = "none";
-  successMsg.setAttribute('aria-live', 'polite');
+}
+
+function showSaveStatus(message, type = 'saved') {
+    saveStatus.innerHTML = `
+        <i class="fas fa-${type === 'saving' ? 'spinner fa-spin' : type === 'saved' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    saveStatus.className = `save-status ${type}`;
+    saveStatus.style.display = 'flex';
+    
+    setTimeout(() => {
+        saveStatus.style.display = 'none';
+    }, 3000);
 }
 
 function resetForm() {
@@ -1139,46 +594,10 @@ function resetForm() {
   progressContainer.style.display = "none";
   uploadText.style.display = "none";
   filePreview.style.display = "none";
-  
-  // Clear validation messages
-  [emailValidation, nameValidation, categoryValidation, 
-   indicatorValidation, subCountyValidation, filesValidation].forEach(el => {
-    el.style.display = "none";
-  });
-  
-  // Clear draft after successful upload
-  clearDraft();
-  
-  // Announce to screen reader
-  const liveRegion = document.createElement('div');
-  liveRegion.setAttribute('aria-live', 'polite');
-  liveRegion.setAttribute('aria-atomic', 'true');
-  liveRegion.style.position = 'absolute';
-  liveRegion.style.left = '-9999px';
-  liveRegion.textContent = 'Form reset successfully';
-  document.body.appendChild(liveRegion);
-  setTimeout(() => document.body.removeChild(liveRegion), 1000);
 }
 
-// Remove error styling instantly when user types/changes value
-[officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
-  el.addEventListener("input", () => {
-    el.style.border = "2px solid #e2e8f0";
-    el.style.boxShadow = "none";
-  });
-  el.addEventListener("change", () => {
-    el.style.border = "2px solid #e2e8f0";
-    el.style.boxShadow = "none";
-  });
-});
-
-// Upload logic
+// ===== UPLOAD FUNCTION =====
 uploadBtn.addEventListener("click", () => {
-  // Check rate limit
-  if (!checkRateLimit()) {
-    return;
-  }
-
   const officerEmail = officerEmailInput.value.trim();
   const evidenceName = evidenceNameInput.value.trim();
   const category = categorySelect.value;
@@ -1188,69 +607,21 @@ uploadBtn.addEventListener("click", () => {
 
   let missing = [];
 
-  // Reset borders to normal
-  [officerEmailInput, evidenceNameInput, categorySelect, indicatorSelect, subCountySelect, filesInput].forEach(el => {
-    el.style.border = "2px solid #e2e8f0";
-    el.style.boxShadow = "none";
-  });
-
   // Validate required fields
-  if (!officerEmail) { 
-    missing.push("Officer Email"); 
-    officerEmailInput.style.border = "2px solid #ef4444";
-    officerEmailInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
-  if (!evidenceName) { 
-    missing.push("Evidence Name"); 
-    evidenceNameInput.style.border = "2px solid #ef4444";
-    evidenceNameInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
-  if (!category) { 
-    missing.push("Category"); 
-    categorySelect.style.border = "2px solid #ef4444";
-    categorySelect.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
-  if (!indicator) { 
-    missing.push("Indicator"); 
-    indicatorSelect.style.border = "2px solid #ef4444";
-    indicatorSelect.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
-  if (!subCounty) { 
-    missing.push("Sub-County"); 
-    subCountySelect.style.border = "2px solid #ef4444";
-    subCountySelect.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
-  if (!files.length) { 
-    missing.push("PDF File(s)"); 
-    filesInput.style.border = "2px solid #ef4444";
-    filesInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
+  if (!officerEmail) missing.push("Officer Email"); 
+  if (!evidenceName) missing.push("Evidence Name"); 
+  if (!category) missing.push("Category"); 
+  if (!indicator) missing.push("Indicator"); 
+  if (!subCounty) missing.push("Sub-County"); 
+  if (!files.length) missing.push("PDF File(s)"); 
 
   if (missing.length > 0) {
     return showError("⚠ Please fill the following required fields:<br>- " + missing.join("<br>- "));
   }
 
-  // Check for invalid files
-  const filesArray = Array.from(files);
-  const invalidFiles = filesArray.filter(file => {
-    const errors = validateFile(file);
-    return errors.length > 0;
-  });
-
-  if (invalidFiles.length > 0) {
-    return showError(`⚠ ${invalidFiles.length} file${invalidFiles.length !== 1 ? 's' : ''} have issues. Please check the file preview.`);
-  }
-
-  // Check for duplicates
-  const duplicates = checkDuplicateFiles(filesArray);
-  if (duplicates.length > 0) {
-    return showError(`⚠ Duplicate files detected: ${duplicates.join(', ')}`);
-  }
-
   // Disable button and show loading
   uploadBtn.classList.add('loading');
   uploadBtn.disabled = true;
-  uploadBtn.setAttribute('aria-busy', 'true');
   
   spinner.style.display = "block";
   progressContainer.style.display = "block";
@@ -1258,8 +629,6 @@ uploadBtn.addEventListener("click", () => {
   uploadText.textContent = "Uploading... 0%";
   progressBar.style.width = "0%";
   showError("");
-  
-  uploadStartTime = Date.now();
 
   const formData = new FormData();
   formData.append("officerEmail", officerEmail);
@@ -1270,40 +639,19 @@ uploadBtn.addEventListener("click", () => {
   formData.append("csrfToken", csrfToken);
   for (let file of files) formData.append("files", file, file.name);
 
-  // If offline, save to queue
-  if (!isOnline) {
-    const uploadId = saveForOfflineUpload(formData);
-    setTimeout(() => {
-      spinner.style.display = "none";
-      uploadBtn.classList.remove('loading');
-      uploadBtn.disabled = false;
-      uploadBtn.setAttribute('aria-busy', 'false');
-      showSuccess(`📴 Upload queued for when you're back online (ID: ${uploadId})`);
-      
-      setTimeout(() => {
-        resetForm();
-        successMsg.style.display = "none";
-      }, 5000);
-    }, 1000);
-    return;
-  }
-
   const xhr = new XMLHttpRequest();
   xhr.open("POST", PROXY_URL, true);
-  xhr.timeout = 300000; // 5 minute timeout
+  xhr.timeout = 300000;
 
   xhr.upload.onprogress = (event) => {
     if (event.lengthComputable) {
       const percent = Math.round((event.loaded / event.total) * 100);
       progressBar.style.width = percent + "%";
       uploadText.textContent = `Uploading... ${percent}%`;
-      uploadText.setAttribute('aria-valuenow', percent);
-      uploadText.setAttribute('aria-valuetext', `${percent} percent uploaded`);
     }
   };
 
   xhr.onload = () => {
-    const uploadTime = Date.now() - uploadStartTime;
     spinner.style.display = "none";
     progressBar.style.width = "100%";
     uploadText.textContent = "Processing...";
@@ -1311,14 +659,11 @@ uploadBtn.addEventListener("click", () => {
     setTimeout(() => {
       progressContainer.style.display = "none";
       uploadText.style.display = "none";
-      
-      // Re-enable button
       uploadBtn.classList.remove('loading');
       uploadBtn.disabled = false;
-      uploadBtn.setAttribute('aria-busy', 'false');
 
       if (xhr.status >= 200 && xhr.status < 300) {
-        const successMessage = `✅ ${files.length} file(s) submitted successfully in ${(uploadTime/1000).toFixed(1)}s. 📩 You will receive an email confirmation.`;
+        const successMessage = `✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`;
         showSuccess(successMessage);
         
         // Save to history
@@ -1330,8 +675,7 @@ uploadBtn.addEventListener("click", () => {
           indicator,
           subCounty,
           filesCount: files.length,
-          totalSize,
-          uploadTime
+          totalSize
         });
         
         setTimeout(() => {
@@ -1350,69 +694,63 @@ uploadBtn.addEventListener("click", () => {
     spinner.style.display = "none";
     uploadBtn.classList.remove('loading');
     uploadBtn.disabled = false;
-    uploadBtn.setAttribute('aria-busy', 'false');
-    showError("❌ Network error. Your upload has been saved locally and will retry when online.");
-    
-    // Save to offline queue
-    saveForOfflineUpload(formData);
+    showError("❌ Network error. Please check your connection and try again.");
   };
 
   xhr.ontimeout = () => {
     spinner.style.display = "none";
     uploadBtn.classList.remove('loading');
     uploadBtn.disabled = false;
-    uploadBtn.setAttribute('aria-busy', 'false');
-    showError("❌ Upload timeout. Your upload has been queued and will retry.");
-    
-    // Save to offline queue
-    saveForOfflineUpload(formData);
+    showError("❌ Upload timeout. Please try again.");
   };
 
   xhr.send(formData);
 });
 
-// Add form submit prevention
+// Prevent form submission
 uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
 });
 
-// Initialize on page load
-window.addEventListener('load', () => {
-  // NO MORE ANNOYING POPUP - draft loads automatically if available
-  loadHistory();
-  checkOfflineQueue();
-  
-  // Focus management for accessibility
-  const firstInput = officerEmailInput;
-  firstInput.focus();
-  
-  // Announce page load to screen readers
-  const liveRegion = document.createElement('div');
-  liveRegion.setAttribute('aria-live', 'polite');
-  liveRegion.setAttribute('aria-atomic', 'true');
-  liveRegion.style.position = 'absolute';
-  liveRegion.style.left = '-9999px';
-  liveRegion.textContent = 'Nakuru County Evidence Upload System loaded';
-  document.body.appendChild(liveRegion);
-  setTimeout(() => document.body.removeChild(liveRegion), 1000);
+// ===== PWA INSTALLATION =====
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.deferredPrompt = e;
+    
+    if (installBtn) {
+        installBtn.style.display = 'flex';
+        installBtn.addEventListener('click', () => {
+            installBtn.style.display = 'none';
+            if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                window.deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted install');
+                    }
+                    window.deferredPrompt = null;
+                });
+            }
+        });
+    }
 });
 
-// Keyboard navigation
-document.addEventListener('keydown', (e) => {
-  // Ctrl/Cmd + S to save draft
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    saveDraft();
-  }
-  
-  // Escape to clear form
-  if (e.key === 'Escape') {
-    if (confirm('Are you sure you want to clear the form?')) {
-      resetForm();
-      clearDraft();
-    }
-  }
+// ===== INITIALIZATION =====
+window.addEventListener('load', () => {
+    updateConnectionStatus();
+    loadIndicators();
+    loadHistory();
+    checkOfflineQueue();
+    
+    // Auto-focus on email field
+    officerEmailInput.focus();
+    
+    console.log('App initialized successfully');
+    console.log('PWA mode:', IS_PWA);
+    console.log('Service Worker:', 'serviceWorker' in navigator);
 });
+
+// Initial connection status
+updateConnectionStatus();
 </script>
 
 </body>
