@@ -158,17 +158,6 @@
       </div>
     </div>
 
-    <!-- Terms & Conditions -->
-    <div class="form-group">
-      <div class="checkbox-group">
-        <input type="checkbox" id="terms" required>
-        <label for="terms">
-          <i class="fas fa-shield-alt"></i> I confirm that I have the authority to upload these files and that they comply with data protection policies.
-        </label>
-      </div>
-      <div class="validation-message" id="termsValidation"></div>
-    </div>
-
     <!-- Progress Elements -->
     <div class="spinner" id="spinner"></div>
     <div class="progress-container" id="progressContainer">
@@ -260,8 +249,6 @@ const historySection = document.getElementById("historySection");
 const historyList = document.getElementById("historyList");
 const emptyHistory = document.getElementById("emptyHistory");
 const refreshHistory = document.getElementById("refreshHistory");
-const termsCheckbox = document.getElementById("terms");
-const termsValidation = document.getElementById("termsValidation");
 const installBtn = document.getElementById("installBtn");
 const connectionStatus = document.getElementById("connectionStatus");
 
@@ -610,12 +597,6 @@ subCountySelect.addEventListener('change', function() {
     }
 });
 
-termsCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        termsValidation.style.display = 'none';
-    }
-});
-
 // ========== FEATURE 3: AUTO-SAVE DRAFT WITH DEBOUNCE ==========
 function debounce(func, wait) {
     let timeout;
@@ -699,10 +680,8 @@ const debouncedSave = debounce(() => {
 // Auto-save on input
 ['input', 'change'].forEach(event => {
     uploadForm.addEventListener(event, function(e) {
-        if (e.target !== termsCheckbox) { // Don't save terms checkbox
-            hasUnsavedChanges = true;
-            debouncedSave();
-        }
+        hasUnsavedChanges = true;
+        debouncedSave();
     });
 });
 
@@ -963,7 +942,6 @@ function resetForm() {
   indicatorSelect.innerHTML = '<option value="">Select Indicator</option>';
   subCountySelect.value = "";
   filesInput.value = "";
-  termsCheckbox.checked = false;
   progressBar.style.width = "0%";
   progressContainer.style.display = "none";
   uploadText.style.display = "none";
@@ -1014,7 +992,6 @@ uploadBtn.addEventListener("click", () => {
   const indicator = indicatorSelect.value;
   const subCounty = subCountySelect.value;
   const files = filesInput.files;
-  const termsAccepted = termsCheckbox.checked;
 
   let missing = [];
 
@@ -1054,12 +1031,6 @@ uploadBtn.addEventListener("click", () => {
     missing.push("PDF File(s)"); 
     filesInput.style.border = "2px solid #ef4444";
     filesInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.1)";
-  }
-  if (!termsAccepted) {
-    missing.push("Terms & Conditions"); 
-    termsValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> You must accept the terms';
-    termsValidation.className = 'validation-message error';
-    termsValidation.style.display = 'flex';
   }
 
   if (missing.length > 0) {
