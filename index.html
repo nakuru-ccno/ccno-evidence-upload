@@ -29,6 +29,9 @@
 <!-- Skip navigation for accessibility -->
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
+<!-- Screen reader live region -->
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="liveRegion"></div>
+
 <!-- HEADER -->
 <header class="site-header">
   <img src="/images/LOGO.png" alt="Nakuru County Logo" class="logo" />
@@ -36,6 +39,14 @@
     <h1>Nakuru County CCNO PC Evidence Upload System</h1>
   </div>
 </header>
+
+<!-- Breadcrumb navigation -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="/">Home</a></li>
+    <li><a href="#main-content" aria-current="page">Upload Evidence</a></li>
+  </ol>
+</nav>
 
 <div class="container" id="main-content">
   <!-- Form Container -->
@@ -51,9 +62,11 @@
       <input 
         list="officerEmails" 
         id="officerEmail" 
-        placeholder="Enter officer's email" 
+        placeholder="Enter any valid email address" 
         type="email" 
         required
+        pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+        title="Enter a valid email address (e.g., name@example.com)"
         aria-label="Officer email address"
         aria-describedby="emailValidation"
         aria-required="true"
@@ -62,7 +75,7 @@
       <datalist id="officerEmails"></datalist>
       <div class="validation-message" id="emailValidation"></div>
       <div class="email-note">
-        <i class="fas fa-info-circle"></i> You will receive an email confirmation once your files are received.
+        <i class="fas fa-info-circle"></i> Enter any valid email to receive confirmation.
       </div>
     </div>
 
@@ -143,7 +156,7 @@
     <!-- File Upload with Drag & Drop -->
     <div class="form-group required">
       <label for="files"><i class="fas fa-file-pdf"></i> Choose PDF file(s)</label>
-      <div class="file-upload-wrapper" id="fileDropZone">
+      <div class="file-upload-wrapper" id="fileDropZone" role="region" aria-label="File upload area" tabindex="0">
         <input 
           type="file" 
           id="files" 
@@ -239,45 +252,37 @@
 <script>
 // ===== BASE URL DETECTION =====
 const IS_PWA = window.matchMedia('(display-mode: standalone)').matches;
-const BASE_URL = window.location.origin; // Automatically gets https://pce.nakurucountychiefnursingofficer.site/
+const BASE_URL = window.location.origin;
 
 console.log('Running as PWA:', IS_PWA);
 console.log('Base URL:', BASE_URL);
 
 // ===== FIX ALL PATHS FOR ANDROID PWA =====
 function fixPath(path) {
-  // If path is already absolute or starts with http, return as is
   if (path.startsWith('http') || path.startsWith('//')) {
     return path;
   }
-  
-  // If path starts with slash, make it absolute
   if (path.startsWith('/')) {
     return BASE_URL + path;
   }
-  
-  // Relative path, make it absolute
   return BASE_URL + '/' + path;
 }
 
 // ===== SERVICE WORKER REGISTRATION =====
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // Use absolute path for service worker
     const swUrl = fixPath('/sw.js');
     
     navigator.serviceWorker.register(swUrl)
       .then(registration => {
         console.log('✅ Service Worker registered:', registration);
         
-        // Check for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           console.log('🔄 New Service Worker found:', newWorker.state);
           
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New update available
               if (confirm('A new version is available! Reload to update?')) {
                 window.location.reload();
               }
@@ -321,12 +326,22 @@ const emptyHistory = document.getElementById("emptyHistory");
 const refreshHistory = document.getElementById("refreshHistory");
 const installBtn = document.getElementById("installBtn");
 const connectionStatus = document.getElementById("connectionStatus");
+const liveRegion = document.getElementById("liveRegion");
 
 // State variables
 let indicatorsData = null;
 let isOnline = navigator.onLine;
 const csrfToken = Math.random().toString(36).substring(2);
 localStorage.setItem('csrfToken', csrfToken);
+
+// ===== FILE SIZE LIMITS =====
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
+const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB total
+
+// ===== EMAIL VALIDATION =====
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 // ===== NETWORK STATUS =====
 function updateConnectionStatus() {
@@ -343,11 +358,13 @@ window.addEventListener('online', () => {
     isOnline = true;
     updateConnectionStatus();
     checkOfflineQueue();
+    liveRegion.textContent = 'You are now online. Offline uploads will be processed.';
 });
 
 window.addEventListener('offline', () => {
     isOnline = false;
     updateConnectionStatus();
+    liveRegion.textContent = 'You are offline. Uploads will be queued and sent when you reconnect.';
 });
 
 // ===== FILE HANDLING =====
@@ -371,27 +388,51 @@ function updateFilePreview() {
     fileList.innerHTML = '';
     
     let totalBytes = 0;
+    let hasErrors = false;
     
     files.forEach((file, index) => {
         totalBytes += file.size;
         
+        // Validate file size
+        let status = 'valid';
+        let statusText = 'Ready';
+        let icon = 'fa-check-circle';
+        
+        if (file.size > MAX_FILE_SIZE) {
+            status = 'error';
+            statusText = 'File too large';
+            icon = 'fa-exclamation-circle';
+            hasErrors = true;
+        }
+        
         const fileItem = document.createElement('div');
-        fileItem.className = 'file-item valid';
+        fileItem.className = `file-item ${status}`;
         
         fileItem.innerHTML = `
-            <i class="fas fa-check-circle"></i>
+            <i class="fas ${icon}"></i>
             <div class="file-info">
                 <span class="file-name">${file.name}</span>
                 <span class="file-size">${formatBytes(file.size)}</span>
             </div>
-            <span class="file-status valid">Ready</span>
+            <span class="file-status ${status}">${statusText}</span>
         `;
         
         fileList.appendChild(fileItem);
     });
     
+    // Validate total size
+    if (totalBytes > MAX_TOTAL_SIZE) {
+        showError(`Total file size (${formatBytes(totalBytes)}) exceeds maximum limit of ${formatBytes(MAX_TOTAL_SIZE)}`);
+        hasErrors = true;
+    }
+    
     fileCount.textContent = `${files.length} file${files.length !== 1 ? 's' : ''}`;
     totalSize.textContent = formatBytes(totalBytes);
+    
+    // Update live region for screen readers
+    if (files.length > 0) {
+        liveRegion.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} selected, total size: ${formatBytes(totalBytes)}`;
+    }
 }
 
 // Drag & drop
@@ -416,15 +457,13 @@ fileDropZone.addEventListener('drop', (e) => {
 
 filesInput.addEventListener('change', updateFilePreview);
 
-// ===== LOAD INDICATORS (FIXED PATH) =====
+// ===== LOAD INDICATORS =====
 function loadIndicators() {
-    // Use absolute URL for indicators.json
     const indicatorsUrl = fixPath('/indicators.json');
     console.log('Loading indicators from:', indicatorsUrl);
     
     fetch(indicatorsUrl)
       .then(res => {
-        console.log('Indicators response status:', res.status);
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
@@ -434,7 +473,6 @@ function loadIndicators() {
         console.log('Indicators loaded successfully:', Object.keys(data).length, 'categories');
         indicatorsData = data;
         
-        // Populate categories
         Object.keys(data).forEach(category => {
           const opt = document.createElement("option");
           opt.value = category;
@@ -458,8 +496,6 @@ function loadIndicators() {
       .catch(err => {
         console.error("Error loading indicators.json:", err);
         showError("Failed to load categories. Please check your internet connection.");
-        
-        // Try fallback after 3 seconds
         setTimeout(loadIndicators, 3000);
       });
 }
@@ -483,6 +519,28 @@ officerEmailInput.addEventListener("focus", () => {
     option.value = email;
     datalist.appendChild(option);
   });
+});
+
+// ===== REAL-TIME EMAIL VALIDATION =====
+officerEmailInput.addEventListener('input', function() {
+    const email = this.value.trim();
+    const validationDiv = document.getElementById('emailValidation');
+    
+    if (email === '') {
+        validationDiv.textContent = '';
+        this.setAttribute('aria-invalid', 'false');
+        return;
+    }
+    
+    if (!isValidEmail(email)) {
+        validationDiv.textContent = 'Please enter a valid email address';
+        validationDiv.className = 'validation-message invalid';
+        this.setAttribute('aria-invalid', 'true');
+    } else {
+        validationDiv.textContent = '✓ Valid email format';
+        validationDiv.className = 'validation-message valid';
+        this.setAttribute('aria-invalid', 'false');
+    }
 });
 
 // ===== UPLOAD HISTORY =====
@@ -594,6 +652,12 @@ function resetForm() {
   progressContainer.style.display = "none";
   uploadText.style.display = "none";
   filePreview.style.display = "none";
+  
+  // Clear validation messages
+  document.querySelectorAll('.validation-message').forEach(el => {
+    el.textContent = '';
+    el.className = 'validation-message';
+  });
 }
 
 // ===== UPLOAD FUNCTION =====
@@ -605,10 +669,15 @@ uploadBtn.addEventListener("click", () => {
   const subCounty = subCountySelect.value;
   const files = filesInput.files;
 
-  let missing = [];
+  // Validate email format
+  if (!isValidEmail(officerEmail)) {
+    showError("⚠ Please enter a valid email address");
+    officerEmailInput.focus();
+    return;
+  }
 
-  // Validate required fields
-  if (!officerEmail) missing.push("Officer Email"); 
+  // Validate other required fields
+  let missing = [];
   if (!evidenceName) missing.push("Evidence Name"); 
   if (!category) missing.push("Category"); 
   if (!indicator) missing.push("Indicator"); 
@@ -616,12 +685,29 @@ uploadBtn.addEventListener("click", () => {
   if (!files.length) missing.push("PDF File(s)"); 
 
   if (missing.length > 0) {
-    return showError("⚠ Please fill the following required fields:<br>- " + missing.join("<br>- "));
+    showError("⚠ Please fill the following required fields:<br>- " + missing.join("<br>- "));
+    return;
+  }
+
+  // Validate file sizes
+  let totalSize = 0;
+  for (let file of files) {
+    if (file.size > MAX_FILE_SIZE) {
+      showError(`File "${file.name}" is too large. Maximum size is ${formatBytes(MAX_FILE_SIZE)}`);
+      return;
+    }
+    totalSize += file.size;
+  }
+
+  if (totalSize > MAX_TOTAL_SIZE) {
+    showError(`Total file size (${formatBytes(totalSize)}) exceeds maximum limit of ${formatBytes(MAX_TOTAL_SIZE)}`);
+    return;
   }
 
   // Disable button and show loading
   uploadBtn.classList.add('loading');
   uploadBtn.disabled = true;
+  uploadBtn.setAttribute('aria-busy', 'true');
   
   spinner.style.display = "block";
   progressContainer.style.display = "block";
@@ -629,6 +715,9 @@ uploadBtn.addEventListener("click", () => {
   uploadText.textContent = "Uploading... 0%";
   progressBar.style.width = "0%";
   showError("");
+
+  // Announce upload start for screen readers
+  liveRegion.textContent = `Starting upload of ${files.length} file${files.length !== 1 ? 's' : ''}`;
 
   const formData = new FormData();
   formData.append("officerEmail", officerEmail);
@@ -648,6 +737,11 @@ uploadBtn.addEventListener("click", () => {
       const percent = Math.round((event.loaded / event.total) * 100);
       progressBar.style.width = percent + "%";
       uploadText.textContent = `Uploading... ${percent}%`;
+      
+      // Update live region for screen readers every 25%
+      if (percent % 25 === 0) {
+        liveRegion.textContent = `Upload progress: ${percent}%`;
+      }
     }
   };
 
@@ -661,13 +755,13 @@ uploadBtn.addEventListener("click", () => {
       uploadText.style.display = "none";
       uploadBtn.classList.remove('loading');
       uploadBtn.disabled = false;
+      uploadBtn.setAttribute('aria-busy', 'false');
 
       if (xhr.status >= 200 && xhr.status < 300) {
-        const successMessage = `✅ ${files.length} file(s) submitted successfully. 📩 You will receive an email confirmation.`;
+        const successMessage = `✅ ${files.length} file(s) submitted successfully. 📩 Confirmation sent to: ${officerEmail}`;
         showSuccess(successMessage);
         
         // Save to history
-        const totalSize = Array.from(files).reduce((sum, file) => sum + file.size, 0);
         saveToHistory({
           evidenceName,
           officerEmail,
@@ -678,6 +772,9 @@ uploadBtn.addEventListener("click", () => {
           totalSize
         });
         
+        // Announce success for screen readers
+        liveRegion.textContent = `Upload completed successfully. ${files.length} file${files.length !== 1 ? 's' : ''} uploaded. Confirmation sent to ${officerEmail}`;
+        
         setTimeout(() => {
           resetForm();
           successMsg.style.display = "none";
@@ -685,7 +782,9 @@ uploadBtn.addEventListener("click", () => {
 
         saveOfficerEmail(officerEmail);
       } else {
-        showError(`❌ Upload failed (Status: ${xhr.status}). Please try again.`);
+        const errorMessage = `❌ Upload failed (Status: ${xhr.status}). Please try again.`;
+        showError(errorMessage);
+        liveRegion.textContent = errorMessage;
       }
     }, 500);
   };
@@ -694,14 +793,22 @@ uploadBtn.addEventListener("click", () => {
     spinner.style.display = "none";
     uploadBtn.classList.remove('loading');
     uploadBtn.disabled = false;
-    showError("❌ Network error. Please check your connection and try again.");
+    uploadBtn.setAttribute('aria-busy', 'false');
+    
+    const errorMessage = "❌ Network error. Please check your connection and try again.";
+    showError(errorMessage);
+    liveRegion.textContent = errorMessage;
   };
 
   xhr.ontimeout = () => {
     spinner.style.display = "none";
     uploadBtn.classList.remove('loading');
     uploadBtn.disabled = false;
-    showError("❌ Upload timeout. Please try again.");
+    uploadBtn.setAttribute('aria-busy', 'false');
+    
+    const errorMessage = "❌ Upload timeout. Please try again.";
+    showError(errorMessage);
+    liveRegion.textContent = errorMessage;
   };
 
   xhr.send(formData);
@@ -726,6 +833,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
                 window.deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('User accepted install');
+                        liveRegion.textContent = 'App installation started';
                     }
                     window.deferredPrompt = null;
                 });
@@ -734,19 +842,69 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
+// ===== AUTO-SAVE DRAFT =====
+const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
+let autoSaveTimer;
+
+function saveDraft() {
+    const draft = {
+        officerEmail: officerEmailInput.value,
+        evidenceName: evidenceNameInput.value,
+        category: categorySelect.value,
+        indicator: indicatorSelect.value,
+        subCounty: subCountySelect.value,
+        timestamp: Date.now()
+    };
+    
+    localStorage.setItem('uploadDraft', JSON.stringify(draft));
+    showSaveStatus('Draft saved', 'info');
+}
+
+function loadDraft() {
+    const draft = JSON.parse(localStorage.getItem('uploadDraft') || '{}');
+    if (draft.timestamp && Date.now() - draft.timestamp < 24 * 60 * 60 * 1000) {
+        if (confirm('Found a saved draft from earlier. Would you like to restore it?')) {
+            officerEmailInput.value = draft.officerEmail || '';
+            evidenceNameInput.value = draft.evidenceName || '';
+            categorySelect.value = draft.category || '';
+            if (draft.category && indicatorsData[draft.category]) {
+                // Trigger change event to populate indicators
+                categorySelect.dispatchEvent(new Event('change'));
+                setTimeout(() => {
+                    indicatorSelect.value = draft.indicator || '';
+                }, 100);
+            }
+            subCountySelect.value = draft.subCounty || '';
+            showSaveStatus('Draft restored', 'info');
+        }
+    }
+}
+
 // ===== INITIALIZATION =====
 window.addEventListener('load', () => {
     updateConnectionStatus();
     loadIndicators();
     loadHistory();
     checkOfflineQueue();
+    loadDraft();
     
     // Auto-focus on email field
     officerEmailInput.focus();
     
+    // Start auto-save
+    autoSaveTimer = setInterval(saveDraft, AUTO_SAVE_INTERVAL);
+    
     console.log('App initialized successfully');
     console.log('PWA mode:', IS_PWA);
     console.log('Service Worker:', 'serviceWorker' in navigator);
+});
+
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+    if (autoSaveTimer) {
+        clearInterval(autoSaveTimer);
+    }
+    saveDraft();
 });
 
 // Initial connection status
@@ -754,4 +912,4 @@ updateConnectionStatus();
 </script>
 
 </body>
-</html>
+  </html>
