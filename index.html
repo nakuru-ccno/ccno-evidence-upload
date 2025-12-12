@@ -23,6 +23,138 @@
 
 <!-- Android PWA -->
 <meta name="mobile-web-app-capable" content="yes">
+
+<!-- Modal CSS -->
+<style>
+/* Custom Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: modalSlideIn 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px 24px;
+    background: #4f46e5;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+    padding: 24px;
+    color: #374151;
+}
+
+.modal-message {
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.modal-btn-primary {
+    background: #4f46e5;
+    color: white;
+}
+
+.modal-btn-primary:hover {
+    background: #4338ca;
+}
+
+.modal-btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modal-btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.modal-warning {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+}
+
+.modal-warning i {
+    color: #f59e0b;
+    margin-right: 8px;
+}
+</style>
 </head>
 <body>
 
@@ -31,6 +163,25 @@
 
 <!-- Screen reader live region -->
 <div class="sr-only" aria-live="polite" aria-atomic="true" id="liveRegion"></div>
+
+<!-- Custom Modal -->
+<div class="modal-overlay" id="customModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+            <h3 id="modalTitle">Notification</h3>
+            <button class="modal-close" id="modalClose" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message" id="modalMessage"></p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" id="modalCancel">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- HEADER -->
 <header class="site-header">
@@ -283,9 +434,17 @@ if ('serviceWorker' in navigator) {
           
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              if (confirm('A new version is available! Reload to update?')) {
-                window.location.reload();
-              }
+              // Use custom modal instead of alert
+              showModal(
+                'New Version Available',
+                'A new version of the app is available. Would you like to reload to update?',
+                'Update',
+                'Later'
+              ).then(confirmed => {
+                if (confirmed) {
+                  window.location.reload();
+                }
+              });
             }
           });
         });
@@ -328,11 +487,70 @@ const installBtn = document.getElementById("installBtn");
 const connectionStatus = document.getElementById("connectionStatus");
 const liveRegion = document.getElementById("liveRegion");
 
+// Modal elements
+const customModal = document.getElementById("customModal");
+const modalTitle = document.getElementById("modalTitle");
+const modalMessage = document.getElementById("modalMessage");
+const modalConfirm = document.getElementById("modalConfirm");
+const modalCancel = document.getElementById("modalCancel");
+const modalClose = document.getElementById("modalClose");
+
 // State variables
 let indicatorsData = null;
 let isOnline = navigator.onLine;
 const csrfToken = Math.random().toString(36).substring(2);
 localStorage.setItem('csrfToken', csrfToken);
+
+// Modal promise resolver
+let modalResolve = null;
+
+// ===== CUSTOM MODAL FUNCTION =====
+function showModal(title, message, confirmText = 'Yes', cancelText = 'No') {
+    return new Promise((resolve) => {
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modalConfirm.textContent = confirmText;
+        modalCancel.textContent = cancelText;
+        
+        modalResolve = resolve;
+        customModal.style.display = 'flex';
+        
+        // Focus trap for accessibility
+        modalConfirm.focus();
+    });
+}
+
+// Modal event handlers
+modalConfirm.addEventListener('click', () => {
+    customModal.style.display = 'none';
+    if (modalResolve) modalResolve(true);
+});
+
+modalCancel.addEventListener('click', () => {
+    customModal.style.display = 'none';
+    if (modalResolve) modalResolve(false);
+});
+
+modalClose.addEventListener('click', () => {
+    customModal.style.display = 'none';
+    if (modalResolve) modalResolve(false);
+});
+
+// Close modal on ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && customModal.style.display === 'flex') {
+        customModal.style.display = 'none';
+        if (modalResolve) modalResolve(false);
+    }
+});
+
+// Close modal on overlay click
+customModal.addEventListener('click', (e) => {
+    if (e.target === customModal) {
+        customModal.style.display = 'none';
+        if (modalResolve) modalResolve(false);
+    }
+});
 
 // ===== FILE SIZE LIMITS =====
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
@@ -408,7 +626,6 @@ async function validateFileSafety(file) {
                 }
                 
                 // Check for PDF magic number "%PDF" (hex: 25 50 44 46)
-                // First 4 bytes: 25 50 44 46 = %PDF
                 const header = Array.from(arr.slice(0, 4))
                     .map(b => b.toString(16).padStart(2, '0'))
                     .join('')
@@ -444,7 +661,7 @@ async function validateFileSafety(file) {
             reject(new Error('Unable to read file for validation'));
         };
         
-        // Only read first 1024 bytes for validation (enough for header check)
+        // Only read first 1024 bytes for validation
         const blobSlice = file.slice(0, Math.min(1024, file.size));
         reader.readAsArrayBuffer(blobSlice);
     });
@@ -974,10 +1191,21 @@ window.addEventListener('beforeunload', (e) => {
         // Save draft automatically
         saveDraft();
         
-        // Show warning to user
+        // Use custom modal instead of browser alert
         e.preventDefault();
-        e.returnValue = 'You have unsaved form data. Are you sure you want to leave?';
-        return e.returnValue;
+        
+        showModal(
+            'Unsaved Changes',
+            'You have unsaved form data. Are you sure you want to leave?',
+            'Leave Page',
+            'Stay'
+        ).then(confirmed => {
+            if (confirmed) {
+                window.location.href = '/'; // Or allow natural navigation
+            }
+        });
+        
+        return false;
     }
 });
 
@@ -999,15 +1227,22 @@ function saveDraft() {
     showSaveStatus('Draft saved', 'info');
 }
 
-function loadDraft() {
+async function loadDraft() {
     const draft = JSON.parse(localStorage.getItem('uploadDraft') || '{}');
     if (draft.timestamp && Date.now() - draft.timestamp < 24 * 60 * 60 * 1000) {
-        if (confirm('Found a saved draft from earlier. Would you like to restore it?')) {
+        // Use custom modal instead of confirm
+        const confirmed = await showModal(
+            'Restore Draft',
+            'Found a saved draft from earlier. Would you like to restore it?',
+            'Restore',
+            'Start New'
+        );
+        
+        if (confirmed) {
             officerEmailInput.value = draft.officerEmail || '';
             evidenceNameInput.value = draft.evidenceName || '';
             categorySelect.value = draft.category || '';
             if (draft.category && indicatorsData[draft.category]) {
-                // Trigger change event to populate indicators
                 categorySelect.dispatchEvent(new Event('change'));
                 setTimeout(() => {
                     indicatorSelect.value = draft.indicator || '';
@@ -1043,12 +1278,16 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 // ===== INITIALIZATION =====
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
     updateConnectionStatus();
     loadIndicators();
     loadHistory();
     checkOfflineQueue();
-    loadDraft();
+    
+    // Load draft with custom modal
+    setTimeout(() => {
+        loadDraft();
+    }, 500);
     
     // Auto-focus on email field
     officerEmailInput.focus();
@@ -1074,4 +1313,4 @@ updateConnectionStatus();
 </script>
 
 </body>
-</html>
+        </html>
