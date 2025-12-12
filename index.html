@@ -244,7 +244,7 @@
 <footer class="site-footer">
   <p>© 2025 Nakuru County Chief Nursing Officer. All Rights Reserved.</p>
   <p style="font-size: 0.85rem; color: #94a3b8;">
-    <i class="fas fa-shield-alt"></i> Secure Evidence Upload System v2.0
+    <i class="fas fa-shield-alt"></i> Secure Evidence Upload System v2.1
     <span id="connectionStatus" style="margin-left: 15px;"></span>
   </p>
 </footer>
@@ -343,6 +343,113 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+// ===== FILE SAFETY CHECK =====
+async function validateFileSafety(file) {
+    return new Promise((resolve, reject) => {
+        // Check file type
+        if (file.type !== 'application/pdf') {
+            reject(new Error('File must be a PDF document'));
+            return;
+        }
+        
+        // Check file extension
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            reject(new Error('File must have .pdf extension'));
+            return;
+        }
+        
+        // Check for suspicious file names
+        const suspiciousPatterns = [
+            /\.exe$/i,
+            /\.js$/i,
+            /\.vbs$/i,
+            /\.bat$/i,
+            /\.cmd$/i,
+            /\.scr$/i,
+            /\.pif$/i,
+            /\.com$/i,
+            /\.jar$/i
+        ];
+        
+        for (const pattern of suspiciousPatterns) {
+            if (pattern.test(file.name)) {
+                reject(new Error('File type not allowed for security reasons'));
+                return;
+            }
+        }
+        
+        // Check for path traversal attempts
+        if (file.name.includes('..') || file.name.includes('/') || file.name.includes('\\')) {
+            reject(new Error('Invalid file name'));
+            return;
+        }
+        
+        // Check file size
+        if (file.size === 0) {
+            reject(new Error('File is empty'));
+            return;
+        }
+        
+        if (file.size > MAX_FILE_SIZE) {
+            reject(new Error(`File size exceeds ${formatBytes(MAX_FILE_SIZE)} limit`));
+            return;
+        }
+        
+        // Validate PDF file signature (magic number)
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const arr = new Uint8Array(e.target.result);
+                
+                // Check if we have enough data
+                if (arr.length < 4) {
+                    reject(new Error('File is too small to be a valid PDF'));
+                    return;
+                }
+                
+                // Check for PDF magic number "%PDF" (hex: 25 50 44 46)
+                // First 4 bytes: 25 50 44 46 = %PDF
+                const header = Array.from(arr.slice(0, 4))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('')
+                    .toLowerCase();
+                
+                // PDF magic number can be: 25504446 (%PDF) or 252150532d (%PDF-)
+                if (header !== '25504446' && header.substring(0, 8) !== '25215053') {
+                    reject(new Error('Invalid PDF file: Not a valid PDF document'));
+                    return;
+                }
+                
+                // Additional check: Look for PDF header in first 1024 bytes
+                const firstKB = new TextDecoder().decode(arr.slice(0, Math.min(arr.length, 1024)));
+                if (!firstKB.includes('%PDF')) {
+                    reject(new Error('Invalid PDF file: Missing PDF header'));
+                    return;
+                }
+                
+                // Check for embedded JavaScript in PDF (potential security risk)
+                if (firstKB.toLowerCase().includes('/javascript') || firstKB.toLowerCase().includes('/js')) {
+                    console.warn('PDF contains JavaScript - potential security risk');
+                    // We'll allow it but log warning
+                }
+                
+                resolve();
+            } catch (error) {
+                console.error('File validation error:', error);
+                reject(new Error('Unable to validate file. Please try a different file.'));
+            }
+        };
+        
+        reader.onerror = () => {
+            reject(new Error('Unable to read file for validation'));
+        };
+        
+        // Only read first 1024 bytes for validation (enough for header check)
+        const blobSlice = file.slice(0, Math.min(1024, file.size));
+        reader.readAsArrayBuffer(blobSlice);
+    });
+}
+
 // ===== NETWORK STATUS =====
 function updateConnectionStatus() {
     if (isOnline) {
@@ -376,7 +483,7 @@ function formatBytes(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function updateFilePreview() {
+async function updateFilePreview() {
     const files = Array.from(filesInput.files);
     
     if (files.length === 0) {
@@ -390,24 +497,29 @@ function updateFilePreview() {
     let totalBytes = 0;
     let hasErrors = false;
     
-    files.forEach((file, index) => {
+    // Validate each file
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         totalBytes += file.size;
         
-        // Validate file size
-        let status = 'valid';
-        let statusText = 'Ready';
-        let icon = 'fa-check-circle';
+        let status = 'pending';
+        let statusText = 'Checking...';
+        let icon = 'fa-spinner fa-spin';
         
-        if (file.size > MAX_FILE_SIZE) {
+        try {
+            await validateFileSafety(file);
+            status = 'valid';
+            statusText = 'Ready';
+            icon = 'fa-check-circle';
+        } catch (error) {
             status = 'error';
-            statusText = 'File too large';
+            statusText = error.message;
             icon = 'fa-exclamation-circle';
             hasErrors = true;
         }
         
         const fileItem = document.createElement('div');
         fileItem.className = `file-item ${status}`;
-        
         fileItem.innerHTML = `
             <i class="fas ${icon}"></i>
             <div class="file-info">
@@ -418,11 +530,21 @@ function updateFilePreview() {
         `;
         
         fileList.appendChild(fileItem);
-    });
+    }
     
     // Validate total size
     if (totalBytes > MAX_TOTAL_SIZE) {
-        showError(`Total file size (${formatBytes(totalBytes)}) exceeds maximum limit of ${formatBytes(MAX_TOTAL_SIZE)}`);
+        const totalErrorItem = document.createElement('div');
+        totalErrorItem.className = 'file-item error';
+        totalErrorItem.innerHTML = `
+            <i class="fas fa-exclamation-circle"></i>
+            <div class="file-info">
+                <span class="file-name">Total Size Exceeded</span>
+                <span class="file-size">${formatBytes(totalBytes)}</span>
+            </div>
+            <span class="file-status error">Maximum total size: ${formatBytes(MAX_TOTAL_SIZE)}</span>
+        `;
+        fileList.appendChild(totalErrorItem);
         hasErrors = true;
     }
     
@@ -432,6 +554,14 @@ function updateFilePreview() {
     // Update live region for screen readers
     if (files.length > 0) {
         liveRegion.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} selected, total size: ${formatBytes(totalBytes)}`;
+    }
+    
+    // Disable upload button if there are errors
+    uploadBtn.disabled = hasErrors;
+    if (hasErrors) {
+        uploadBtn.classList.add('disabled');
+    } else {
+        uploadBtn.classList.remove('disabled');
     }
 }
 
@@ -661,7 +791,9 @@ function resetForm() {
 }
 
 // ===== UPLOAD FUNCTION =====
-uploadBtn.addEventListener("click", () => {
+let isUploading = false; // For emergency save feature
+
+uploadBtn.addEventListener("click", async () => {
   const officerEmail = officerEmailInput.value.trim();
   const evidenceName = evidenceNameInput.value.trim();
   const category = categorySelect.value;
@@ -689,20 +821,33 @@ uploadBtn.addEventListener("click", () => {
     return;
   }
 
-  // Validate file sizes
+  // Validate all files before upload
   let totalSize = 0;
-  for (let file of files) {
-    if (file.size > MAX_FILE_SIZE) {
-      showError(`File "${file.name}" is too large. Maximum size is ${formatBytes(MAX_FILE_SIZE)}`);
-      return;
-    }
+  const validationErrors = [];
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     totalSize += file.size;
+    
+    try {
+      await validateFileSafety(file);
+    } catch (error) {
+      validationErrors.push(`"${file.name}": ${error.message}`);
+    }
+  }
+
+  if (validationErrors.length > 0) {
+    showError("⚠ File validation errors:<br>- " + validationErrors.join("<br>- "));
+    return;
   }
 
   if (totalSize > MAX_TOTAL_SIZE) {
     showError(`Total file size (${formatBytes(totalSize)}) exceeds maximum limit of ${formatBytes(MAX_TOTAL_SIZE)}`);
     return;
   }
+
+  // Set uploading flag for emergency save
+  isUploading = true;
 
   // Disable button and show loading
   uploadBtn.classList.add('loading');
@@ -756,6 +901,7 @@ uploadBtn.addEventListener("click", () => {
       uploadBtn.classList.remove('loading');
       uploadBtn.disabled = false;
       uploadBtn.setAttribute('aria-busy', 'false');
+      isUploading = false;
 
       if (xhr.status >= 200 && xhr.status < 300) {
         const successMessage = `✅ ${files.length} file(s) submitted successfully. 📩 Confirmation sent to: ${officerEmail}`;
@@ -785,6 +931,7 @@ uploadBtn.addEventListener("click", () => {
         const errorMessage = `❌ Upload failed (Status: ${xhr.status}). Please try again.`;
         showError(errorMessage);
         liveRegion.textContent = errorMessage;
+        isUploading = false;
       }
     }, 500);
   };
@@ -794,6 +941,7 @@ uploadBtn.addEventListener("click", () => {
     uploadBtn.classList.remove('loading');
     uploadBtn.disabled = false;
     uploadBtn.setAttribute('aria-busy', 'false');
+    isUploading = false;
     
     const errorMessage = "❌ Network error. Please check your connection and try again.";
     showError(errorMessage);
@@ -805,6 +953,7 @@ uploadBtn.addEventListener("click", () => {
     uploadBtn.classList.remove('loading');
     uploadBtn.disabled = false;
     uploadBtn.setAttribute('aria-busy', 'false');
+    isUploading = false;
     
     const errorMessage = "❌ Upload timeout. Please try again.";
     showError(errorMessage);
@@ -814,31 +963,21 @@ uploadBtn.addEventListener("click", () => {
   xhr.send(formData);
 });
 
-// Prevent form submission
-uploadForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-});
-
-// ===== PWA INSTALLATION =====
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    window.deferredPrompt = e;
+// ===== EMERGENCY SAVE FEATURE =====
+window.addEventListener('beforeunload', (e) => {
+    const officerEmail = officerEmailInput.value.trim();
+    const evidenceName = evidenceNameInput.value.trim();
+    const category = categorySelect.value;
     
-    if (installBtn) {
-        installBtn.style.display = 'flex';
-        installBtn.addEventListener('click', () => {
-            installBtn.style.display = 'none';
-            if (window.deferredPrompt) {
-                window.deferredPrompt.prompt();
-                window.deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted install');
-                        liveRegion.textContent = 'App installation started';
-                    }
-                    window.deferredPrompt = null;
-                });
-            }
-        });
+    // Only warn if there's actual data and not currently uploading
+    if ((officerEmail || evidenceName || category) && !isUploading) {
+        // Save draft automatically
+        saveDraft();
+        
+        // Show warning to user
+        e.preventDefault();
+        e.returnValue = 'You have unsaved form data. Are you sure you want to leave?';
+        return e.returnValue;
     }
 });
 
@@ -880,6 +1019,29 @@ function loadDraft() {
     }
 }
 
+// ===== PWA INSTALLATION =====
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.deferredPrompt = e;
+    
+    if (installBtn) {
+        installBtn.style.display = 'flex';
+        installBtn.addEventListener('click', () => {
+            installBtn.style.display = 'none';
+            if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                window.deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted install');
+                        liveRegion.textContent = 'App installation started';
+                    }
+                    window.deferredPrompt = null;
+                });
+            }
+        });
+    }
+});
+
 // ===== INITIALIZATION =====
 window.addEventListener('load', () => {
     updateConnectionStatus();
@@ -912,4 +1074,4 @@ updateConnectionStatus();
 </script>
 
 </body>
-  </html>
+</html>
