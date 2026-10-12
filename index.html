@@ -2230,6 +2230,31 @@ body { background:#f3f7f5; color:#253b37; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
 }
+
+/* FY 2026/2027 portal visual upgrade */
+.header-title-accent { color:#f2c34e; font-size:clamp(1.05rem,2.05vw,1.55rem); font-weight:800; line-height:1.2; letter-spacing:-.02em; margin:.1rem 0 .25rem; }
+.site-header { position:relative; overflow:hidden; background:linear-gradient(112deg,#063b35 0%,#07564b 66%,#0a3d3b 100%); }
+.site-header::before { content:""; position:absolute; right:-3%; top:-80%; width:36%; height:250%; border:1px solid rgba(240,205,101,.2); border-radius:50%; transform:rotate(-15deg); pointer-events:none; }
+.header-texts h1 { font-size:clamp(1.2rem,2.25vw,1.85rem); }
+.header-subtitle { display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; }
+.header-subtitle span { color:#f0c64c; }
+.portal-highlights { max-width:1400px; margin:1.1rem auto 0; padding:0 clamp(1rem,3vw,2.5rem); display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.85rem; }
+.highlight-card { display:flex; align-items:center; gap:.8rem; min-width:0; padding:1rem; border:1px solid #e1ebe6; border-radius:14px; background:rgba(255,255,255,.96); box-shadow:0 5px 18px rgba(19,61,53,.055); }
+.highlight-icon { flex:0 0 48px; width:48px; height:48px; display:grid; place-items:center; border-radius:50%; font-size:1.25rem; }
+.highlight-icon.mint { background:#d9f6e8; color:#08785d; }
+.highlight-icon.blue { background:#dceeff; color:#1766a8; }
+.highlight-icon.violet { background:#eee4ff; color:#6335bb; }
+.highlight-icon.gold { background:#fff0c9; color:#9a6505; }
+.highlight-card h2 { color:#173b37; font-size:.91rem; line-height:1.25; margin:0 0 .2rem; }
+.highlight-card p { color:#697b76; font-size:.75rem; line-height:1.4; margin:0; }
+.welcome-strip { margin-top:1.1rem; }
+.welcome-icon { background:#e5f4ed; color:#0a6258; }
+#uploadForm { border-radius:0 0 16px 16px; }
+.file-upload-wrapper { background:linear-gradient(180deg,#fbfefc,#f1f8f4); }
+.site-footer { background:linear-gradient(110deg,#052f2b,#064b41); }
+@media (max-width:1050px) { .portal-highlights { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:600px) { .portal-highlights { grid-template-columns:minmax(0,1fr); padding:0 .85rem; gap:.55rem; margin-top:.75rem; } .highlight-card { padding:.8rem; } .highlight-icon { flex-basis:42px; width:42px; height:42px; } .header-subtitle { justify-content:center; } .header-title-accent { font-size:1.08rem; } }
+
 </style>
 
 </head>
@@ -2265,8 +2290,9 @@ body { background:#f3f7f5; color:#253b37; }
   <img src="/images/LOGO.png" alt="Nakuru County Logo" class="logo" />
   <div class="header-texts">
     <p class="header-kicker">COUNTY GOVERNMENT OF NAKURU · HEALTH SERVICES</p>
-    <h1>Nakuru County CCNO Evidence &amp; Performance Reporting Portal</h1>
-    <p class="header-subtitle">Official evidence submission workspace</p>
+    <h1>Chief Nursing Officer (CCNO)</h1>
+    <p class="header-title-accent">Evidence &amp; Performance Reporting Portal</p>
+    <p class="header-subtitle">Program Evidence Submission <span aria-hidden="true">•</span> Financial Year 2026/2027</p>
   </div>
   <div class="header-year" aria-label="Financial year 2026 to 2027"><span>FINANCIAL YEAR</span><strong>2026/2027</strong></div>
 </header>
@@ -2279,12 +2305,19 @@ body { background:#f3f7f5; color:#253b37; }
   </ol>
 </nav>
 
+<section class="portal-highlights" aria-label="Portal benefits">
+  <article class="highlight-card"><span class="highlight-icon mint"><i class="fas fa-file-arrow-up" aria-hidden="true"></i></span><div><h2>Submit Evidence</h2><p>Upload program documents securely</p></div></article>
+  <article class="highlight-card"><span class="highlight-icon blue"><i class="fas fa-envelope-circle-check" aria-hidden="true"></i></span><div><h2>Get Confirmation</h2><p>Receive email confirmation after upload</p></div></article>
+  <article class="highlight-card"><span class="highlight-icon violet"><i class="fas fa-chart-column" aria-hidden="true"></i></span><div><h2>Track Progress</h2><p>Support evidence-based reporting</p></div></article>
+  <article class="highlight-card"><span class="highlight-icon gold"><i class="fas fa-people-group" aria-hidden="true"></i></span><div><h2>Strengthen Services</h2><p>Improve health service accountability</p></div></article>
+</section>
+
 <main class="container" id="main-content">
   <section class="welcome-strip" aria-label="Portal purpose">
     <div class="welcome-icon"><i class="fas fa-file-circle-check"></i></div>
     <div><p class="eyebrow">EVIDENCE SUBMISSION WORKSPACE</p>
-      <h2>Submit program evidence</h2>
-      <p>Upload clear, verifiable PDF documents to support performance monitoring and reporting.</p></div>
+      <h2>Evidence Submission Workspace</h2>
+      <p>Complete the required fields and upload your PDF documents for the 2026/2027 financial year.</p></div>
   </section>
 
   <div class="portal-layout">
