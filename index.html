@@ -1920,6 +1920,72 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 
+
+
+/* ===== Breadcrumb and header alignment fix ===== */
+.breadcrumb {
+  display: block;
+  max-width: 1320px;
+  margin: .65rem auto 0;
+  padding: 0 clamp(1rem, 2vw, 1.5rem);
+  background: transparent;
+}
+.breadcrumb ol {
+  list-style: none !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .55rem;
+  margin: 0;
+  padding: 0;
+}
+.breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  color: #647774;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+.breadcrumb li + li::before {
+  content: "/";
+  color: #a2b3ad;
+  margin-right: .55rem;
+}
+.breadcrumb a {
+  color: #315e56;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.breadcrumb a:hover {
+  color: #0a3d3b;
+  border-bottom-color: #c49a1b;
+}
+.site-header {
+  overflow: hidden;
+  min-height: 116px;
+}
+.site-header .logo {
+  display: block;
+  flex: 0 0 auto;
+  max-width: 130px;
+  max-height: 84px;
+  object-fit: contain;
+}
+.site-header .header-texts {
+  min-width: 0;
+}
+.site-header::after {
+  pointer-events: none;
+}
+@media (max-width: 650px) {
+  .breadcrumb { margin-top: .5rem; }
+  .breadcrumb ol { gap: .35rem; }
+  .breadcrumb li { font-size: .78rem; }
+  .breadcrumb li + li::before { margin-right: .35rem; }
+}
+
 </style>
 <!-- Existing modal-specific styles -->
 <style>
